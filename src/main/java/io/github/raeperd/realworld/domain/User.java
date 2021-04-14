@@ -15,16 +15,17 @@ public class User {
     private String bio;
     private String image;
 
-    protected User() {
+    public static User createNewUser(String username, String email, String password) {
+        return new User(username, email, password);
     }
 
-    public static User fromEmailAndPassword(String email, String password) {
-        return new User(email, password);
-    }
-
-    private User(String email, String password) {
+    private User(String username, String email, String password) {
+        this.username = username;
         this.email = email;
         this.password = password;
+    }
+
+    protected User() {
     }
 
     public String getEmail() {

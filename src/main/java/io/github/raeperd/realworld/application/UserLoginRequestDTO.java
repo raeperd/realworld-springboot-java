@@ -1,6 +1,5 @@
 package io.github.raeperd.realworld.application;
 
-import io.github.raeperd.realworld.domain.User;
 import lombok.Getter;
 
 @Getter
@@ -14,7 +13,4 @@ public class UserLoginRequestDTO {
         this.password = password;
     }
 
-    public User toUser() {
-        return User.fromEmailAndPassword(email, password);
-    }
 }

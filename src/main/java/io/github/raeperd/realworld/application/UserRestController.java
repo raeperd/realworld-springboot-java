@@ -1,26 +1,33 @@
 package io.github.raeperd.realworld.application;
 
-import io.github.raeperd.realworld.domain.UserRepository;
+import io.github.raeperd.realworld.domain.UserService;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
+import static org.springframework.http.HttpStatus.CREATED;
 import static org.springframework.http.ResponseEntity.of;
 
+@RequestMapping("/users")
 @RestController
 public class UserRestController {
 
-    private final UserRepository userRepository;
+    private final UserService userService;
 
-    public UserRestController(UserRepository userRepository) {
-        this.userRepository = userRepository;
+    public UserRestController(UserService userService) {
+        this.userService = userService;
     }
 
-    @PostMapping("/users/login")
+    @PostMapping("/login")
     public ResponseEntity<UserResponseDTO> login(@RequestBody UserLoginRequestDTO loginRequest) {
-        return of(userRepository.findFirstByEmailAndPassword(loginRequest.getEmail(), loginRequest.getPassword())
+        return of(userService.login(loginRequest.getEmail(), loginRequest.getPassword())
                 .map(UserResponseDTO::fromUser));
+    }
+
+    @ResponseStatus(CREATED)
+    @PostMapping
+    public UserResponseDTO postUser(@RequestBody UserPostRequestDTO postRequest) {
+        return UserResponseDTO.fromUser(
+                userService.createUser(postRequest.toUser()));
     }
 
 }
