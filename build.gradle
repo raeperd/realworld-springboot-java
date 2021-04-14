@@ -2,6 +2,7 @@ plugins {
     id 'org.springframework.boot' version '2.4.4'
     id 'io.spring.dependency-management' version '1.0.11.RELEASE'
     id 'java'
+    id 'jacoco'
     id "io.freefair.lombok" version "5.3.3.3"
     id "org.ec4j.editorconfig" version "0.0.3"
     id "org.sonarqube" version "3.1.1"
@@ -22,6 +23,8 @@ dependencies {
     runtimeOnly 'com.h2database:h2'
     testImplementation 'org.springframework.boot:spring-boot-starter-test'
 }
+
+apply from: 'test.gradle'
 
 test {
     useJUnitPlatform()
