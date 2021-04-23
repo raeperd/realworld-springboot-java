@@ -28,6 +28,10 @@ public class User {
     protected User() {
     }
 
+    public long getId() {
+        return id;
+    }
+
     public String getEmail() {
         return email;
     }
