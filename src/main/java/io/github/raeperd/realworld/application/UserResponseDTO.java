@@ -4,7 +4,7 @@ import com.fasterxml.jackson.annotation.JsonTypeInfo;
 import com.fasterxml.jackson.annotation.JsonTypeInfo.As;
 import com.fasterxml.jackson.annotation.JsonTypeInfo.Id;
 import com.fasterxml.jackson.annotation.JsonTypeName;
-import io.github.raeperd.realworld.domain.User;
+import io.github.raeperd.realworld.domain.AuthorizedUser;
 import lombok.Getter;
 
 @JsonTypeName("user")
@@ -18,16 +18,15 @@ public class UserResponseDTO {
     private final String bio;
     private final String image;
 
-    public static UserResponseDTO fromUser(User user) {
+    public static UserResponseDTO fromAuthorizedUser(AuthorizedUser user) {
         return new UserResponseDTO(user);
     }
 
-    private UserResponseDTO(User user) {
+    private UserResponseDTO(AuthorizedUser user) {
         this.email = user.getEmail();
         this.username = user.getUsername();
         this.bio = user.getBio();
         this.image = user.getImage();
-        // TODO: Generate token from user somewhere else
-        this.token = "";
+        this.token = user.getToken();
     }
 }

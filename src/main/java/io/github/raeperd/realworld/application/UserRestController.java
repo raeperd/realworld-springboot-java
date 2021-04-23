@@ -17,17 +17,17 @@ public class UserRestController {
         this.userService = userService;
     }
 
-    @PostMapping("/login")
-    public ResponseEntity<UserResponseDTO> login(@RequestBody UserLoginRequestDTO loginRequest) {
-        return of(userService.login(loginRequest.getEmail(), loginRequest.getPassword())
-                .map(UserResponseDTO::fromUser));
-    }
-
     @ResponseStatus(CREATED)
     @PostMapping
     public UserResponseDTO postUser(@RequestBody UserPostRequestDTO postRequest) {
-        return UserResponseDTO.fromUser(
-                userService.createUser(postRequest.toUser()));
+        return UserResponseDTO.fromAuthorizedUser(
+                userService.signUp(postRequest.toUser()));
+    }
+
+    @PostMapping("/login")
+    public ResponseEntity<UserResponseDTO> login(@RequestBody UserLoginRequestDTO loginRequest) {
+        return of(userService.login(loginRequest.getEmail(), loginRequest.getPassword())
+                .map(UserResponseDTO::fromAuthorizedUser));
     }
 
 }

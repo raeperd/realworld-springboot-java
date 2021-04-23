@@ -10,19 +10,21 @@ public class User {
     private long id;
 
     private String email;
-    private String password;
     private String username;
     private String bio;
     private String image;
+    private String password;
 
-    public static User createNewUser(String username, String email, String password) {
-        return new User(username, email, password);
+    public User(String email, String username, String password) {
+        this(email, username, null, null);
+        this.password = password;
     }
 
-    private User(String username, String email, String password) {
-        this.username = username;
+    protected User(String email, String username, String bio, String image) {
         this.email = email;
-        this.password = password;
+        this.username = username;
+        this.bio = bio;
+        this.image = image;
     }
 
     protected User() {
