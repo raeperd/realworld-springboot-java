@@ -17,7 +17,7 @@ public class UserPostRequestDTO {
     }
 
     public User toUser() {
-        return User.createNewUser(username, email, password);
+        return new User(email, username, password);
     }
 
 }

@@ -5,7 +5,6 @@ import org.junit.jupiter.api.Test;
 
 import java.nio.charset.StandardCharsets;
 
-import static io.github.raeperd.realworld.domain.User.createNewUser;
 import static org.assertj.core.api.Assertions.assertThat;
 
 class HS256JWTServiceTest {
@@ -14,7 +13,7 @@ class HS256JWTServiceTest {
 
     private final JWTService jwtService = new HS256JWTService(SECRET, 1000);
 
-    private final User user = createNewUser("user", "user@email.com", "password");
+    private final User user = new User("user@email.com", "user", "password");
 
     @Test
     void when_generateToken_expect_result_startsWith_encodedHeader() {
