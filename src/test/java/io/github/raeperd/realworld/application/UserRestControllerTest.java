@@ -21,6 +21,7 @@ import static org.mockito.BDDMockito.given;
 import static org.mockito.BDDMockito.then;
 import static org.mockito.Mockito.*;
 import static org.springframework.http.MediaType.APPLICATION_JSON;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
@@ -92,6 +93,23 @@ class UserRestControllerTest {
                 .andExpect(jsonPath("user.bio").hasJsonPath())
                 .andExpect(jsonPath("user.image").hasJsonPath())
                 .andExpect(jsonPath("user.token").hasJsonPath());
+    }
+
+    @Test
+    void when_get_user_without_authentication_token_expect_unAuthorized_status() throws Exception {
+        mockMvc.perform(get("/user"))
+                .andExpect(status().isUnauthorized());
+    }
+
+    @Test
+    void when_get_user_expect_findUserById_called() throws Exception {
+        final var authorizedUser = mockAuthorizedUser();
+        given(userService.findUserById(anyLong())).willReturn(authorizedUser);
+
+        mockMvc.perform(get("/user"))
+                .andExpect(status().isOk());
+
+        then(userService).should(times(1)).findUserById(anyLong());
     }
 
     private AuthorizedUser mockAuthorizedUser() {

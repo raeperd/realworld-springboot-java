@@ -10,7 +10,7 @@ class JWTConfiguration {
     private static final long DURATION_SECONDS = 800;
 
     @Bean
-    JWTService jwtService() {
+    JWTGenerator jwtService() {
         return new HS256JWTService(SECRET, DURATION_SECONDS);
     }
 

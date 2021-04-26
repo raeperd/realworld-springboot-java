@@ -11,7 +11,7 @@ class HS256JWTServiceTest {
 
     private static final String SECRET = "SOME_SECRET";
 
-    private final JWTService jwtService = new HS256JWTService(SECRET, 1000);
+    private final HS256JWTService jwtService = new HS256JWTService(SECRET, 1000);
 
     private final User user = new User("user@email.com", "user", "password");
 
