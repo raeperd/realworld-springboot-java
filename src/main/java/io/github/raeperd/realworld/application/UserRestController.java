@@ -5,8 +5,6 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.Authentication;
 import org.springframework.web.bind.annotation.*;
 
-import java.util.Optional;
-
 import static java.util.Optional.ofNullable;
 import static org.springframework.http.HttpStatus.CREATED;
 import static org.springframework.http.ResponseEntity.of;
@@ -36,9 +34,9 @@ public class UserRestController {
 
     @GetMapping("/user")
     public UserResponseDTO getUser() {
-        return UserResponseDTO.fromAuthorizedUser(
-                userService.findUserById(getCurrentUserId())
-        );
+        return userService.findUserById(getCurrentUserId())
+                .map(UserResponseDTO::fromAuthorizedUser)
+                .orElseThrow(IllegalStateException::new);
     }
 
     private long getCurrentUserId() {

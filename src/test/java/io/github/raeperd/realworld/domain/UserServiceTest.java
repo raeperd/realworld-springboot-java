@@ -9,6 +9,7 @@ import org.mockito.junit.jupiter.MockitoExtension;
 
 import static java.util.Optional.of;
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.mockito.ArgumentMatchers.anyLong;
 import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.BDDMockito.given;
 import static org.mockito.BDDMockito.then;
@@ -66,6 +67,24 @@ class UserServiceTest {
         given(userRepository.findFirstByEmailAndPassword(anyString(), anyString())).willReturn(of(user));
 
         userService.login("email", "password");
+
+        then(jwtGenerator).should(times(1)).generateTokenFromUser(user);
+    }
+
+    @Test
+    void when_findUserById_expect_findById_called(@Mock User user) {
+        given(userRepository.findById(anyLong())).willReturn(of(user));
+
+        userService.findUserById(2);
+
+        then(userRepository).should(times(1)).findById(anyLong());
+    }
+
+    @Test
+    void when_findUserById_expect_generateToken(@Mock User user) {
+        given(userRepository.findById(anyLong())).willReturn(of(user));
+
+        userService.findUserById(2);
 
         then(jwtGenerator).should(times(1)).generateTokenFromUser(user);
     }

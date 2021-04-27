@@ -30,10 +30,10 @@ public class UserService {
         return authorizeUser(userRepository.save(user));
     }
 
-    // TODO
     @Transactional(readOnly = true)
-    public AuthorizedUser findUserById(long id) {
-        return null;
+    public Optional<AuthorizedUser> findUserById(long id) {
+        return userRepository.findById(id)
+                .map(this::authorizeUser);
     }
 
     private AuthorizedUser authorizeUser(User user) {

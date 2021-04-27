@@ -104,7 +104,7 @@ class UserRestControllerTest {
     @Test
     void when_get_user_expect_findUserById_called() throws Exception {
         final var authorizedUser = mockAuthorizedUser();
-        given(userService.findUserById(anyLong())).willReturn(authorizedUser);
+        given(userService.findUserById(anyLong())).willReturn(of(authorizedUser));
 
         mockMvc.perform(get("/user"))
                 .andExpect(status().isOk());
