@@ -7,24 +7,24 @@ import java.nio.charset.StandardCharsets;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
-class HS256JWTServiceTest {
+class JWTGeneratorTest {
 
     private static final String SECRET = "SOME_SECRET";
 
-    private final HS256JWTService jwtService = new HS256JWTService(SECRET, 1000);
+    private final JWTGenerator jwtGenerator = new HS256JWTService(SECRET, 1000);
 
     private final User user = new User("user@email.com", "user", "password");
 
     @Test
     void when_generateToken_expect_result_startsWith_encodedHeader() {
-        final var token = jwtService.generateTokenFromUser(user);
+        final var token = jwtGenerator.generateTokenFromUser(user);
 
         assertThat(token).startsWith(Base64URL.encodeFromString("{\"alg\":\"HS256\",\"type\":\"JWT\"}"));
     }
 
     @Test
     void when_generateToken_return_value_can_be_verified() {
-        final var token = jwtService.generateTokenFromUser(user);
+        final var token = jwtGenerator.generateTokenFromUser(user);
         final var indexOfSignature = token.lastIndexOf('.') + 1;
 
         final var message = token.substring(0, indexOfSignature - 1);

@@ -16,4 +16,9 @@ class Base64URL {
         return Base64.getUrlEncoder().withoutPadding()
                 .encodeToString(rawBytes);
     }
+
+    public static String decodeFromString(String base64URLString) {
+        return new String(Base64.getUrlDecoder()
+                .decode(base64URLString));
+    }
 }
