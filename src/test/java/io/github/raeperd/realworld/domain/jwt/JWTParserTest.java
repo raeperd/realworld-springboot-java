@@ -79,7 +79,22 @@ class JWTParserTest {
     }
 
     private String generateExpiredToken(User user) {
-        return new HS256JWTService("SOME_SECRET", -1)
+        return generateToken(user, -1);
+    }
+
+    private String generateToken(User user, long durationSeconds) {
+        return new HS256JWTService("SOME_SECRET", durationSeconds)
                 .generateTokenFromUser(user);
+    }
+
+    @Test
+    void when_valid_token_expect_return_jwtPayload(@Mock User user) {
+        when(user.getId()).thenReturn(1L);
+        when(user.getEmail()).thenReturn("user@email.com");
+        final var token = generateToken(user, 2L);
+
+        assertThat(jwtParser.validateToken(token))
+                .extracting(JWTPayload::getSubject)
+                .isEqualTo(1L);
     }
 }

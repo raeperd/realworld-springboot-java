@@ -1,6 +1,7 @@
 package io.github.raeperd.realworld.application;
 
 import io.github.raeperd.realworld.domain.UserService;
+import io.github.raeperd.realworld.domain.jwt.JWTPayload;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.Authentication;
 import org.springframework.web.bind.annotation.*;
@@ -40,8 +41,10 @@ public class UserRestController {
     }
 
     private long getCurrentUserId() {
-        return (long) ofNullable(getContext().getAuthentication())
+        return ofNullable(getContext().getAuthentication())
                 .map(Authentication::getPrincipal)
+                .map(JWTPayload.class::cast)
+                .map(JWTPayload::getSubject)
                 .orElseThrow(IllegalStateException::new);
     }
 

@@ -4,6 +4,8 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import io.github.raeperd.realworld.domain.AuthorizedUser;
 import io.github.raeperd.realworld.domain.User;
 import io.github.raeperd.realworld.domain.UserService;
+import io.github.raeperd.realworld.domain.jwt.JWTParser;
+import io.github.raeperd.realworld.domain.jwt.WithMockJWT;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.Mock;
@@ -33,6 +35,8 @@ class UserRestControllerTest {
 
     @MockBean
     private UserService userService;
+    @MockBean
+    private JWTParser jwtParser;
 
     @Autowired
     private MockMvc mockMvc;
@@ -101,6 +105,7 @@ class UserRestControllerTest {
                 .andExpect(status().isUnauthorized());
     }
 
+    @WithMockJWT
     @Test
     void when_get_user_expect_findUserById_called() throws Exception {
         final var authorizedUser = mockAuthorizedUser();

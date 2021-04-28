@@ -1,13 +1,17 @@
 package io.github.raeperd.realworld.domain;
 
 import javax.persistence.Entity;
+import javax.persistence.GeneratedValue;
 import javax.persistence.Id;
+
+import static javax.persistence.GenerationType.IDENTITY;
 
 @Entity
 public class User {
 
+    @GeneratedValue(strategy = IDENTITY)
     @Id
-    private long id;
+    private Long id;
 
     private String email;
     private String username;
@@ -21,6 +25,7 @@ public class User {
     }
 
     protected User(String email, String username, String bio, String image) {
+        this.id = null;
         this.email = email;
         this.username = username;
         this.bio = bio;
@@ -30,7 +35,7 @@ public class User {
     protected User() {
     }
 
-    public long getId() {
+    public Long getId() {
         return id;
     }
 

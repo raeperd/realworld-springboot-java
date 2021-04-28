@@ -9,9 +9,20 @@ class JWTConfiguration {
     private static final String SECRET = "IO_GITHUB_RAEPERD_SOME_SECRET";
     private static final long DURATION_SECONDS = 800;
 
+    private final HS256JWTService jwtService;
+
+    JWTConfiguration() {
+        this.jwtService = new HS256JWTService(SECRET, DURATION_SECONDS);
+    }
+
     @Bean
-    JWTGenerator jwtService() {
-        return new HS256JWTService(SECRET, DURATION_SECONDS);
+    JWTGenerator jwtGenerator() {
+        return jwtService;
+    }
+
+    @Bean
+    JWTParser jwtParser() {
+        return jwtService;
     }
 
 }

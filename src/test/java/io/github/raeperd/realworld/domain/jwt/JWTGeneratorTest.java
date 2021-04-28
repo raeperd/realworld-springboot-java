@@ -1,19 +1,32 @@
 package io.github.raeperd.realworld.domain.jwt;
 
 import io.github.raeperd.realworld.domain.User;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
+import org.mockito.Mock;
+import org.mockito.junit.jupiter.MockitoExtension;
 
 import java.nio.charset.StandardCharsets;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.mockito.Mockito.when;
 
+@ExtendWith(MockitoExtension.class)
 class JWTGeneratorTest {
 
     private static final String SECRET = "SOME_SECRET";
 
     private final JWTGenerator jwtGenerator = new HS256JWTService(SECRET, 1000);
 
-    private final User user = new User("user@email.com", "user", "password");
+    @Mock
+    private User user;
+
+    @BeforeEach
+    void initializeUser() {
+        when(user.getId()).thenReturn(1L);
+        when(user.getEmail()).thenReturn("user@email.com");
+    }
 
     @Test
     void when_generateToken_expect_result_startsWith_encodedHeader() {
