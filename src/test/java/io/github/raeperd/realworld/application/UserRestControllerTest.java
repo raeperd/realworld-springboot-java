@@ -4,6 +4,8 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import io.github.raeperd.realworld.domain.AuthorizedUser;
 import io.github.raeperd.realworld.domain.User;
 import io.github.raeperd.realworld.domain.UserService;
+import io.github.raeperd.realworld.domain.jwt.JWTParser;
+import io.github.raeperd.realworld.domain.jwt.WithMockJWT;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.Mock;
@@ -21,6 +23,7 @@ import static org.mockito.BDDMockito.given;
 import static org.mockito.BDDMockito.then;
 import static org.mockito.Mockito.*;
 import static org.springframework.http.MediaType.APPLICATION_JSON;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
@@ -32,6 +35,8 @@ class UserRestControllerTest {
 
     @MockBean
     private UserService userService;
+    @MockBean
+    private JWTParser jwtParser;
 
     @Autowired
     private MockMvc mockMvc;
@@ -92,6 +97,24 @@ class UserRestControllerTest {
                 .andExpect(jsonPath("user.bio").hasJsonPath())
                 .andExpect(jsonPath("user.image").hasJsonPath())
                 .andExpect(jsonPath("user.token").hasJsonPath());
+    }
+
+    @Test
+    void when_get_user_without_authentication_token_expect_unAuthorized_status() throws Exception {
+        mockMvc.perform(get("/user"))
+                .andExpect(status().isUnauthorized());
+    }
+
+    @WithMockJWT
+    @Test
+    void when_get_user_expect_findUserById_called() throws Exception {
+        final var authorizedUser = mockAuthorizedUser();
+        given(userService.findUserById(anyLong())).willReturn(of(authorizedUser));
+
+        mockMvc.perform(get("/user"))
+                .andExpect(status().isOk());
+
+        then(userService).should(times(1)).findUserById(anyLong());
     }
 
     private AuthorizedUser mockAuthorizedUser() {

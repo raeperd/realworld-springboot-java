@@ -1,7 +1,6 @@
 package io.github.raeperd.realworld.domain;
 
-import io.github.raeperd.realworld.domain.jwt.JWTService;
-import org.assertj.core.api.Assertions;
+import io.github.raeperd.realworld.domain.jwt.JWTGenerator;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -10,6 +9,7 @@ import org.mockito.junit.jupiter.MockitoExtension;
 
 import static java.util.Optional.of;
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.mockito.ArgumentMatchers.anyLong;
 import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.BDDMockito.given;
 import static org.mockito.BDDMockito.then;
@@ -24,11 +24,11 @@ class UserServiceTest {
     @Mock
     private UserRepository userRepository;
     @Mock
-    private JWTService jwtService;
+    private JWTGenerator jwtGenerator;
 
     @BeforeEach
     void initializeService() {
-        this.userService = new UserService(userRepository, jwtService);
+        this.userService = new UserService(userRepository, jwtGenerator);
     }
 
     @Test
@@ -44,7 +44,7 @@ class UserServiceTest {
     void when_signUp_expect_jwtService_to_generateToken(@Mock User user) {
         final var mockedToken = "MOCKED_TOKEN";
         when(userRepository.save(user)).thenReturn(user);
-        when(jwtService.generateTokenFromUser(user)).thenReturn(mockedToken);
+        when(jwtGenerator.generateTokenFromUser(user)).thenReturn(mockedToken);
 
         assertThat(userService.signUp(user))
                 .extracting(AuthorizedUser::getToken)
@@ -68,7 +68,25 @@ class UserServiceTest {
 
         userService.login("email", "password");
 
-        then(jwtService).should(times(1)).generateTokenFromUser(user);
+        then(jwtGenerator).should(times(1)).generateTokenFromUser(user);
+    }
+
+    @Test
+    void when_findUserById_expect_findById_called(@Mock User user) {
+        given(userRepository.findById(anyLong())).willReturn(of(user));
+
+        userService.findUserById(2);
+
+        then(userRepository).should(times(1)).findById(anyLong());
+    }
+
+    @Test
+    void when_findUserById_expect_generateToken(@Mock User user) {
+        given(userRepository.findById(anyLong())).willReturn(of(user));
+
+        userService.findUserById(2);
+
+        then(jwtGenerator).should(times(1)).generateTokenFromUser(user);
     }
 
 }

@@ -1,6 +1,6 @@
 package io.github.raeperd.realworld.domain;
 
-import io.github.raeperd.realworld.domain.jwt.JWTService;
+import io.github.raeperd.realworld.domain.jwt.JWTGenerator;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -12,11 +12,11 @@ import static io.github.raeperd.realworld.domain.AuthorizedUser.fromUser;
 public class UserService {
 
     private final UserRepository userRepository;
-    private final JWTService jwtService;
+    private final JWTGenerator jwtGenerator;
 
-    public UserService(UserRepository userRepository, JWTService jwtService) {
+    public UserService(UserRepository userRepository, JWTGenerator jwtGenerator) {
         this.userRepository = userRepository;
-        this.jwtService = jwtService;
+        this.jwtGenerator = jwtGenerator;
     }
 
     @Transactional(readOnly = true)
@@ -30,8 +30,14 @@ public class UserService {
         return authorizeUser(userRepository.save(user));
     }
 
+    @Transactional(readOnly = true)
+    public Optional<AuthorizedUser> findUserById(long id) {
+        return userRepository.findById(id)
+                .map(this::authorizeUser);
+    }
+
     private AuthorizedUser authorizeUser(User user) {
-        return fromUser(user, jwtService.generateTokenFromUser(user));
+        return fromUser(user, jwtGenerator.generateTokenFromUser(user));
     }
 
 }
