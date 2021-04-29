@@ -7,8 +7,10 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 
+import static java.util.Optional.empty;
 import static java.util.Optional.of;
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.mockito.ArgumentMatchers.anyLong;
 import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.BDDMockito.given;
@@ -87,6 +89,15 @@ class UserServiceTest {
         userService.findUserById(2);
 
         then(jwtGenerator).should(times(1)).generateTokenFromUser(user);
+    }
+
+    @Test
+    void when_findById_return_empty_throw_IllegalStateException(@Mock UserUpdateCommand userUpdateCommand) {
+        given(userRepository.findById(anyLong())).willReturn(empty());
+
+        assertThatThrownBy(() ->
+                userService.updateUser(1L, userUpdateCommand)
+        ).isInstanceOf(IllegalStateException.class);
     }
 
 }

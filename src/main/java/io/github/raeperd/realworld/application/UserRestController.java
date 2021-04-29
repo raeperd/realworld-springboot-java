@@ -40,6 +40,12 @@ public class UserRestController {
                 .orElseThrow(IllegalStateException::new);
     }
 
+    @PutMapping("/user")
+    public UserResponseDTO updateUser(@RequestBody UserUpdateRequestDTO userUpdateRequestDTO) {
+        return UserResponseDTO.fromAuthorizedUser(
+                userService.updateUser(getCurrentUserId(), userUpdateRequestDTO.toUpdateCommand()));
+    }
+
     private long getCurrentUserId() {
         return ofNullable(getContext().getAuthentication())
                 .map(Authentication::getPrincipal)
