@@ -1,4 +1,4 @@
-package io.github.raeperd.realworld.domain;
+package io.github.raeperd.realworld.domain.user;
 
 import io.github.raeperd.realworld.domain.jwt.JWTGenerator;
 import org.springframework.stereotype.Service;
@@ -6,17 +6,19 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.util.Optional;
 
-import static io.github.raeperd.realworld.domain.AuthorizedUser.fromUser;
+import static io.github.raeperd.realworld.domain.user.AuthorizedUser.fromUser;
 
 @Service
 public class UserService {
 
     private final UserRepository userRepository;
     private final JWTGenerator jwtGenerator;
+    private final UserContextHolder userContextHolder;
 
-    public UserService(UserRepository userRepository, JWTGenerator jwtGenerator) {
+    public UserService(UserRepository userRepository, JWTGenerator jwtGenerator, UserContextHolder userContextHolder) {
         this.userRepository = userRepository;
         this.jwtGenerator = jwtGenerator;
+        this.userContextHolder = userContextHolder;
     }
 
     @Transactional(readOnly = true)
@@ -31,14 +33,15 @@ public class UserService {
     }
 
     @Transactional(readOnly = true)
-    public Optional<AuthorizedUser> findUserById(long id) {
-        return userRepository.findById(id)
-                .map(this::authorizeUser);
+    public AuthorizedUser refreshUserAuthorization() {
+        return userContextHolder.getCurrentUser()
+                .map(this::authorizeUser)
+                .orElseThrow(IllegalStateException::new);
     }
 
     @Transactional
-    public AuthorizedUser updateUser(long id, UserUpdateCommand updateCommand) {
-        return userRepository.findById(id)
+    public AuthorizedUser updateUser(UserUpdateCommand updateCommand) {
+        return userContextHolder.getCurrentUser()
                 .map(user -> user.updateUser(updateCommand))
                 .map(userRepository::save)
                 .map(this::authorizeUser)

@@ -1,8 +1,10 @@
-package io.github.raeperd.realworld.domain;
+package io.github.raeperd.realworld.domain.user;
 
-import javax.persistence.Entity;
-import javax.persistence.GeneratedValue;
-import javax.persistence.Id;
+import io.github.raeperd.realworld.domain.user.profile.Profile;
+
+import javax.persistence.*;
+import java.util.ArrayList;
+import java.util.Collection;
 
 import static javax.persistence.GenerationType.IDENTITY;
 
@@ -12,6 +14,10 @@ public class User {
     @GeneratedValue(strategy = IDENTITY)
     @Id
     private Long id;
+
+    @OneToMany
+    @JoinColumn(name = "id")
+    private Collection<User> followingUsers = new ArrayList<>();
 
     private String email;
     private String username;
@@ -24,7 +30,7 @@ public class User {
         this.password = password;
     }
 
-    protected User(String email, String username, String bio, String image) {
+    User(String email, String username, String bio, String image) {
         this.id = null;
         this.email = email;
         this.username = username;
@@ -42,6 +48,15 @@ public class User {
         updateCommand.getImageToUpdate().ifPresent(imageToUpdate -> this.image = imageToUpdate);
         updateCommand.getPasswordToUpdate().ifPresent(passwordToUpdate -> this.password = passwordToUpdate);
         return this;
+    }
+
+    public void followUser(User user) {
+        followingUsers.add(user);
+    }
+
+    public Profile viewProfile(User otherUser) {
+        return new Profile(otherUser.getUsername(), otherUser.getBio(), otherUser.getImage(),
+                followingUsers.contains(otherUser));
     }
 
     public Long getId() {

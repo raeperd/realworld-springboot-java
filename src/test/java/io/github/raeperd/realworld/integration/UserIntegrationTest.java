@@ -1,10 +1,10 @@
 package io.github.raeperd.realworld.integration;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
-import io.github.raeperd.realworld.application.UserLoginRequestDTO;
-import io.github.raeperd.realworld.application.UserPostRequestDTO;
-import io.github.raeperd.realworld.application.UserUpdateRequestDTO;
-import io.github.raeperd.realworld.domain.User;
+import io.github.raeperd.realworld.application.user.UserLoginRequestDTO;
+import io.github.raeperd.realworld.application.user.UserPostRequestDTO;
+import io.github.raeperd.realworld.application.user.UserUpdateRequestDTO;
+import io.github.raeperd.realworld.domain.user.User;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Tag;
 import org.junit.jupiter.api.Test;

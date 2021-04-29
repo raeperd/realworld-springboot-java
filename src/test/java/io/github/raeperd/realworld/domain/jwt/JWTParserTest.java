@@ -1,6 +1,6 @@
 package io.github.raeperd.realworld.domain.jwt;
 
-import io.github.raeperd.realworld.domain.User;
+import io.github.raeperd.realworld.domain.user.User;
 import io.github.raeperd.realworld.domain.jwt.exception.InvalidJWTException;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -94,7 +94,7 @@ class JWTParserTest {
         final var token = generateToken(user, 2L);
 
         assertThat(jwtParser.validateToken(token))
-                .extracting(JWTPayload::getSubject)
+                .extracting(JWTPayload::getUserId)
                 .isEqualTo(1L);
     }
 }

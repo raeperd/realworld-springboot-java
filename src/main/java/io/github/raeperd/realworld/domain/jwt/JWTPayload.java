@@ -1,6 +1,6 @@
 package io.github.raeperd.realworld.domain.jwt;
 
-import io.github.raeperd.realworld.domain.User;
+import io.github.raeperd.realworld.domain.user.User;
 
 import static java.lang.String.format;
 import static java.time.Instant.now;
@@ -25,7 +25,7 @@ public class JWTPayload {
         return iat < now().getEpochSecond();
     }
 
-    public long getSubject() {
+    public long getUserId() {
         return sub;
     }
 

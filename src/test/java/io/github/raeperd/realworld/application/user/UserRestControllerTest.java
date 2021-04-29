@@ -1,9 +1,13 @@
-package io.github.raeperd.realworld.application;
+package io.github.raeperd.realworld.application.user;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
-import io.github.raeperd.realworld.domain.AuthorizedUser;
-import io.github.raeperd.realworld.domain.User;
-import io.github.raeperd.realworld.domain.UserService;
+import io.github.raeperd.realworld.application.user.UserLoginRequestDTO;
+import io.github.raeperd.realworld.application.user.UserPostRequestDTO;
+import io.github.raeperd.realworld.application.user.UserRestController;
+import io.github.raeperd.realworld.domain.user.AuthorizedUser;
+import io.github.raeperd.realworld.domain.user.User;
+import io.github.raeperd.realworld.domain.user.UserContextHolder;
+import io.github.raeperd.realworld.domain.user.UserService;
 import io.github.raeperd.realworld.domain.jwt.JWTParser;
 import io.github.raeperd.realworld.domain.jwt.WithMockJWT;
 import org.junit.jupiter.api.Test;
@@ -37,6 +41,8 @@ class UserRestControllerTest {
     private UserService userService;
     @MockBean
     private JWTParser jwtParser;
+    @MockBean
+    private UserContextHolder userContextHolder;
 
     @Autowired
     private MockMvc mockMvc;
@@ -107,14 +113,14 @@ class UserRestControllerTest {
 
     @WithMockJWT
     @Test
-    void when_get_user_expect_findUserById_called() throws Exception {
+    void when_get_user_expect_refreshUserAuthorization_called() throws Exception {
         final var authorizedUser = mockAuthorizedUser();
-        given(userService.findUserById(anyLong())).willReturn(of(authorizedUser));
+        given(userService.refreshUserAuthorization()).willReturn(authorizedUser);
 
         mockMvc.perform(get("/user"))
                 .andExpect(status().isOk());
 
-        then(userService).should(times(1)).findUserById(anyLong());
+        then(userService).should(times(1)).refreshUserAuthorization();
     }
 
     private AuthorizedUser mockAuthorizedUser() {

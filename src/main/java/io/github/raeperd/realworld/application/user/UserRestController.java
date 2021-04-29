@@ -1,15 +1,11 @@
-package io.github.raeperd.realworld.application;
+package io.github.raeperd.realworld.application.user;
 
-import io.github.raeperd.realworld.domain.UserService;
-import io.github.raeperd.realworld.domain.jwt.JWTPayload;
+import io.github.raeperd.realworld.domain.user.UserService;
 import org.springframework.http.ResponseEntity;
-import org.springframework.security.core.Authentication;
 import org.springframework.web.bind.annotation.*;
 
-import static java.util.Optional.ofNullable;
 import static org.springframework.http.HttpStatus.CREATED;
 import static org.springframework.http.ResponseEntity.of;
-import static org.springframework.security.core.context.SecurityContextHolder.getContext;
 
 @RestController
 public class UserRestController {
@@ -35,23 +31,15 @@ public class UserRestController {
 
     @GetMapping("/user")
     public UserResponseDTO getUser() {
-        return userService.findUserById(getCurrentUserId())
-                .map(UserResponseDTO::fromAuthorizedUser)
-                .orElseThrow(IllegalStateException::new);
+        return UserResponseDTO.fromAuthorizedUser(
+                userService.refreshUserAuthorization()
+        );
     }
 
     @PutMapping("/user")
     public UserResponseDTO updateUser(@RequestBody UserUpdateRequestDTO userUpdateRequestDTO) {
         return UserResponseDTO.fromAuthorizedUser(
-                userService.updateUser(getCurrentUserId(), userUpdateRequestDTO.toUpdateCommand()));
-    }
-
-    private long getCurrentUserId() {
-        return ofNullable(getContext().getAuthentication())
-                .map(Authentication::getPrincipal)
-                .map(JWTPayload.class::cast)
-                .map(JWTPayload::getSubject)
-                .orElseThrow(IllegalStateException::new);
+                userService.updateUser(userUpdateRequestDTO.toUpdateCommand()));
     }
 
 }
