@@ -35,6 +35,15 @@ public class User {
     protected User() {
     }
 
+    User updateUser(UserUpdateCommand updateCommand) {
+        updateCommand.getEmailToUpdate().ifPresent(emailToUpdate -> this.email = emailToUpdate);
+        updateCommand.getUsernameToUpdate().ifPresent(usernameToUpdate -> this.username = usernameToUpdate);
+        updateCommand.getBioToUpdate().ifPresent(bioToUpdate -> this.bio = bioToUpdate);
+        updateCommand.getImageToUpdate().ifPresent(imageToUpdate -> this.image = imageToUpdate);
+        updateCommand.getPasswordToUpdate().ifPresent(passwordToUpdate -> this.password = passwordToUpdate);
+        return this;
+    }
+
     public Long getId() {
         return id;
     }

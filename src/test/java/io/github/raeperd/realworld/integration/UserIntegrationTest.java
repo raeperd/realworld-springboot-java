@@ -3,6 +3,7 @@ package io.github.raeperd.realworld.integration;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import io.github.raeperd.realworld.application.UserLoginRequestDTO;
 import io.github.raeperd.realworld.application.UserPostRequestDTO;
+import io.github.raeperd.realworld.application.UserUpdateRequestDTO;
 import io.github.raeperd.realworld.domain.User;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Tag;
@@ -18,8 +19,7 @@ import static org.hamcrest.Matchers.is;
 import static org.junit.jupiter.api.TestInstance.Lifecycle.PER_CLASS;
 import static org.springframework.http.HttpHeaders.AUTHORIZATION;
 import static org.springframework.http.MediaType.APPLICATION_JSON;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
@@ -103,4 +103,28 @@ class UserIntegrationTest {
         return objectMapper.readTree(responseBodyAsString)
                 .get("user").get("token").textValue();
     }
+
+    @Test
+    void when_put_user_after_login_expect_return_user_response() throws Exception {
+        final var originalEmail = savedUser.getEmail();
+        final var emailToUpdate = "updatedUser@email.com";
+        final var token = loginAndRememberToken();
+
+        updateUserEmail(emailToUpdate, token)
+                .andExpect(jsonPath("user").exists())
+                .andExpect(jsonPath("user.email", is(emailToUpdate)));
+
+        updateUserEmail(originalEmail, token);
+    }
+
+    private ResultActions updateUserEmail(String emailToUpdate, String token) throws Exception {
+        final var userUpdateDTO = new UserUpdateRequestDTO(emailToUpdate, null, null, null, null);
+        return mockMvc.perform(put("/user")
+                .accept(APPLICATION_JSON).contentType(APPLICATION_JSON)
+                .header(AUTHORIZATION, "Token " + token)
+                .content(objectMapper.writeValueAsString(userUpdateDTO)))
+                .andExpect(status().isOk());
+    }
+
+
 }

@@ -36,6 +36,15 @@ public class UserService {
                 .map(this::authorizeUser);
     }
 
+    @Transactional
+    public AuthorizedUser updateUser(long id, UserUpdateCommand updateCommand) {
+        return userRepository.findById(id)
+                .map(user -> user.updateUser(updateCommand))
+                .map(userRepository::save)
+                .map(this::authorizeUser)
+                .orElseThrow(IllegalStateException::new);
+    }
+
     private AuthorizedUser authorizeUser(User user) {
         return fromUser(user, jwtGenerator.generateTokenFromUser(user));
     }
