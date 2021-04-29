@@ -1,6 +1,6 @@
-package io.github.raeperd.realworld.application.profile;
+package io.github.raeperd.realworld.application.user.profile;
 
-import io.github.raeperd.realworld.domain.ProfileService;
+import io.github.raeperd.realworld.domain.user.profile.ProfileService;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;

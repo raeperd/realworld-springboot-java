@@ -1,6 +1,6 @@
-package io.github.raeperd.realworld.application;
+package io.github.raeperd.realworld.application.user;
 
-import io.github.raeperd.realworld.domain.UserService;
+import io.github.raeperd.realworld.domain.user.UserService;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 

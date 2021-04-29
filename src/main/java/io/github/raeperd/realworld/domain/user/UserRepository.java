@@ -1,4 +1,4 @@
-package io.github.raeperd.realworld.domain;
+package io.github.raeperd.realworld.domain.user;
 
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Repository;

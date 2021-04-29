@@ -1,5 +1,7 @@
-package io.github.raeperd.realworld.domain;
+package io.github.raeperd.realworld.domain.user;
 
+import io.github.raeperd.realworld.domain.user.User;
+import io.github.raeperd.realworld.domain.user.UserUpdateCommand;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.Arguments;

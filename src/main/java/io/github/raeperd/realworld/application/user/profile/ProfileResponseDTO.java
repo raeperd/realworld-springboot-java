@@ -1,8 +1,8 @@
-package io.github.raeperd.realworld.application.profile;
+package io.github.raeperd.realworld.application.user.profile;
 
 import com.fasterxml.jackson.annotation.JsonTypeInfo;
 import com.fasterxml.jackson.annotation.JsonTypeName;
-import io.github.raeperd.realworld.domain.Profile;
+import io.github.raeperd.realworld.domain.user.profile.Profile;
 import lombok.Getter;
 
 import static com.fasterxml.jackson.annotation.JsonTypeInfo.As.WRAPPER_OBJECT;

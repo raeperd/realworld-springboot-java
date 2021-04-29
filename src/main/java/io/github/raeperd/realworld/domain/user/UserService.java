@@ -1,4 +1,4 @@
-package io.github.raeperd.realworld.domain;
+package io.github.raeperd.realworld.domain.user;
 
 import io.github.raeperd.realworld.domain.jwt.JWTGenerator;
 import org.springframework.stereotype.Service;
@@ -6,7 +6,7 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.util.Optional;
 
-import static io.github.raeperd.realworld.domain.AuthorizedUser.fromUser;
+import static io.github.raeperd.realworld.domain.user.AuthorizedUser.fromUser;
 
 @Service
 public class UserService {

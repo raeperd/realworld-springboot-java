@@ -1,5 +1,7 @@
-package io.github.raeperd.realworld.domain;
+package io.github.raeperd.realworld.domain.user.profile;
 
+import io.github.raeperd.realworld.domain.user.UserContextHolder;
+import io.github.raeperd.realworld.domain.user.UserRepository;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 

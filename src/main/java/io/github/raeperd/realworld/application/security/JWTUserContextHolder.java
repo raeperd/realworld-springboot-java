@@ -1,9 +1,9 @@
 package io.github.raeperd.realworld.application.security;
 
 import io.github.raeperd.realworld.application.security.JWTAuthenticationFilter.JWTAuthenticationToken;
-import io.github.raeperd.realworld.domain.User;
-import io.github.raeperd.realworld.domain.UserContextHolder;
-import io.github.raeperd.realworld.domain.UserRepository;
+import io.github.raeperd.realworld.domain.user.User;
+import io.github.raeperd.realworld.domain.user.UserContextHolder;
+import io.github.raeperd.realworld.domain.user.UserRepository;
 import io.github.raeperd.realworld.domain.jwt.JWTPayload;
 
 import java.util.Optional;

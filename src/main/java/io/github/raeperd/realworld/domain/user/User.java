@@ -1,4 +1,6 @@
-package io.github.raeperd.realworld.domain;
+package io.github.raeperd.realworld.domain.user;
+
+import io.github.raeperd.realworld.domain.user.profile.Profile;
 
 import javax.persistence.*;
 import java.util.ArrayList;

@@ -1,10 +1,10 @@
-package io.github.raeperd.realworld.application;
+package io.github.raeperd.realworld.application.user;
 
 import com.fasterxml.jackson.annotation.JsonTypeInfo;
 import com.fasterxml.jackson.annotation.JsonTypeInfo.As;
 import com.fasterxml.jackson.annotation.JsonTypeInfo.Id;
 import com.fasterxml.jackson.annotation.JsonTypeName;
-import io.github.raeperd.realworld.domain.AuthorizedUser;
+import io.github.raeperd.realworld.domain.user.AuthorizedUser;
 import lombok.Getter;
 
 @JsonTypeName("user")

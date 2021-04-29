@@ -1,4 +1,4 @@
-package io.github.raeperd.realworld.domain;
+package io.github.raeperd.realworld.domain.user.profile;
 
 public class Profile {
 

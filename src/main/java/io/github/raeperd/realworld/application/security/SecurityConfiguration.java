@@ -1,7 +1,7 @@
 package io.github.raeperd.realworld.application.security;
 
-import io.github.raeperd.realworld.domain.UserContextHolder;
-import io.github.raeperd.realworld.domain.UserRepository;
+import io.github.raeperd.realworld.domain.user.UserContextHolder;
+import io.github.raeperd.realworld.domain.user.UserRepository;
 import io.github.raeperd.realworld.domain.jwt.JWTParser;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;

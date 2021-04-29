@@ -3,7 +3,7 @@ package io.github.raeperd.realworld.domain.jwt;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.module.paramnames.ParameterNamesModule;
-import io.github.raeperd.realworld.domain.User;
+import io.github.raeperd.realworld.domain.user.User;
 import io.github.raeperd.realworld.domain.jwt.exception.InvalidJWTException;
 
 import java.nio.charset.StandardCharsets;

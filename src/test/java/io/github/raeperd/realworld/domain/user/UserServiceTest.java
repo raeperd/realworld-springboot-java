@@ -1,6 +1,7 @@
-package io.github.raeperd.realworld.domain;
+package io.github.raeperd.realworld.domain.user;
 
 import io.github.raeperd.realworld.domain.jwt.JWTGenerator;
+import io.github.raeperd.realworld.domain.user.*;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
