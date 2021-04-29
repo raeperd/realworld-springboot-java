@@ -23,16 +23,6 @@ class UserTest {
         assertThat(childUser).isInstanceOf(User.class);
     }
 
-    @MethodSource("provideUserUpdateCommandWithName")
-    @ParameterizedTest
-    void when_update_user_with_single_property_expect_return_user_updated(UserUpdateCommand command, String property) {
-        final var user = new User("some-email", "some-username", "some-password");
-
-        user.updateUser(command);
-
-        assertThat(user).hasFieldOrPropertyWithValue(property, "updated-" + property);
-    }
-
     @Test
     void when_update_all_possible_field_expect_return_user_updated() {
         final var user = new User(null, null, null);
@@ -46,7 +36,17 @@ class UserTest {
 
         user.updateUser(updateCommand);
 
-        assertThat(user).hasNoNullFieldsOrPropertiesExcept("id");
+        assertThat(user).hasNoNullFieldsOrPropertiesExcept("id", "followingUsers");
+    }
+
+    @MethodSource("provideUserUpdateCommandWithName")
+    @ParameterizedTest
+    void when_update_user_with_single_property_expect_return_user_updated(UserUpdateCommand command, String property) {
+        final var user = new User("some-email", "some-username", "some-password");
+
+        user.updateUser(command);
+
+        assertThat(user).hasFieldOrPropertyWithValue(property, "updated-" + property);
     }
 
     private static Stream<Arguments> provideUserUpdateCommandWithName() {
@@ -57,5 +57,15 @@ class UserTest {
                 Arguments.of(new UserUpdateCommand.Builder().image("updated-image").build(), "image"),
                 Arguments.of(new UserUpdateCommand.Builder().password("updated-password").build(), "password")
         );
+    }
+
+    @Test
+    void when_follow_user_expect_following_profile() {
+        final var user = new User("some-email", "some-username", "some-password");
+        final var celebrity = new User("other-email", "celeb", "some-password");
+
+        user.followUser(celebrity);
+
+        assertThat(user.viewProfile(celebrity).isFollowing()).isTrue();
     }
 }
