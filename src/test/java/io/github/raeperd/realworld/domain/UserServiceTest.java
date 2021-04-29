@@ -11,7 +11,6 @@ import static java.util.Optional.empty;
 import static java.util.Optional.of;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
-import static org.mockito.ArgumentMatchers.anyLong;
 import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.BDDMockito.given;
 import static org.mockito.BDDMockito.then;
@@ -27,10 +26,12 @@ class UserServiceTest {
     private UserRepository userRepository;
     @Mock
     private JWTGenerator jwtGenerator;
+    @Mock
+    private UserContextHolder userContextHolder;
 
     @BeforeEach
     void initializeService() {
-        this.userService = new UserService(userRepository, jwtGenerator);
+        this.userService = new UserService(userRepository, jwtGenerator, userContextHolder);
     }
 
     @Test
@@ -74,29 +75,11 @@ class UserServiceTest {
     }
 
     @Test
-    void when_findUserById_expect_findById_called(@Mock User user) {
-        given(userRepository.findById(anyLong())).willReturn(of(user));
-
-        userService.findUserById(2);
-
-        then(userRepository).should(times(1)).findById(anyLong());
-    }
-
-    @Test
-    void when_findUserById_expect_generateToken(@Mock User user) {
-        given(userRepository.findById(anyLong())).willReturn(of(user));
-
-        userService.findUserById(2);
-
-        then(jwtGenerator).should(times(1)).generateTokenFromUser(user);
-    }
-
-    @Test
-    void when_findById_return_empty_throw_IllegalStateException(@Mock UserUpdateCommand userUpdateCommand) {
-        given(userRepository.findById(anyLong())).willReturn(empty());
+    void when_getCurrentUser_return_empty_throw_IllegalStateException(@Mock UserUpdateCommand userUpdateCommand) {
+        when(userContextHolder.getCurrentUser()).thenReturn(empty());
 
         assertThatThrownBy(() ->
-                userService.updateUser(1L, userUpdateCommand)
+                userService.updateUser(userUpdateCommand)
         ).isInstanceOf(IllegalStateException.class);
     }
 

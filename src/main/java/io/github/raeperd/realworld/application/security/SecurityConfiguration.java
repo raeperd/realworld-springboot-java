@@ -1,5 +1,7 @@
 package io.github.raeperd.realworld.application.security;
 
+import io.github.raeperd.realworld.domain.UserContextHolder;
+import io.github.raeperd.realworld.domain.UserRepository;
 import io.github.raeperd.realworld.domain.jwt.JWTParser;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -36,4 +38,10 @@ public class SecurityConfiguration extends WebSecurityConfigurerAdapter {
     public JWTAuthenticationFilter jwtAuthenticationFilter() {
         return new JWTAuthenticationFilter(jwtParser);
     }
+
+    @Bean
+    public UserContextHolder userContextHolder(UserRepository userRepository) {
+        return new JWTUserContextHolder(userRepository);
+    }
+
 }

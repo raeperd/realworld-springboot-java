@@ -25,7 +25,7 @@ public class JWTPayload {
         return iat < now().getEpochSecond();
     }
 
-    public long getSubject() {
+    public long getUserId() {
         return sub;
     }
 

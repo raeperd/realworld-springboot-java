@@ -94,7 +94,7 @@ class JWTParserTest {
         final var token = generateToken(user, 2L);
 
         assertThat(jwtParser.validateToken(token))
-                .extracting(JWTPayload::getSubject)
+                .extracting(JWTPayload::getUserId)
                 .isEqualTo(1L);
     }
 }

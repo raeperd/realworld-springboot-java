@@ -6,7 +6,6 @@ import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.test.context.support.WithSecurityContextFactory;
 
 import static org.mockito.Mockito.mock;
-import static org.mockito.Mockito.when;
 
 final class WIthMockJWTSecurityContextFactory implements WithSecurityContextFactory<WithMockJWT> {
 
@@ -18,9 +17,7 @@ final class WIthMockJWTSecurityContextFactory implements WithSecurityContextFact
     }
 
     private JWTPayload mockJWTPayload(WithMockJWT withMockJWT) {
-        final var mockJWTPayload = mock(JWTPayload.class);
-        when(mockJWTPayload.getSubject()).thenReturn(withMockJWT.userId());
-        return mockJWTPayload;
+        return mock(JWTPayload.class);
     }
 
     private static class MockJWTAuthenticationToken extends AbstractAuthenticationToken {
