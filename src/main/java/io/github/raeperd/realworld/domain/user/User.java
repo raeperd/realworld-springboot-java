@@ -57,6 +57,11 @@ public class User {
         return this;
     }
 
+    public User unfollowUser(User user) {
+        followingUsers.removeIf(followed -> followed.getId().equals(user.getId()));
+        return this;
+    }
+
     public Profile viewProfile(User otherUser) {
         return new Profile(otherUser.getUsername(), otherUser.getBio(), otherUser.getImage(),
                 followingUsers.contains(otherUser));

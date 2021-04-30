@@ -3,6 +3,8 @@ package io.github.raeperd.realworld.application.user.profile;
 import io.github.raeperd.realworld.domain.user.profile.ProfileService;
 import org.springframework.web.bind.annotation.*;
 
+import static io.github.raeperd.realworld.application.user.profile.ProfileResponseDTO.fromProfile;
+
 @RequestMapping("/profiles")
 @RestController
 public class ProfileRestController {
@@ -15,13 +17,19 @@ public class ProfileRestController {
 
     @GetMapping("/{username}")
     public ProfileResponseDTO getProfile(@PathVariable String username) {
-        return ProfileResponseDTO.fromProfile(
+        return fromProfile(
                 profileService.viewProfileByUsername(username));
     }
 
     @PostMapping("/{username}/follow")
     public ProfileResponseDTO followUser(@PathVariable String username) {
-        return ProfileResponseDTO.fromProfile(
+        return fromProfile(
                 profileService.followByUsername(username));
+    }
+
+    @DeleteMapping("/{username}/unfollow")
+    public ProfileResponseDTO unfollowUser(@PathVariable String username) {
+        return fromProfile(
+                profileService.unfollowByUsername(username));
     }
 }
