@@ -24,4 +24,14 @@ public class ProfileService {
                 .map(currentUser -> currentUser.viewProfile(userToSee))
                 .orElseThrow(IllegalStateException::new);
     }
+
+    @Transactional
+    public Profile followByUsername(String username) {
+        final var userToFollow = userRepository.findFirstByUsername(username)
+                .orElseThrow(IllegalArgumentException::new);
+        return userContextHolder.getCurrentUser()
+                .map(currentUser -> currentUser.followUser(userToFollow))
+                .map(currentUser -> currentUser.viewProfile(userToFollow))
+                .orElseThrow(IllegalStateException::new);
+    }
 }

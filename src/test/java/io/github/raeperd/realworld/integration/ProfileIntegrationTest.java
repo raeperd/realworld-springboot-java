@@ -35,10 +35,16 @@ class ProfileIntegrationTest {
     private ObjectMapper objectMapper;
 
     private final User savedUser = new User("raeperd@gmail.com", "raeperd", "password");
+    private final User celebrity = new User("celeb@gmail.com", "celebrity", "psasword");
 
     @BeforeAll
     void initializeUser() throws Exception {
-        final var userPostRequestDTO = new UserPostRequestDTO(savedUser.getUsername(), savedUser.getEmail(), "password");
+        saveUser(savedUser);
+        saveUser(celebrity);
+    }
+
+    private void saveUser(User user) throws Exception {
+        final var userPostRequestDTO = new UserPostRequestDTO(user.getUsername(), user.getEmail(), "password");
 
         mockMvc.perform(post("/users")
                 .accept(APPLICATION_JSON).contentType(APPLICATION_JSON)
@@ -58,6 +64,23 @@ class ProfileIntegrationTest {
                 .andExpect(jsonPath("profile.bio").hasJsonPath())
                 .andExpect(jsonPath("profile.image").hasJsonPath())
                 .andExpect(jsonPath("profile.following").isBoolean());
+    }
+
+    @Test
+    void when_follow_user_expect_return_following_profile() throws Exception {
+        final var token = loginAndRememberToken();
+
+        mockMvc.perform(post("/profiles/{username}/follow", celebrity.getUsername())
+                .header(AUTHORIZATION, "Token " + token))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("profile").exists())
+                .andExpect(jsonPath("profile.following", is(true)));
+
+        mockMvc.perform(get("/profiles/{username}", celebrity.getUsername())
+                .header(AUTHORIZATION, "Token " + token))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("profile").exists())
+                .andExpect(jsonPath("profile.following", is(true)));
     }
 
     private ResultActions login() throws Exception {
