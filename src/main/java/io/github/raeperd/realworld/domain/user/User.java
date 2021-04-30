@@ -2,7 +2,10 @@ package io.github.raeperd.realworld.domain.user;
 
 import io.github.raeperd.realworld.domain.user.profile.Profile;
 
-import javax.persistence.*;
+import javax.persistence.Entity;
+import javax.persistence.GeneratedValue;
+import javax.persistence.Id;
+import javax.persistence.OneToMany;
 import java.util.ArrayList;
 import java.util.Collection;
 
@@ -16,7 +19,6 @@ public class User {
     private Long id;
 
     @OneToMany
-    @JoinColumn(name = "id")
     private Collection<User> followingUsers = new ArrayList<>();
 
     private String email;
@@ -50,8 +52,9 @@ public class User {
         return this;
     }
 
-    public void followUser(User user) {
+    public User followUser(User user) {
         followingUsers.add(user);
+        return this;
     }
 
     public Profile viewProfile(User otherUser) {

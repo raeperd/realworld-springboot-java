@@ -1,15 +1,15 @@
-package io.github.raeperd.realworld.application.user;
+package io.github.raeperd.realworld.application;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import io.github.raeperd.realworld.application.user.UserLoginRequestDTO;
 import io.github.raeperd.realworld.application.user.UserPostRequestDTO;
 import io.github.raeperd.realworld.application.user.UserRestController;
+import io.github.raeperd.realworld.domain.jwt.JWTParser;
+import io.github.raeperd.realworld.domain.jwt.WithMockJWT;
 import io.github.raeperd.realworld.domain.user.AuthorizedUser;
 import io.github.raeperd.realworld.domain.user.User;
 import io.github.raeperd.realworld.domain.user.UserContextHolder;
 import io.github.raeperd.realworld.domain.user.UserService;
-import io.github.raeperd.realworld.domain.jwt.JWTParser;
-import io.github.raeperd.realworld.domain.jwt.WithMockJWT;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.Mock;
