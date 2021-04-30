@@ -18,8 +18,7 @@ import static org.hamcrest.Matchers.is;
 import static org.junit.jupiter.api.TestInstance.Lifecycle.PER_CLASS;
 import static org.springframework.http.HttpHeaders.AUTHORIZATION;
 import static org.springframework.http.MediaType.APPLICATION_JSON;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
@@ -81,6 +80,12 @@ class ProfileIntegrationTest {
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("profile").exists())
                 .andExpect(jsonPath("profile.following", is(true)));
+
+        mockMvc.perform(delete("/profiles/{username}/unfollow", celebrity.getUsername())
+                .header(AUTHORIZATION, "Token " + token))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("profile").exists())
+                .andExpect(jsonPath("profile.following", is(false)));
     }
 
     private ResultActions login() throws Exception {

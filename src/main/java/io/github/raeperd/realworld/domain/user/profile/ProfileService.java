@@ -34,4 +34,14 @@ public class ProfileService {
                 .map(currentUser -> currentUser.viewProfile(userToFollow))
                 .orElseThrow(IllegalStateException::new);
     }
+
+    @Transactional
+    public Profile unfollowByUsername(String username) {
+        final var userToUnfollow = userRepository.findFirstByUsername(username)
+                .orElseThrow(IllegalArgumentException::new);
+        return userContextHolder.getCurrentUser()
+                .map(currentUser -> currentUser.unfollowUser(userToUnfollow))
+                .map(currentUser -> currentUser.viewProfile(userToUnfollow))
+                .orElseThrow(IllegalStateException::new);
+    }
 }
