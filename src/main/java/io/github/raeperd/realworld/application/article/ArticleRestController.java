@@ -34,4 +34,9 @@ public class ArticleRestController {
         return fromArticleAndProfile(article, authorProfile);
     }
 
+    @DeleteMapping("/{slug}")
+    public void deleteArticleBySlug(@PathVariable String slug) {
+        articleService.deleteArticleBySlug(slug);
+    }
+
 }

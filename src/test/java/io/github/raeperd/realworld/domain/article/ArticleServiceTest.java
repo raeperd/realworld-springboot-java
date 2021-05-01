@@ -1,63 +1,77 @@
 package io.github.raeperd.realworld.domain.article;
 
 import io.github.raeperd.realworld.domain.user.User;
+import io.github.raeperd.realworld.domain.user.UserContextHolder;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
+import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.test.autoconfigure.orm.jpa.DataJpaTest;
-import org.springframework.boot.test.mock.mockito.MockBean;
-import org.springframework.data.domain.AuditorAware;
-import org.springframework.data.jpa.repository.config.EnableJpaAuditing;
 
-import java.util.Set;
+import java.util.NoSuchElementException;
 
-import static java.util.Collections.emptySet;
 import static java.util.Optional.empty;
-import static org.assertj.core.api.Assertions.assertThat;
+import static java.util.Optional.of;
+import static org.assertj.core.api.Assertions.assertThatThrownBy;
+import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.BDDMockito.given;
 import static org.mockito.BDDMockito.then;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.when;
 
 @ExtendWith(MockitoExtension.class)
-@EnableJpaAuditing
-@DataJpaTest
 class ArticleServiceTest {
 
-    @Autowired
-    private ArticleRepository repository;
-    @MockBean
-    private AuditorAware<User> articleAuthorProvider;
+    @Mock
+    private UserContextHolder userContextHolder;
+    @Mock
+    private ArticleRepository articleRepository;
 
     private ArticleService articleService;
 
     @BeforeEach
     void initializeService() {
-        articleService = new ArticleService(repository);
+        articleService = new ArticleService(articleRepository, userContextHolder);
     }
 
     @Test
-    void when_save_article_expect_author_from_auditor() {
-        given(articleAuthorProvider.getCurrentAuditor()).willReturn(empty());
-        final var article = new Article("title", "description", "body", emptySet());
+    void when_current_user_empty_expect_IllegalStateException() {
+        when(userContextHolder.getCurrentUser()).thenReturn(empty());
 
-        articleService.createArticle(article);
-
-        then(articleAuthorProvider).should(times(1)).getCurrentAuditor();
+        assertThatThrownBy(() ->
+                articleService.deleteArticleBySlug("slug")
+        ).isInstanceOf(IllegalStateException.class);
     }
 
     @Test
-    void when_save_same_tag_from_another_article_expect_saved_successfully() {
-        when(articleAuthorProvider.getCurrentAuditor()).thenReturn(empty());
-        final var tagToSave = new Tag("some-tag");
-        final var article = new Article("title", "description", "body", Set.of(tagToSave, new Tag("other-tag")));
-        final var articleWithSameTag = new Article("title", "description", "body", Set.of(tagToSave));
+    void when_delete_by_not_exists_slug_expect_NoSuchElementException(@Mock User currentUser) {
+        when(userContextHolder.getCurrentUser()).thenReturn(of(currentUser));
+        when(articleRepository.findFirstByTitle(anyString())).thenReturn(empty());
 
-        articleService.createArticle(article);
+        assertThatThrownBy(() ->
+                articleService.deleteArticleBySlug("slug")
+        ).isInstanceOf(NoSuchElementException.class);
+    }
 
-        assertThat(articleService.createArticle(articleWithSameTag).getTagList())
-                .contains(tagToSave);
+    @Test
+    void when_delete_by_slug_from_reader_expect_IllegalAccessError(@Mock User currentUser, @Mock Article article, @Mock User author) {
+        when(userContextHolder.getCurrentUser()).thenReturn(of(currentUser));
+        when(articleRepository.findFirstByTitle(anyString())).thenReturn(of(article));
+        when(article.getAuthor()).thenReturn(author);
+
+        assertThatThrownBy(() ->
+                articleService.deleteArticleBySlug("some-slug")
+        ).isInstanceOf(IllegalAccessError.class);
+    }
+
+    @Test
+    void when_delete_by_slug_from_author_expect_to_delete(@Mock User currentUser, @Mock Article article) {
+        given(userContextHolder.getCurrentUser()).willReturn(of(currentUser));
+        given(articleRepository.findFirstByTitle(anyString())).willReturn(of(article));
+        given(article.getAuthor()).willReturn(currentUser);
+
+        articleService.deleteArticleBySlug("some-slug");
+
+        then(articleRepository).should(times(1)).delete(article);
     }
 }
