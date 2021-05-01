@@ -447,4 +447,4 @@ No additional parameters required
 
 `GET /api/tags`
 
-# No authentication required, returns a [List of Tags](#list-of-tags)
+No authentication required, returns a [List of Tags](#list-of-tags)
