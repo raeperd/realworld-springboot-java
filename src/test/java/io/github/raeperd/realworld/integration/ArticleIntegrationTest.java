@@ -7,6 +7,7 @@ import io.github.raeperd.realworld.application.user.UserPostRequestDTO;
 import io.github.raeperd.realworld.domain.user.User;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Tag;
+import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.TestInstance;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.Arguments;
@@ -17,10 +18,17 @@ import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.ResultActions;
 
+import java.util.regex.Pattern;
 import java.util.stream.Stream;
 
+import static java.time.LocalDateTime.now;
+import static java.time.ZoneOffset.UTC;
+import static java.time.format.DateTimeFormatter.ISO_ZONED_DATE_TIME;
 import static java.util.Collections.emptySet;
+import static java.util.regex.Pattern.compile;
+import static org.assertj.core.api.Assertions.assertThat;
 import static org.hamcrest.Matchers.is;
+import static org.hamcrest.Matchers.matchesPattern;
 import static org.junit.jupiter.api.TestInstance.Lifecycle.PER_CLASS;
 import static org.springframework.http.HttpHeaders.AUTHORIZATION;
 import static org.springframework.http.MediaType.APPLICATION_JSON;
@@ -33,6 +41,8 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 @TestInstance(PER_CLASS)
 @SpringBootTest
 class ArticleIntegrationTest {
+
+    private static final Pattern ISO_8601_PATTERN = compile("^\\d{4,}-[01]\\d-[0-3]\\dT[0-2]\\d:[0-5]\\d:[0-5]\\d.\\d+(?:[+-][0-2]\\d:[0-5]\\d|Z)$");
 
     @Autowired
     private MockMvc mockMvc;
@@ -67,8 +77,15 @@ class ArticleIntegrationTest {
                 .andExpect(jsonPath("article.body", is("body")))
                 .andExpect(jsonPath("article.tagList").isArray())
                 .andExpect(jsonPath("article.slug").hasJsonPath())
+                .andExpect(jsonPath("article.createdAt", matchesPattern(ISO_8601_PATTERN)))
+                .andExpect(jsonPath("article.updatedAt", matchesPattern(ISO_8601_PATTERN)))
                 .andExpect(jsonPath("article.favorited").isBoolean())
                 .andExpect(jsonPath("article.favoritesCount").isNumber());
+    }
+
+    @Test
+    void iso_8601_pattern_matching() {
+        assertThat(ISO_8601_PATTERN.matcher(now().atOffset(UTC).format(ISO_ZONED_DATE_TIME)).matches()).isTrue();
     }
 
     private String loginAndRememberToken() throws Exception {

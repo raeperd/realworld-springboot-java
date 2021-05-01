@@ -2,9 +2,12 @@ package io.github.raeperd.realworld.domain.article;
 
 import io.github.raeperd.realworld.domain.user.User;
 import org.springframework.data.annotation.CreatedBy;
+import org.springframework.data.annotation.CreatedDate;
+import org.springframework.data.annotation.LastModifiedDate;
 import org.springframework.data.jpa.domain.support.AuditingEntityListener;
 
 import javax.persistence.*;
+import java.time.LocalDateTime;
 import java.util.Collection;
 import java.util.HashSet;
 import java.util.Set;
@@ -28,6 +31,12 @@ public class Article {
     @OneToMany(fetch = FetchType.LAZY)
     private final Collection<Tag> tagList = new HashSet<>();
 
+    @CreatedDate
+    private LocalDateTime createdAt;
+
+    @LastModifiedDate
+    private LocalDateTime updatedAt;
+
     private String title;
     private String description;
     private String body;
@@ -44,6 +53,14 @@ public class Article {
         this.description = description;
         this.body = body;
         this.tagList.addAll(tagList);
+    }
+
+    public LocalDateTime getCreatedAt() {
+        return createdAt;
+    }
+
+    public LocalDateTime getUpdatedAt() {
+        return updatedAt;
     }
 
     public String getTitle() {
