@@ -11,14 +11,14 @@ import static com.fasterxml.jackson.annotation.JsonTypeInfo.Id.NAME;
 @JsonTypeName("profile")
 @JsonTypeInfo(include = WRAPPER_OBJECT, use = NAME)
 @Getter
-class ProfileResponseDTO {
+public class ProfileResponseDTO {
 
     private final String username;
     private final String bio;
     private final String image;
     private final boolean following;
 
-    static ProfileResponseDTO fromProfile(Profile profile) {
+    public static ProfileResponseDTO fromProfile(Profile profile) {
         return new ProfileResponseDTO(profile.getUsername(), profile.getBio(), profile.getImage(), profile.isFollowing());
     }
 

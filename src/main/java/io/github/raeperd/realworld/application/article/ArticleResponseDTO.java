@@ -4,6 +4,7 @@ import com.fasterxml.jackson.annotation.JsonTypeInfo;
 import com.fasterxml.jackson.annotation.JsonTypeName;
 import io.github.raeperd.realworld.domain.article.Article;
 import io.github.raeperd.realworld.domain.article.Tag;
+import io.github.raeperd.realworld.domain.user.profile.Profile;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
@@ -30,10 +31,12 @@ public class ArticleResponseDTO {
     private final Set<Tag> tagList;
     private final ZonedDateTime createdAt;
     private final ZonedDateTime updatedAt;
+    // TODO: Create ProfileDTO for unwrapped Profile view
+    private final Profile author;
     private final boolean favorited;
     private final int favoritesCount;
 
-    public static ArticleResponseDTO fromArticle(Article article) {
+    public static ArticleResponseDTO fromArticleAndProfile(Article article, Profile profile) {
         return ArticleResponseDTO.builder()
                 .title(article.getTitle())
                 .description(article.getDescription())
@@ -41,6 +44,7 @@ public class ArticleResponseDTO {
                 .tagList(new HashSet<>(article.getTagList()))
                 .createdAt(article.getCreatedAt().atZone(of("Asia/Seoul")))
                 .updatedAt(article.getUpdatedAt().atZone(of("Asia/Seoul")))
+                .author(profile)
                 .build();
     }
 

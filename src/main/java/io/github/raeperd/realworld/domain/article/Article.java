@@ -55,6 +55,10 @@ public class Article {
         this.tagList.addAll(tagList);
     }
 
+    public User getAuthor() {
+        return author;
+    }
+
     public LocalDateTime getCreatedAt() {
         return createdAt;
     }

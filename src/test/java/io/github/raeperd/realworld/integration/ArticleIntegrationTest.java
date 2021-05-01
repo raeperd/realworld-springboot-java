@@ -72,6 +72,8 @@ class ArticleIntegrationTest {
                 .content(objectMapper.writeValueAsString(requestDTO)))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("article").exists())
+                .andExpect(jsonPath("article.author").exists())
+                .andExpect(jsonPath("article.author.username").exists())
                 .andExpect(jsonPath("article.title", is("title")))
                 .andExpect(jsonPath("article.description", is("description")))
                 .andExpect(jsonPath("article.body", is("body")))
