@@ -65,6 +65,8 @@ class ArticleIntegrationTest {
                 .andExpect(jsonPath("article.title", is(requestDTO.getTitle())))
                 .andExpect(jsonPath("article.description", is(requestDTO.getDescription())))
                 .andExpect(jsonPath("article.body", is(requestDTO.getBody())));
+
+        deleteArticleBySlug(requestDTO.getTitle());
     }
 
     private Stream<Arguments> provideArticlePostRequests() {
@@ -96,6 +98,12 @@ class ArticleIntegrationTest {
                 .andExpect(jsonPath("article.favoritesCount").isNumber());
     }
 
+    private ResultActions deleteArticleBySlug(String slug) throws Exception {
+        return mockMvc.perform(delete("/articles/{slug}", slug)
+                .accept(APPLICATION_JSON)
+                .header(AUTHORIZATION, "Token " + userToken));
+    }
+
     @Test
     void when_get_article_expect_return_valid_response() throws Exception {
         final var requestDTO = new ArticlePostRequestDTO("title-to-get", "description", "body", emptySet());
@@ -106,6 +114,7 @@ class ArticleIntegrationTest {
                 .header(AUTHORIZATION, "Token " + userToken));
 
         andExpectValidArticleResponse(resultActions);
+        deleteArticleBySlug(requestDTO.getTitle());
     }
 
     @Test
@@ -113,9 +122,7 @@ class ArticleIntegrationTest {
         final var requestDTO = new ArticlePostRequestDTO("title-to-delete", "description", "body", emptySet());
         createArticle(requestDTO);
 
-        mockMvc.perform(delete("/articles/{slug}", requestDTO.getTitle())
-                .accept(APPLICATION_JSON)
-                .header(AUTHORIZATION, "Token " + userToken))
+        deleteArticleBySlug(requestDTO.getTitle())
                 .andExpect(status().isOk());
     }
 
