@@ -1,7 +1,5 @@
 package io.github.raeperd.realworld.domain.user;
 
-import io.github.raeperd.realworld.domain.user.User;
-import io.github.raeperd.realworld.domain.user.UserUpdateCommand;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.Arguments;
@@ -70,4 +68,12 @@ class UserTest {
 
         assertThat(user.viewProfile(celebrity).isFollowing()).isTrue();
     }
+
+    @Test
+    void same_user_generate_same_hash_code() {
+        final var user = new User("some-email", "some-username", "some-password");
+
+        assertThat(user).hasSameHashCodeAs(user);
+    }
+
 }

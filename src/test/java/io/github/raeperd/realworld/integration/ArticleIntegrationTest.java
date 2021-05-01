@@ -28,8 +28,7 @@ import static org.hamcrest.Matchers.matchesPattern;
 import static org.junit.jupiter.api.TestInstance.Lifecycle.PER_CLASS;
 import static org.springframework.http.HttpHeaders.AUTHORIZATION;
 import static org.springframework.http.MediaType.APPLICATION_JSON;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
@@ -66,6 +65,14 @@ class ArticleIntegrationTest {
                 .andExpect(jsonPath("article.title", is(requestDTO.getTitle())))
                 .andExpect(jsonPath("article.description", is(requestDTO.getDescription())))
                 .andExpect(jsonPath("article.body", is(requestDTO.getBody())));
+
+        deleteArticleBySlug(requestDTO.getTitle());
+    }
+
+    private Stream<Arguments> provideArticlePostRequests() {
+        return Stream.of(
+                Arguments.of(new ArticlePostRequestDTO("null-tag-title", "description", "body", null)),
+                Arguments.of(new ArticlePostRequestDTO("empty-tag-title", "description", "body", emptySet())));
     }
 
     private ResultActions createArticle(ArticlePostRequestDTO postRequestDTO) throws Exception {
@@ -91,6 +98,12 @@ class ArticleIntegrationTest {
                 .andExpect(jsonPath("article.favoritesCount").isNumber());
     }
 
+    private ResultActions deleteArticleBySlug(String slug) throws Exception {
+        return mockMvc.perform(delete("/articles/{slug}", slug)
+                .accept(APPLICATION_JSON)
+                .header(AUTHORIZATION, "Token " + userToken));
+    }
+
     @Test
     void when_get_article_expect_return_valid_response() throws Exception {
         final var requestDTO = new ArticlePostRequestDTO("title-to-get", "description", "body", emptySet());
@@ -101,12 +114,16 @@ class ArticleIntegrationTest {
                 .header(AUTHORIZATION, "Token " + userToken));
 
         andExpectValidArticleResponse(resultActions);
+        deleteArticleBySlug(requestDTO.getTitle());
     }
 
-    private Stream<Arguments> provideArticlePostRequests() {
-        return Stream.of(
-                Arguments.of(new ArticlePostRequestDTO("null-tag-title", "description", "body", null)),
-                Arguments.of(new ArticlePostRequestDTO("empty-tag-title", "description", "body", emptySet())));
+    @Test
+    void when_delete_article_expect_status_ok() throws Exception {
+        final var requestDTO = new ArticlePostRequestDTO("title-to-delete", "description", "body", emptySet());
+        createArticle(requestDTO);
+
+        deleteArticleBySlug(requestDTO.getTitle())
+                .andExpect(status().isOk());
     }
 
 }
