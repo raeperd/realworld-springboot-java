@@ -19,7 +19,7 @@ public class User {
     private Long id;
 
     @OneToMany
-    private Collection<User> followingUsers = new ArrayList<>();
+    private final Collection<User> followingUsers = new ArrayList<>();
 
     private String email;
     private String username;
