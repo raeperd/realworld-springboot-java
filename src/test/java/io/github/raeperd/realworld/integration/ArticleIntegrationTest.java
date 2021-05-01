@@ -14,23 +14,21 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.test.web.servlet.MockMvc;
+import org.springframework.test.web.servlet.ResultActions;
 
 import java.util.regex.Pattern;
 import java.util.stream.Stream;
 
 import static io.github.raeperd.realworld.integration.IntegrationTestUtils.loginAndRememberToken;
 import static io.github.raeperd.realworld.integration.IntegrationTestUtils.saveUser;
-import static java.time.LocalDateTime.now;
-import static java.time.ZoneOffset.UTC;
-import static java.time.format.DateTimeFormatter.ISO_ZONED_DATE_TIME;
 import static java.util.Collections.emptySet;
 import static java.util.regex.Pattern.compile;
-import static org.assertj.core.api.Assertions.assertThat;
 import static org.hamcrest.Matchers.is;
 import static org.hamcrest.Matchers.matchesPattern;
 import static org.junit.jupiter.api.TestInstance.Lifecycle.PER_CLASS;
 import static org.springframework.http.HttpHeaders.AUTHORIZATION;
 import static org.springframework.http.MediaType.APPLICATION_JSON;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
@@ -48,31 +46,45 @@ class ArticleIntegrationTest {
     @Autowired
     private ObjectMapper objectMapper;
 
+    private String userToken;
+
     private final User userSaved = new User("raeperd@gmail.com", "raeperd", "password");
 
     @BeforeAll
     void initializeUser() throws Exception {
         saveUser(mockMvc, userSaved).andExpect(status().isCreated());
+        userToken = loginAndRememberToken(mockMvc, userSaved);
     }
 
     @MethodSource("provideArticlePostRequests")
     @ParameterizedTest
     void when_create_article_expect_return_valid_response(ArticlePostRequestDTO requestDTO) throws Exception {
-        final var token = loginAndRememberToken(mockMvc, userSaved);
+        final var resultActions = createArticle(requestDTO);
 
-        mockMvc.perform(post("/articles")
+        andExpectValidArticleResponse(resultActions)
+                .andExpect(jsonPath("article.slug", is(requestDTO.getTitle())))
+                .andExpect(jsonPath("article.title", is(requestDTO.getTitle())))
+                .andExpect(jsonPath("article.description", is(requestDTO.getDescription())))
+                .andExpect(jsonPath("article.body", is(requestDTO.getBody())));
+    }
+
+    private ResultActions createArticle(ArticlePostRequestDTO postRequestDTO) throws Exception {
+        return mockMvc.perform(post("/articles")
                 .accept(APPLICATION_JSON).contentType(APPLICATION_JSON)
-                .header(AUTHORIZATION, "Token " + token)
-                .content(objectMapper.writeValueAsString(requestDTO)))
-                .andExpect(status().isOk())
+                .header(AUTHORIZATION, "Token " + userToken)
+                .content(objectMapper.writeValueAsString(postRequestDTO)));
+    }
+
+    private ResultActions andExpectValidArticleResponse(ResultActions resultActions) throws Exception {
+        return resultActions.andExpect(status().isOk())
                 .andExpect(jsonPath("article").exists())
                 .andExpect(jsonPath("article.author").exists())
                 .andExpect(jsonPath("article.author.username").exists())
-                .andExpect(jsonPath("article.title", is("title")))
-                .andExpect(jsonPath("article.description", is("description")))
-                .andExpect(jsonPath("article.body", is("body")))
+                .andExpect(jsonPath("article.slug").isString())
+                .andExpect(jsonPath("article.title").isString())
+                .andExpect(jsonPath("article.description").isString())
+                .andExpect(jsonPath("article.body").isString())
                 .andExpect(jsonPath("article.tagList").isArray())
-                .andExpect(jsonPath("article.slug").hasJsonPath())
                 .andExpect(jsonPath("article.createdAt", matchesPattern(ISO_8601_PATTERN)))
                 .andExpect(jsonPath("article.updatedAt", matchesPattern(ISO_8601_PATTERN)))
                 .andExpect(jsonPath("article.favorited").isBoolean())
@@ -80,14 +92,21 @@ class ArticleIntegrationTest {
     }
 
     @Test
-    void iso_8601_pattern_matching() {
-        assertThat(ISO_8601_PATTERN.matcher(now().atOffset(UTC).format(ISO_ZONED_DATE_TIME)).matches()).isTrue();
+    void when_get_article_expect_return_valid_response() throws Exception {
+        final var requestDTO = new ArticlePostRequestDTO("title-to-get", "description", "body", emptySet());
+        createArticle(requestDTO);
+
+        final var resultActions = mockMvc.perform(get("/articles/{slug}", requestDTO.getTitle())
+                .accept(APPLICATION_JSON)
+                .header(AUTHORIZATION, "Token " + userToken));
+
+        andExpectValidArticleResponse(resultActions);
     }
 
     private Stream<Arguments> provideArticlePostRequests() {
         return Stream.of(
-                Arguments.of(new ArticlePostRequestDTO("title", "description", "body", null)),
-                Arguments.of(new ArticlePostRequestDTO("title", "description", "body", emptySet())));
+                Arguments.of(new ArticlePostRequestDTO("null-tag-title", "description", "body", null)),
+                Arguments.of(new ArticlePostRequestDTO("empty-tag-title", "description", "body", emptySet())));
     }
 
 }

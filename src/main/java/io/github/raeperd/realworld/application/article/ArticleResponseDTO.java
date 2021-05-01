@@ -38,6 +38,7 @@ public class ArticleResponseDTO {
 
     public static ArticleResponseDTO fromArticleAndProfile(Article article, Profile profile) {
         return ArticleResponseDTO.builder()
+                .slug(article.getTitle())
                 .title(article.getTitle())
                 .description(article.getDescription())
                 .body(article.getBody())

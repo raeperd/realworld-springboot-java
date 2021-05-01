@@ -2,10 +2,9 @@ package io.github.raeperd.realworld.application.article;
 
 import io.github.raeperd.realworld.domain.article.ArticleService;
 import io.github.raeperd.realworld.domain.user.profile.ProfileService;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
+
+import java.util.NoSuchElementException;
 
 import static io.github.raeperd.realworld.application.article.ArticleResponseDTO.fromArticleAndProfile;
 
@@ -27,4 +26,12 @@ public class ArticleRestController {
         final var authorProfile = profileService.viewProfileByUsername(article.getAuthor().getUsername());
         return fromArticleAndProfile(article, authorProfile);
     }
+
+    @GetMapping("/{slug}")
+    public ArticleResponseDTO getArticleBySlug(@PathVariable String slug) {
+        final var article = articleService.findArticleBySlug(slug).orElseThrow(NoSuchElementException::new);
+        final var authorProfile = profileService.viewProfileByUsername(article.getAuthor().getUsername());
+        return fromArticleAndProfile(article, authorProfile);
+    }
+
 }
