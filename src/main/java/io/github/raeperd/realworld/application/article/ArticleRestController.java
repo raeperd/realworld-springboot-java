@@ -34,6 +34,13 @@ public class ArticleRestController {
         return fromArticleAndProfile(article, authorProfile);
     }
 
+    @PutMapping("/{slug}")
+    public ArticleResponseDTO putArticleBySlug(@PathVariable String slug, @RequestBody ArticlePutRequestDTO articlePutRequestDTO) {
+        final var articleUpdated = articleService.updateArticle(slug, articlePutRequestDTO.toUpdateCommand());
+        final var authorProfile = profileService.viewProfileByUsername(articleUpdated.getAuthor().getUsername());
+        return fromArticleAndProfile(articleUpdated, authorProfile);
+    }
+
     @DeleteMapping("/{slug}")
     public void deleteArticleBySlug(@PathVariable String slug) {
         articleService.deleteArticleBySlug(slug);

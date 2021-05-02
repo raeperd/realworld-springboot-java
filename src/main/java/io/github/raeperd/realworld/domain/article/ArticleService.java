@@ -31,6 +31,13 @@ public class ArticleService {
     }
 
     @Transactional
+    public Article updateArticle(String slug, ArticleUpdateCommand articleUpdateCommand) {
+        return articleRepository.findFirstByTitle(slug)
+                .map(article -> article.updateArticle(articleUpdateCommand))
+                .orElseThrow(NoSuchElementException::new);
+    }
+
+    @Transactional
     public void deleteArticleBySlug(String slug) {
         final var currentUser = userContextHolder.getCurrentUser()
                 .orElseThrow(IllegalStateException::new);

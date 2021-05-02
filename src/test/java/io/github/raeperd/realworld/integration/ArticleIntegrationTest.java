@@ -2,6 +2,7 @@ package io.github.raeperd.realworld.integration;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import io.github.raeperd.realworld.application.article.ArticlePostRequestDTO;
+import io.github.raeperd.realworld.application.article.ArticlePutRequestDTO;
 import io.github.raeperd.realworld.domain.user.User;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Tag;
@@ -115,6 +116,22 @@ class ArticleIntegrationTest {
 
         andExpectValidArticleResponse(resultActions);
         deleteArticleBySlug(requestDTO.getTitle());
+    }
+
+    @Test
+    void when_put_article_expect_return_valid_response() throws Exception {
+        final var articlePostRequestDTO = new ArticlePostRequestDTO("title-to-update", "description", "body", emptySet());
+        createArticle(articlePostRequestDTO);
+        final var articlePutRequestDTO = new ArticlePutRequestDTO("title-updated", null, null);
+
+        final var resultActions = mockMvc.perform(put("/articles/{slug}", articlePostRequestDTO.getTitle())
+                .accept(APPLICATION_JSON).contentType(APPLICATION_JSON)
+                .header(AUTHORIZATION, "Token " + userToken)
+                .content(objectMapper.writeValueAsString(articlePutRequestDTO)));
+
+        andExpectValidArticleResponse(resultActions);
+        deleteArticleBySlug(articlePutRequestDTO.getTitle())
+                .andExpect(status().isOk());
     }
 
     @Test
