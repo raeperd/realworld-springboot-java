@@ -55,6 +55,13 @@ public class Article {
         this.tagList.addAll(tagList);
     }
 
+    Article updateArticle(ArticleUpdateCommand updateCommand) {
+        updateCommand.getTitleToUpdate().ifPresent(titleToUpdate -> this.title = titleToUpdate);
+        updateCommand.getDescriptionToUpdate().ifPresent(descriptionToUpdate -> this.description = descriptionToUpdate);
+        updateCommand.getBodyToUpdate().ifPresent(bodyToUpdate -> this.body = bodyToUpdate);
+        return this;
+    }
+
     public User getAuthor() {
         return author;
     }
