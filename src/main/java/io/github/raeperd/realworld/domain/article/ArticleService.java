@@ -1,13 +1,18 @@
 package io.github.raeperd.realworld.domain.article;
 
 import io.github.raeperd.realworld.domain.user.UserContextHolder;
+import io.github.raeperd.realworld.domain.user.profile.Profile;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.util.Map;
 import java.util.NoSuchElementException;
 import java.util.Optional;
+import java.util.stream.Collectors;
 
 import static java.lang.String.format;
+import static java.util.function.Function.identity;
 
 @Service
 public class ArticleService {
@@ -23,6 +28,14 @@ public class ArticleService {
     @Transactional
     public Article createArticle(Article article) {
         return articleRepository.save(article);
+    }
+
+    @Transactional(readOnly = true)
+    public Map<Article, Profile> getAllArticles(Pageable pageable) {
+        final var currentUser = userContextHolder.getCurrentUser()
+                .orElseThrow(IllegalStateException::new);
+        return articleRepository.findAll(pageable).stream()
+                .collect(Collectors.toMap(identity(), article -> currentUser.viewProfile(article.getAuthor())));
     }
 
     @Transactional

@@ -61,7 +61,7 @@ class ArticleIntegrationTest {
     void when_create_article_expect_return_valid_response(ArticlePostRequestDTO requestDTO) throws Exception {
         final var resultActions = createArticle(requestDTO);
 
-        andExpectValidArticleResponse(resultActions)
+        andExpectValidSingleArticleResponse(resultActions)
                 .andExpect(jsonPath("article.slug", is(requestDTO.getTitle())))
                 .andExpect(jsonPath("article.title", is(requestDTO.getTitle())))
                 .andExpect(jsonPath("article.description", is(requestDTO.getDescription())))
@@ -83,20 +83,24 @@ class ArticleIntegrationTest {
                 .content(objectMapper.writeValueAsString(postRequestDTO)));
     }
 
-    private ResultActions andExpectValidArticleResponse(ResultActions resultActions) throws Exception {
+    private ResultActions andExpectValidSingleArticleResponse(ResultActions resultActions) throws Exception {
+        return andExpectValidArticleResponse(resultActions, "article");
+    }
+
+    private ResultActions andExpectValidArticleResponse(ResultActions resultActions, String articlePath) throws Exception {
         return resultActions.andExpect(status().isOk())
-                .andExpect(jsonPath("article").exists())
-                .andExpect(jsonPath("article.author").exists())
-                .andExpect(jsonPath("article.author.username").exists())
-                .andExpect(jsonPath("article.slug").isString())
-                .andExpect(jsonPath("article.title").isString())
-                .andExpect(jsonPath("article.description").isString())
-                .andExpect(jsonPath("article.body").isString())
-                .andExpect(jsonPath("article.tagList").isArray())
-                .andExpect(jsonPath("article.createdAt", matchesPattern(ISO_8601_PATTERN)))
-                .andExpect(jsonPath("article.updatedAt", matchesPattern(ISO_8601_PATTERN)))
-                .andExpect(jsonPath("article.favorited").isBoolean())
-                .andExpect(jsonPath("article.favoritesCount").isNumber());
+                .andExpect(jsonPath(articlePath).exists())
+                .andExpect(jsonPath(articlePath + ".author").exists())
+                .andExpect(jsonPath(articlePath + ".author.username").exists())
+                .andExpect(jsonPath(articlePath + ".slug").isString())
+                .andExpect(jsonPath(articlePath + ".title").isString())
+                .andExpect(jsonPath(articlePath + ".description").isString())
+                .andExpect(jsonPath(articlePath + ".body").isString())
+                .andExpect(jsonPath(articlePath + ".tagList").isArray())
+                .andExpect(jsonPath(articlePath + ".createdAt", matchesPattern(ISO_8601_PATTERN)))
+                .andExpect(jsonPath(articlePath + ".updatedAt", matchesPattern(ISO_8601_PATTERN)))
+                .andExpect(jsonPath(articlePath + ".favorited").isBoolean())
+                .andExpect(jsonPath(articlePath + ".favoritesCount").isNumber());
     }
 
     private ResultActions deleteArticleBySlug(String slug) throws Exception {
@@ -114,7 +118,20 @@ class ArticleIntegrationTest {
                 .accept(APPLICATION_JSON)
                 .header(AUTHORIZATION, "Token " + userToken));
 
-        andExpectValidArticleResponse(resultActions);
+        andExpectValidSingleArticleResponse(resultActions);
+        deleteArticleBySlug(requestDTO.getTitle());
+    }
+
+    @Test
+    void when_get_articles_expect_return_valid_response() throws Exception {
+        final var requestDTO = new ArticlePostRequestDTO("title-to-get", "description", "body", emptySet());
+        createArticle(requestDTO);
+
+        final var resultActions = mockMvc.perform(get("/articles")
+                .accept(APPLICATION_JSON)
+                .header(AUTHORIZATION, "Token " + userToken));
+
+        andExpectValidArticleResponse(resultActions, "$.articles[0]");
         deleteArticleBySlug(requestDTO.getTitle());
     }
 
@@ -129,7 +146,7 @@ class ArticleIntegrationTest {
                 .header(AUTHORIZATION, "Token " + userToken)
                 .content(objectMapper.writeValueAsString(articlePutRequestDTO)));
 
-        andExpectValidArticleResponse(resultActions);
+        andExpectValidSingleArticleResponse(resultActions);
         deleteArticleBySlug(articlePutRequestDTO.getTitle())
                 .andExpect(status().isOk());
     }

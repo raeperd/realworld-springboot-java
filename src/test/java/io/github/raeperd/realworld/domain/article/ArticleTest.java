@@ -18,4 +18,13 @@ class ArticleTest {
                 .hasFieldOrPropertyWithValue("description", "description-updated")
                 .hasFieldOrPropertyWithValue("body", "body-updated");
     }
+
+    @Test
+    void when_article_has_same_id_and_title_expect_equals() {
+        final var article = new Article("some-title", null, null);
+        final var articleWithSameTitle = new Article(article.getTitle(), null, null);
+
+        assertThat(article).isEqualTo(articleWithSameTitle);
+    }
+
 }
