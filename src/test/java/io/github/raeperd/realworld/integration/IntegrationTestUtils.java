@@ -14,11 +14,15 @@ class IntegrationTestUtils {
 
     private final static ObjectMapper OBJECT_MAPPER = new ObjectMapper();
 
+    public static String saveUserAndRememberToken(MockMvc mockMvc, User user) throws Exception {
+        final var responseBody = saveUser(mockMvc, user).andReturn().getResponse().getContentAsString();
+        return OBJECT_MAPPER.readTree(responseBody).get("user").get("token").textValue();
+    }
+
     public static ResultActions saveUser(MockMvc mockMvc, User user) throws Exception {
         return mockMvc.perform(post("/users")
                 .accept(APPLICATION_JSON).contentType(APPLICATION_JSON)
                 .content(OBJECT_MAPPER.writeValueAsString(new UserPostRequestDTO(user.getUsername(), user.getEmail(), "password"))));
-
     }
 
     public static String loginAndRememberToken(MockMvc mockMvc, User user) throws Exception {

@@ -39,6 +39,13 @@ public class ArticleRestController {
         return fromArticleViews(articleViews);
     }
 
+    @GetMapping("/feed")
+    public MultipleArticleResponseDTO getArticleFeed(Pageable pageable) {
+        final var articleViews = articleService.viewFeedFromCurrentUser(pageable)
+                .stream().collect(toList());
+        return fromArticleViews(articleViews);
+    }
+
     @GetMapping("/{slug}")
     public SingleArticleResponseDTO getArticleBySlug(@PathVariable String slug) {
         final var article = articleService.viewArticleBySlug(slug).orElseThrow(NoSuchElementException::new);
