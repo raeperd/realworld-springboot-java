@@ -165,12 +165,34 @@ class ArticleIntegrationTest {
         final var requestDTO = new ArticlePostRequestDTO("title-to-delete", "description", "body", emptySet());
         createArticle(requestDTO);
 
-        final var resultActions = mockMvc.perform(post("/articles/{slug}/favorite", requestDTO.getTitle())
-                .accept(APPLICATION_JSON)
-                .header(AUTHORIZATION, "Token " + userToken));
+        final var resultActions = postArticleFavoriteBySlug(requestDTO.getTitle());
 
         andExpectValidSingleArticleResponse(resultActions)
                 .andExpect(jsonPath("article.favorited", is(true)));
+    }
+
+    private ResultActions postArticleFavoriteBySlug(String slug) throws Exception {
+        return mockMvc.perform(post("/articles/{slug}/favorite", slug)
+                .accept(APPLICATION_JSON)
+                .header(AUTHORIZATION, "Token " + userToken));
+    }
+
+    @Test
+    void when_delete_favorite_article_expect_valid_response() throws Exception {
+        final var requestDTO = new ArticlePostRequestDTO("title-to-delete", "description", "body", emptySet());
+        createArticle(requestDTO);
+        postArticleFavoriteBySlug(requestDTO.getTitle());
+
+        final var resultActions = deleteArticleFavoriteBySlug(requestDTO.getTitle());
+
+        andExpectValidSingleArticleResponse(resultActions)
+                .andExpect(jsonPath("article.favorited", is(false)));
+    }
+
+    private ResultActions deleteArticleFavoriteBySlug(String slug) throws Exception {
+        return mockMvc.perform(delete("/articles/{slug}/favorite", slug)
+                .accept(APPLICATION_JSON)
+                .header(AUTHORIZATION, "Token " + userToken));
     }
 
 }
