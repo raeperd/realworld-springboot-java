@@ -80,6 +80,10 @@ public class Article {
         return comment;
     }
 
+    public Collection<Comment> getComments() {
+        return comments;
+    }
+
     public String getSlug() {
         return slug;
     }
