@@ -8,8 +8,6 @@ import org.springframework.transaction.annotation.Transactional;
 import java.util.NoSuchElementException;
 import java.util.Optional;
 
-import static java.lang.String.format;
-
 @Service
 public class ArticleService {
 
@@ -34,8 +32,13 @@ public class ArticleService {
     }
 
     @Transactional
+    public Optional<Article> findArticleBySlug(String slug) {
+        return articleRepository.findFirstByTitle(slug);
+    }
+
+    @Transactional
     public Optional<ArticleView> viewArticleBySlug(String slug) {
-        return articleRepository.findFirstByTitle(slug)
+        return findArticleBySlug(slug)
                 .map(articleViewer::viewArticle);
     }
 
@@ -47,15 +50,4 @@ public class ArticleService {
                 .orElseThrow(NoSuchElementException::new);
     }
 
-    // TODO Can be improved
-    @Transactional
-    public void deleteArticleBySlug(Long authorId, String slug) {
-        final var articleToDelete = articleRepository.findFirstByTitle(slug)
-                .orElseThrow(NoSuchElementException::new);
-        if (!articleToDelete.getAuthor().getId().equals(authorId)) {
-            throw new IllegalAccessError(format("User with id(%d) is not authorized to delete Article(%s)",
-                    authorId, articleToDelete.getTitle()));
-        }
-        articleRepository.delete(articleToDelete);
-    }
 }

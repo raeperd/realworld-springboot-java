@@ -38,7 +38,7 @@ public class SingleArticleResponseDTO {
         // TODO: Create ProfileDTO for unwrapped Profile view
         private final Profile author;
         private final boolean favorited;
-        private final int favoritesCount;
+        private final long favoritesCount;
 
         public static ArticleResponseDTO fromArticleView(ArticleView articleView) {
             return fromArticle(articleView.getArticle())

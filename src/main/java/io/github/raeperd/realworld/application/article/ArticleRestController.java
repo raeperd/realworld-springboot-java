@@ -1,9 +1,9 @@
 package io.github.raeperd.realworld.application.article;
 
+import io.github.raeperd.realworld.domain.article.ArticleDeleteService;
+import io.github.raeperd.realworld.domain.article.ArticleFavoriteService;
 import io.github.raeperd.realworld.domain.article.ArticleService;
-import io.github.raeperd.realworld.domain.jwt.JWTPayload;
 import org.springframework.data.domain.Pageable;
-import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.NoSuchElementException;
@@ -17,9 +17,13 @@ import static java.util.stream.Collectors.toList;
 public class ArticleRestController {
 
     private final ArticleService articleService;
+    private final ArticleFavoriteService favoriteService;
+    private final ArticleDeleteService deleteService;
 
-    public ArticleRestController(ArticleService articleService) {
+    public ArticleRestController(ArticleService articleService, ArticleFavoriteService favoriteService, ArticleDeleteService deleteService) {
         this.articleService = articleService;
+        this.favoriteService = favoriteService;
+        this.deleteService = deleteService;
     }
 
     @PostMapping
@@ -28,9 +32,12 @@ public class ArticleRestController {
         return fromArticleView(articleView);
     }
 
-    @PostMapping("/{slug}/favorited")
-    public SingleArticleResponseDTO favortieArticle() {
-        return null;
+    @PostMapping("/{slug}/favorite")
+    public SingleArticleResponseDTO favoriteArticle(@PathVariable String slug) {
+        return articleService.findArticleBySlug(slug)
+                .map(favoriteService::favoriteArticleAndView)
+                .map(SingleArticleResponseDTO::fromArticleView)
+                .orElseThrow(NoSuchElementException::new);
     }
 
     @GetMapping
@@ -53,8 +60,8 @@ public class ArticleRestController {
     }
 
     @DeleteMapping("/{slug}")
-    public void deleteArticleBySlug(@AuthenticationPrincipal JWTPayload jwtPayload, @PathVariable String slug) {
-        articleService.deleteArticleBySlug(jwtPayload.getUserId(), slug);
+    public void deleteArticleBySlug(@PathVariable String slug) {
+        deleteService.deleteArticleBySlug(slug);
     }
 
 }

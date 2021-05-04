@@ -7,13 +7,13 @@ public class ArticleView {
     private final Article article;
     private final Profile authorProfile;
     private final boolean favorited;
-    private final int favoritedCount;
+    private final Long favoritedCount;
 
-    static ArticleView of(Article article, Profile authorProfile, boolean favorited, int favoritedCount) {
+    static ArticleView of(Article article, Profile authorProfile, boolean favorited, long favoritedCount) {
         return new ArticleView(article, authorProfile, favorited, favoritedCount);
     }
 
-    private ArticleView(Article article, Profile authorProfile, boolean favorited, int favoritedCount) {
+    private ArticleView(Article article, Profile authorProfile, boolean favorited, long favoritedCount) {
         this.article = article;
         this.authorProfile = authorProfile;
         this.favorited = favorited;
@@ -32,7 +32,7 @@ public class ArticleView {
         return favorited;
     }
 
-    public int getFavoritedCount() {
+    public long getFavoritedCount() {
         return favoritedCount;
     }
 

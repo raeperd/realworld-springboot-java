@@ -170,7 +170,7 @@ class ArticleIntegrationTest {
                 .header(AUTHORIZATION, "Token " + userToken));
 
         andExpectValidSingleArticleResponse(resultActions)
-                .andExpect(jsonPath("article.author.favorited", is(true)));
+                .andExpect(jsonPath("article.favorited", is(true)));
     }
 
 }
