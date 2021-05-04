@@ -1,64 +1,60 @@
 package io.github.raeperd.realworld.domain.article;
 
-import io.github.raeperd.realworld.domain.user.UserContextHolder;
-import io.github.raeperd.realworld.domain.user.profile.Profile;
+import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.util.Map;
 import java.util.NoSuchElementException;
 import java.util.Optional;
-import java.util.stream.Collectors;
 
 import static java.lang.String.format;
-import static java.util.function.Function.identity;
 
 @Service
 public class ArticleService {
 
     private final ArticleRepository articleRepository;
-    private final UserContextHolder userContextHolder;
+    private final ArticleViewer articleViewer;
 
-    public ArticleService(ArticleRepository articleRepository, UserContextHolder userContextHolder) {
+    public ArticleService(ArticleRepository articleRepository, ArticleViewer articleViewer) {
         this.articleRepository = articleRepository;
-        this.userContextHolder = userContextHolder;
+        this.articleViewer = articleViewer;
     }
 
     @Transactional
-    public Article createArticle(Article article) {
-        return articleRepository.save(article);
+    public ArticleView createAndViewArticle(Article article) {
+        final var savedArticle = articleRepository.save(article);
+        return articleViewer.viewArticle(savedArticle);
     }
 
     @Transactional(readOnly = true)
-    public Map<Article, Profile> getAllArticles(Pageable pageable) {
-        final var currentUser = userContextHolder.getCurrentUser()
-                .orElseThrow(IllegalStateException::new);
-        return articleRepository.findAll(pageable).stream()
-                .collect(Collectors.toMap(identity(), article -> currentUser.viewProfile(article.getAuthor())));
+    public Page<ArticleView> viewAllArticle(Pageable pageable) {
+        return articleRepository.findAll(pageable)
+                .map(articleViewer::viewArticle);
     }
 
     @Transactional
-    public Optional<Article> findArticleBySlug(String slug) {
-        return articleRepository.findFirstByTitle(slug);
+    public Optional<ArticleView> viewArticleBySlug(String slug) {
+        return articleRepository.findFirstByTitle(slug)
+                .map(articleViewer::viewArticle);
     }
 
     @Transactional
-    public Article updateArticle(String slug, ArticleUpdateCommand articleUpdateCommand) {
+    public ArticleView updateArticleAndView(String slug, ArticleUpdateCommand articleUpdateCommand) {
         return articleRepository.findFirstByTitle(slug)
                 .map(article -> article.updateArticle(articleUpdateCommand))
+                .map(articleViewer::viewArticle)
                 .orElseThrow(NoSuchElementException::new);
     }
 
+    // TODO Can be improved
     @Transactional
-    public void deleteArticleBySlug(String slug) {
-        final var currentUser = userContextHolder.getCurrentUser()
-                .orElseThrow(IllegalStateException::new);
+    public void deleteArticleBySlug(Long authorId, String slug) {
         final var articleToDelete = articleRepository.findFirstByTitle(slug)
                 .orElseThrow(NoSuchElementException::new);
-        if (!currentUser.equals(articleToDelete.getAuthor())) {
-            throw new IllegalAccessError(format("User(%s) is not authorized to delete Article(%s)",
-                    currentUser.getEmail(), articleToDelete.getTitle()));
+        if (!articleToDelete.getAuthor().getId().equals(authorId)) {
+            throw new IllegalAccessError(format("User with id(%d) is not authorized to delete Article(%s)",
+                    authorId, articleToDelete.getTitle()));
         }
         articleRepository.delete(articleToDelete);
     }

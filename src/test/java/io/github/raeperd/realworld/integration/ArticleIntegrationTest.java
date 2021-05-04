@@ -160,4 +160,17 @@ class ArticleIntegrationTest {
                 .andExpect(status().isOk());
     }
 
+    @Test
+    void when_favorite_article_expect_valid_response() throws Exception {
+        final var requestDTO = new ArticlePostRequestDTO("title-to-delete", "description", "body", emptySet());
+        createArticle(requestDTO);
+
+        final var resultActions = mockMvc.perform(post("/articles/{slug}/favorite", requestDTO.getTitle())
+                .accept(APPLICATION_JSON)
+                .header(AUTHORIZATION, "Token " + userToken));
+
+        andExpectValidSingleArticleResponse(resultActions)
+                .andExpect(jsonPath("article.author.favorited", is(true)));
+    }
+
 }

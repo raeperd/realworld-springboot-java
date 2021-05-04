@@ -1,7 +1,6 @@
 package io.github.raeperd.realworld.domain.article;
 
 import io.github.raeperd.realworld.domain.user.User;
-import io.github.raeperd.realworld.domain.user.UserContextHolder;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -23,54 +22,44 @@ import static org.mockito.Mockito.when;
 class ArticleServiceTest {
 
     @Mock
-    private UserContextHolder userContextHolder;
-    @Mock
     private ArticleRepository articleRepository;
+    @Mock
+    private ArticleViewer articleViewer;
 
     private ArticleService articleService;
 
     @BeforeEach
     void initializeService() {
-        articleService = new ArticleService(articleRepository, userContextHolder);
+        articleService = new ArticleService(articleRepository, articleViewer);
     }
 
     @Test
-    void when_current_user_empty_expect_IllegalStateException() {
-        when(userContextHolder.getCurrentUser()).thenReturn(empty());
-
-        assertThatThrownBy(() ->
-                articleService.deleteArticleBySlug("slug")
-        ).isInstanceOf(IllegalStateException.class);
-    }
-
-    @Test
-    void when_delete_by_not_exists_slug_expect_NoSuchElementException(@Mock User currentUser) {
-        when(userContextHolder.getCurrentUser()).thenReturn(of(currentUser));
+    void when_delete_by_not_exists_slug_expect_NoSuchElementException() {
         when(articleRepository.findFirstByTitle(anyString())).thenReturn(empty());
 
         assertThatThrownBy(() ->
-                articleService.deleteArticleBySlug("slug")
+                articleService.deleteArticleBySlug(1L, "slug")
         ).isInstanceOf(NoSuchElementException.class);
     }
 
     @Test
-    void when_delete_by_slug_from_reader_expect_IllegalAccessError(@Mock User currentUser, @Mock Article article, @Mock User author) {
-        when(userContextHolder.getCurrentUser()).thenReturn(of(currentUser));
+    void when_delete_by_slug_from_reader_expect_IllegalAccessError(@Mock Article article, @Mock User author) {
         when(articleRepository.findFirstByTitle(anyString())).thenReturn(of(article));
         when(article.getAuthor()).thenReturn(author);
+        when(author.getId()).thenReturn(-1L);
 
         assertThatThrownBy(() ->
-                articleService.deleteArticleBySlug("some-slug")
+                articleService.deleteArticleBySlug(1L, "some-slug")
         ).isInstanceOf(IllegalAccessError.class);
     }
 
     @Test
     void when_delete_by_slug_from_author_expect_to_delete(@Mock User currentUser, @Mock Article article) {
-        given(userContextHolder.getCurrentUser()).willReturn(of(currentUser));
         given(articleRepository.findFirstByTitle(anyString())).willReturn(of(article));
         given(article.getAuthor()).willReturn(currentUser);
+        given(currentUser.getId()).willReturn(1L);
 
-        articleService.deleteArticleBySlug("some-slug");
+        articleService.deleteArticleBySlug(1L, "some-slug");
 
         then(articleRepository).should(times(1)).delete(article);
     }
