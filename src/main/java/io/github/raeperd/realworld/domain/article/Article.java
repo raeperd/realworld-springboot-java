@@ -1,5 +1,6 @@
 package io.github.raeperd.realworld.domain.article;
 
+import io.github.raeperd.realworld.domain.article.tag.Tag;
 import io.github.raeperd.realworld.domain.user.User;
 import org.springframework.data.annotation.CreatedBy;
 import org.springframework.data.annotation.CreatedDate;

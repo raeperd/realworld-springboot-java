@@ -1,5 +1,6 @@
 package io.github.raeperd.realworld.domain.article;
 
+import io.github.raeperd.realworld.domain.article.tag.Tag;
 import org.junit.jupiter.api.Test;
 
 import static org.assertj.core.api.Assertions.assertThat;
