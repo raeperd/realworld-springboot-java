@@ -1,6 +1,7 @@
 package io.github.raeperd.realworld.application.article;
 
 import io.github.raeperd.realworld.domain.article.Article;
+import io.github.raeperd.realworld.domain.article.ArticleView;
 import io.github.raeperd.realworld.domain.article.Tag;
 import io.github.raeperd.realworld.domain.user.profile.Profile;
 import lombok.Builder;
@@ -19,8 +20,8 @@ public class SingleArticleResponseDTO {
 
     private final ArticleResponseDTO article;
 
-    public static SingleArticleResponseDTO fromArticleAndProfile(Article article, Profile profile) {
-        return new SingleArticleResponseDTO(ArticleResponseDTO.fromArticleAndProfile(article, profile));
+    public static SingleArticleResponseDTO fromArticleView(ArticleView articleView) {
+        return new SingleArticleResponseDTO(ArticleResponseDTO.fromArticleView(articleView));
     }
 
     @Getter
@@ -37,19 +38,24 @@ public class SingleArticleResponseDTO {
         // TODO: Create ProfileDTO for unwrapped Profile view
         private final Profile author;
         private final boolean favorited;
-        private final int favoritesCount;
+        private final long favoritesCount;
 
-        public static ArticleResponseDTO fromArticleAndProfile(Article article, Profile profile) {
-            return ArticleResponseDTO.builder()
-                    .slug(article.getTitle())
+        public static ArticleResponseDTO fromArticleView(ArticleView articleView) {
+            return fromArticle(articleView.getArticle())
+                    .author(articleView.getAuthorProfile())
+                    .favorited(articleView.isFavorited())
+                    .favoritesCount(articleView.getFavoritedCount())
+                    .build();
+        }
+
+        private static ArticleResponseDTOBuilder fromArticle(Article article) {
+            return builder().slug(article.getTitle())
                     .title(article.getTitle())
                     .description(article.getDescription())
                     .body(article.getBody())
                     .tagList(new HashSet<>(article.getTagList()))
                     .createdAt(article.getCreatedAt().atZone(of("Asia/Seoul")))
-                    .updatedAt(article.getUpdatedAt().atZone(of("Asia/Seoul")))
-                    .author(profile)
-                    .build();
+                    .updatedAt(article.getUpdatedAt().atZone(of("Asia/Seoul")));
         }
     }
 

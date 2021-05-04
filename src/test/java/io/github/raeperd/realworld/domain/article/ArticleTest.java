@@ -24,7 +24,9 @@ class ArticleTest {
         final var article = new Article("some-title", null, null);
         final var articleWithSameTitle = new Article(article.getTitle(), null, null);
 
-        assertThat(article).isEqualTo(articleWithSameTitle);
+        assertThat(article)
+                .isEqualTo(articleWithSameTitle)
+                .hasSameHashCodeAs(articleWithSameTitle);
     }
 
 }

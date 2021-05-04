@@ -63,6 +63,10 @@ public class Article {
         return this;
     }
 
+    public boolean isAuthor(User user) {
+        return author.equals(user);
+    }
+
     public User getAuthor() {
         return author;
     }
