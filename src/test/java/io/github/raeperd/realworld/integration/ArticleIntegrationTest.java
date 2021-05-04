@@ -38,7 +38,8 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 class ArticleIntegrationTest {
 
     private static final Pattern ISO_8601_PATTERN = compile("^\\d{4,}-[01]\\d-[0-3]\\dT[0-2]\\d:[0-5]\\d:[0-5]\\d.\\d+(?:[+-][0-2]\\d:[0-5]\\d|Z)$");
-    private static final String SAMPLE_ARTICLE_SLUG = "SAMPLE_ARTICLE_SLUG";
+    private static final String SAMPLE_ARTICLE_TITLE = "SAMPLE ARTICLE TITLE";
+    private static final String SAMPLE_ARTICLE_SLUG = "sample-article-title";
 
     @Autowired
     private MockMvc mockMvc;
@@ -62,7 +63,7 @@ class ArticleIntegrationTest {
     }
 
     private ResultActions postSampleArticle() throws Exception {
-        return postArticle(new ArticlePostRequestDTO(SAMPLE_ARTICLE_SLUG, "description", "body", Set.of(sampleTag)));
+        return postArticle(new ArticlePostRequestDTO(SAMPLE_ARTICLE_TITLE, "description", "body", Set.of(sampleTag)));
     }
 
     private ResultActions postArticle(ArticlePostRequestDTO postRequestDTO) throws Exception {
@@ -77,8 +78,8 @@ class ArticleIntegrationTest {
         deleteSampleArticle();
     }
 
-    private ResultActions deleteSampleArticle() throws Exception {
-        return deleteArticleBySlug(SAMPLE_ARTICLE_SLUG);
+    private void deleteSampleArticle() throws Exception {
+        deleteArticleBySlug(SAMPLE_ARTICLE_SLUG);
     }
 
     private ResultActions deleteArticleBySlug(String slug) throws Exception {
@@ -111,8 +112,8 @@ class ArticleIntegrationTest {
         return andExpectValidArticleResponse(resultActions, "article");
     }
 
-    private ResultActions andExpectValidMultipleArticleResponse(ResultActions resultActions) throws Exception {
-        return andExpectValidArticleResponse(resultActions, "$.articles[0]");
+    private void andExpectValidMultipleArticleResponse(ResultActions resultActions) throws Exception {
+        andExpectValidArticleResponse(resultActions, "$.articles[0]");
     }
 
     private ResultActions andExpectValidArticleResponse(ResultActions resultActions, String articlePath) throws Exception {
@@ -159,17 +160,17 @@ class ArticleIntegrationTest {
 
     @Test
     void when_put_article_expect_return_valid_response() throws Exception {
-        final var articlePostRequestDTO = new ArticlePostRequestDTO("title-to-updated", "description", "body", null);
+        final var articlePostRequestDTO = new ArticlePostRequestDTO("title to updated", "description", "body", null);
         postArticle(articlePostRequestDTO);
-        final var articlePutRequestDTO = new ArticlePutRequestDTO("title-updated", null, null);
+        final var articlePutRequestDTO = new ArticlePutRequestDTO("title updated", "other-description", "other body");
 
-        final var resultActions = mockMvc.perform(put("/articles/{slug}", articlePostRequestDTO.getTitle())
+        final var resultActions = mockMvc.perform(put("/articles/{slug}", "title-to-updated")
                 .accept(APPLICATION_JSON).contentType(APPLICATION_JSON)
                 .header(AUTHORIZATION, "Token " + userToken)
                 .content(objectMapper.writeValueAsString(articlePutRequestDTO)));
 
         andExpectValidSingleArticleResponse(resultActions);
-        deleteArticleBySlug(articlePutRequestDTO.getTitle()).andExpect(status().isOk());
+        deleteArticleBySlug("title-updated").andExpect(status().isOk());
     }
 
     @Test

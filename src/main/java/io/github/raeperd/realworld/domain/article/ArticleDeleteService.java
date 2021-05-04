@@ -25,7 +25,7 @@ public class ArticleDeleteService {
     public void deleteArticleBySlug(String slug) {
         final var currentUser = userContextHolder.getCurrentUser()
                 .orElseThrow(IllegalStateException::new);
-        final var articleToDelete = articleRepository.findFirstByTitle(slug)
+        final var articleToDelete = articleRepository.findFirstBySlug(slug)
                 .orElseThrow(NoSuchElementException::new);
         if (!articleToDelete.isAuthor(currentUser)) {
             throw new IllegalAccessError(

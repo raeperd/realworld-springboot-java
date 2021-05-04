@@ -8,5 +8,5 @@ import java.util.Optional;
 @Repository
 interface ArticleRepository extends JpaRepository<Article, Long> {
 
-    Optional<Article> findFirstByTitle(String title);
+    Optional<Article> findFirstBySlug(String title);
 }

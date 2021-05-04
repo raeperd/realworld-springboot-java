@@ -42,6 +42,8 @@ public class Article {
     private String description;
     private String body;
 
+    private String slug;
+
     protected Article() {
     }
 
@@ -51,16 +53,28 @@ public class Article {
 
     public Article(String title, String description, String body, Set<Tag> tagList) {
         this.title = title;
+        this.slug = slugFromTitle(title);
         this.description = description;
         this.body = body;
         this.tagList.addAll(tagList);
     }
 
+    public static String slugFromTitle(String title) {
+        return title.toLowerCase().replaceAll("\\$,'\"|\\s|\\.|\\?", "-");
+    }
+
     Article updateArticle(ArticleUpdateCommand updateCommand) {
-        updateCommand.getTitleToUpdate().ifPresent(titleToUpdate -> this.title = titleToUpdate);
-        updateCommand.getDescriptionToUpdate().ifPresent(descriptionToUpdate -> this.description = descriptionToUpdate);
-        updateCommand.getBodyToUpdate().ifPresent(bodyToUpdate -> this.body = bodyToUpdate);
+        updateCommand.getTitleToUpdate().ifPresent(titleToUpdate -> {
+            title = titleToUpdate;
+            slug = slugFromTitle(titleToUpdate);
+        });
+        updateCommand.getDescriptionToUpdate().ifPresent(descriptionToUpdate -> description = descriptionToUpdate);
+        updateCommand.getBodyToUpdate().ifPresent(bodyToUpdate -> body = bodyToUpdate);
         return this;
+    }
+
+    public String getSlug() {
+        return slug;
     }
 
     public boolean isAuthor(User user) {
