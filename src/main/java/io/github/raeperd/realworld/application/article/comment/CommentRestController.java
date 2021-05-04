@@ -4,6 +4,7 @@ package io.github.raeperd.realworld.application.article.comment;
 import io.github.raeperd.realworld.domain.article.comment.CommentService;
 import org.springframework.web.bind.annotation.*;
 
+import static io.github.raeperd.realworld.application.article.comment.MultipleCommentResponseDTO.fromCommentViews;
 import static io.github.raeperd.realworld.application.article.comment.SingleCommentResponseDTO.fromCommentView;
 
 @RequestMapping("/articles")
@@ -20,5 +21,11 @@ public class CommentRestController {
     public SingleCommentResponseDTO postComment(@RequestBody CommentPostRequestDTO requestDTO, @PathVariable String slug) {
         final var commentSaved = commentService.commentArticleBySlug(slug, requestDTO.toComment());
         return fromCommentView(commentService.viewCommentFromCurrentUser(commentSaved));
+    }
+
+    @GetMapping("/{slug}/comments")
+    public MultipleCommentResponseDTO getComments(@PathVariable String slug) {
+        return fromCommentViews(
+                commentService.viewAllCommentsBySlugFromCurrentUser(slug));
     }
 }

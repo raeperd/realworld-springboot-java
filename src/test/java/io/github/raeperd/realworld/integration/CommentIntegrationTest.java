@@ -21,6 +21,7 @@ import static io.github.raeperd.realworld.integration.IntegrationTestUtils.saveU
 import static org.junit.jupiter.api.TestInstance.Lifecycle.PER_CLASS;
 import static org.springframework.http.HttpHeaders.AUTHORIZATION;
 import static org.springframework.http.MediaType.APPLICATION_JSON;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
@@ -57,11 +58,25 @@ class CommentIntegrationTest {
 
     @Test
     void when_create_comment_expect_return_valid_comment() throws Exception {
-        final var requestDTO = new CommentPostRequestDTO("some comments");
-        mockMvc.perform(post("/articles/{slug}/comments", SAMPLE_ARTICLE_SLUG)
+        postCommentInSampleArticle("some-comment")
+                .andExpect(status().isOk());
+    }
+
+    private ResultActions postCommentInSampleArticle(String body) throws Exception {
+        final var requestDTO = new CommentPostRequestDTO(body);
+        return mockMvc.perform(post("/articles/{slug}/comments", SAMPLE_ARTICLE_SLUG)
                 .accept(APPLICATION_JSON).contentType(APPLICATION_JSON)
                 .header(AUTHORIZATION, "Token " + userToken)
-                .content(objectMapper.writeValueAsString(requestDTO)))
+                .content(objectMapper.writeValueAsString(requestDTO)));
+    }
+
+    @Test
+    void when_get_comment_expect_return_valid_comment() throws Exception {
+        postCommentInSampleArticle("some-comment");
+
+        mockMvc.perform(get("/articles/{slug}/comments", SAMPLE_ARTICLE_SLUG)
+                .accept(APPLICATION_JSON)
+                .header(AUTHORIZATION, "Token " + userToken))
                 .andExpect(status().isOk());
     }
 
