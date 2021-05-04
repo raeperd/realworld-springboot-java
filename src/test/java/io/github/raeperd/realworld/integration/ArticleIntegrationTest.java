@@ -14,6 +14,7 @@ import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.ResultActions;
 
+import java.util.Set;
 import java.util.regex.Pattern;
 import java.util.stream.Stream;
 
@@ -47,6 +48,7 @@ class ArticleIntegrationTest {
     private String userToken;
 
     private final User userSaved = new User("raeperd@gmail.com", "raeperd", "password");
+    private final String sampleTag = "some-tag";
 
     @BeforeAll
     void initializeUser() throws Exception {
@@ -60,7 +62,7 @@ class ArticleIntegrationTest {
     }
 
     private ResultActions postSampleArticle() throws Exception {
-        return postArticle(new ArticlePostRequestDTO(SAMPLE_ARTICLE_SLUG, "description", "body", emptySet()));
+        return postArticle(new ArticlePostRequestDTO(SAMPLE_ARTICLE_SLUG, "description", "body", Set.of(sampleTag)));
     }
 
     private ResultActions postArticle(ArticlePostRequestDTO postRequestDTO) throws Exception {
@@ -109,6 +111,10 @@ class ArticleIntegrationTest {
         return andExpectValidArticleResponse(resultActions, "article");
     }
 
+    private ResultActions andExpectValidMultipleArticleResponse(ResultActions resultActions) throws Exception {
+        return andExpectValidArticleResponse(resultActions, "$.articles[0]");
+    }
+
     private ResultActions andExpectValidArticleResponse(ResultActions resultActions, String articlePath) throws Exception {
         return resultActions.andExpect(status().isOk())
                 .andExpect(jsonPath(articlePath).exists())
@@ -140,7 +146,15 @@ class ArticleIntegrationTest {
                 .accept(APPLICATION_JSON)
                 .header(AUTHORIZATION, "Token " + userToken));
 
-        andExpectValidArticleResponse(resultActions, "$.articles[0]");
+        andExpectValidMultipleArticleResponse(resultActions);
+    }
+
+    @Test
+    void when_get_articles_without_authentication_expect_return_valid_response() throws Exception {
+        final var resultActions = mockMvc.perform(get("/articles")
+                .accept(APPLICATION_JSON));
+
+        andExpectValidMultipleArticleResponse(resultActions);
     }
 
     @Test

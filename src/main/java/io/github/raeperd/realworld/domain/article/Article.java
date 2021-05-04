@@ -29,7 +29,7 @@ public class Article {
     @ManyToOne(targetEntity = User.class)
     private User author;
 
-    @OneToMany(fetch = FetchType.LAZY)
+    @OneToMany(fetch = FetchType.LAZY, cascade = CascadeType.ALL)
     private final Collection<Tag> tagList = new HashSet<>();
 
     @CreatedDate
