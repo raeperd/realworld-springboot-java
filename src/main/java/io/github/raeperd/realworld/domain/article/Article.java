@@ -10,6 +10,7 @@ import javax.persistence.*;
 import java.time.LocalDateTime;
 import java.util.Collection;
 import java.util.HashSet;
+import java.util.Objects;
 import java.util.Set;
 
 import static java.util.Collections.emptySet;
@@ -62,6 +63,10 @@ public class Article {
         return this;
     }
 
+    public boolean isAuthor(User user) {
+        return author.equals(user);
+    }
+
     public User getAuthor() {
         return author;
     }
@@ -88,5 +93,18 @@ public class Article {
 
     public Collection<Tag> getTagList() {
         return tagList;
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+        final var article = (Article) o;
+        return Objects.equals(id, article.id) && Objects.equals(title, article.title);
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(id, title);
     }
 }
