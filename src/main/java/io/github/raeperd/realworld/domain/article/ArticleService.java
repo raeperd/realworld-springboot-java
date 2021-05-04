@@ -1,5 +1,6 @@
 package io.github.raeperd.realworld.domain.article;
 
+import io.github.raeperd.realworld.domain.user.UserContextHolder;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
@@ -11,10 +12,12 @@ import java.util.Optional;
 @Service
 public class ArticleService {
 
+    private final UserContextHolder userContextHolder;
     private final ArticleRepository articleRepository;
     private final ArticleViewer articleViewer;
 
-    public ArticleService(ArticleRepository articleRepository, ArticleViewer articleViewer) {
+    public ArticleService(UserContextHolder userContextHolder, ArticleRepository articleRepository, ArticleViewer articleViewer) {
+        this.userContextHolder = userContextHolder;
         this.articleRepository = articleRepository;
         this.articleViewer = articleViewer;
     }
@@ -22,13 +25,15 @@ public class ArticleService {
     @Transactional
     public ArticleView createAndViewArticle(Article article) {
         final var savedArticle = articleRepository.save(article);
-        return articleViewer.viewArticle(savedArticle);
+        return viewArticleFromCurrentUser(savedArticle);
     }
 
     @Transactional(readOnly = true)
     public Page<ArticleView> viewAllArticle(Pageable pageable) {
-        return articleRepository.findAll(pageable)
-                .map(articleViewer::viewArticle);
+        final var articles = articleRepository.findAll(pageable);
+        return userContextHolder.getCurrentUser()
+                .map(currentUser -> articles.map(this::viewArticleFromCurrentUser))
+                .orElseGet(() -> articles.map(articleViewer::viewArticle));
     }
 
     @Transactional
@@ -39,15 +44,21 @@ public class ArticleService {
     @Transactional
     public Optional<ArticleView> viewArticleBySlug(String slug) {
         return findArticleBySlug(slug)
-                .map(articleViewer::viewArticle);
+                .map(this::viewArticleFromCurrentUser);
     }
 
     @Transactional
     public ArticleView updateArticleAndView(String slug, ArticleUpdateCommand articleUpdateCommand) {
         return articleRepository.findFirstByTitle(slug)
                 .map(article -> article.updateArticle(articleUpdateCommand))
-                .map(articleViewer::viewArticle)
+                .map(this::viewArticleFromCurrentUser)
                 .orElseThrow(NoSuchElementException::new);
+    }
+
+    private ArticleView viewArticleFromCurrentUser(Article article) {
+        return userContextHolder.getCurrentUser()
+                .map(currentUser -> articleViewer.viewArticleFromUser(article, currentUser))
+                .orElseThrow(IllegalStateException::new);
     }
 
 }

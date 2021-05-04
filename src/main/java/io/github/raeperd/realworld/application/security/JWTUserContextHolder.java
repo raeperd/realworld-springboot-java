@@ -1,10 +1,10 @@
 package io.github.raeperd.realworld.application.security;
 
 import io.github.raeperd.realworld.application.security.JWTAuthenticationFilter.JWTAuthenticationToken;
+import io.github.raeperd.realworld.domain.jwt.JWTPayload;
 import io.github.raeperd.realworld.domain.user.User;
 import io.github.raeperd.realworld.domain.user.UserContextHolder;
 import io.github.raeperd.realworld.domain.user.UserRepository;
-import io.github.raeperd.realworld.domain.jwt.JWTPayload;
 
 import java.util.Optional;
 
@@ -22,6 +22,7 @@ class JWTUserContextHolder implements UserContextHolder {
     @Override
     public Optional<User> getCurrentUser() {
         return ofNullable(getContext().getAuthentication())
+                .filter(JWTAuthenticationToken.class::isInstance)
                 .map(JWTAuthenticationToken.class::cast)
                 .map(JWTAuthenticationToken::getPrincipal)
                 .map(JWTPayload.class::cast)

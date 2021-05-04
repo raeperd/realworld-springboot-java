@@ -1,5 +1,7 @@
 package io.github.raeperd.realworld.domain.user.profile;
 
+import io.github.raeperd.realworld.domain.user.User;
+
 public class Profile {
 
     private final String username;
@@ -12,6 +14,10 @@ public class Profile {
         this.bio = bio;
         this.image = image;
         this.following = following;
+    }
+
+    public static Profile fromUser(User user) {
+        return new Profile(user.getUsername(), user.getBio(), user.getImage(), false);
     }
 
     public String getUsername() {

@@ -1,24 +1,24 @@
 package io.github.raeperd.realworld.domain.article;
 
 import io.github.raeperd.realworld.domain.user.User;
-import io.github.raeperd.realworld.domain.user.UserContextHolder;
+import io.github.raeperd.realworld.domain.user.profile.Profile;
 import org.springframework.stereotype.Component;
 
 @Component
 class UserContextArticleViewer implements ArticleViewer {
 
-    private final UserContextHolder userContextHolder;
     private final ArticleFavoriteRepository favoriteRepository;
 
-    public UserContextArticleViewer(UserContextHolder userContextHolder, ArticleFavoriteRepository favoriteRepository) {
-        this.userContextHolder = userContextHolder;
+    public UserContextArticleViewer(ArticleFavoriteRepository favoriteRepository) {
         this.favoriteRepository = favoriteRepository;
     }
 
     @Override
     public ArticleView viewArticle(Article article) {
-        final var currentUser = userContextHolder.getCurrentUser().orElseThrow(IllegalStateException::new);
-        return viewArticleFromUser(article, currentUser);
+        return ArticleView.of(article,
+                Profile.fromUser(article.getAuthor()),
+                false,
+                favoriteRepository.countAllByArticle(article));
     }
 
     @Override
