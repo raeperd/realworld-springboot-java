@@ -32,14 +32,6 @@ public class ArticleRestController {
         return fromArticleView(articleView);
     }
 
-    @PostMapping("/{slug}/favorite")
-    public SingleArticleResponseDTO favoriteArticle(@PathVariable String slug) {
-        return articleService.findArticleBySlug(slug)
-                .map(favoriteService::favoriteArticleAndView)
-                .map(SingleArticleResponseDTO::fromArticleView)
-                .orElseThrow(NoSuchElementException::new);
-    }
-
     @GetMapping
     public MultipleArticleResponseDTO getArticles(Pageable pageable) {
         final var articleViews = articleService.viewAllArticle(pageable)
@@ -62,6 +54,22 @@ public class ArticleRestController {
     @DeleteMapping("/{slug}")
     public void deleteArticleBySlug(@PathVariable String slug) {
         deleteService.deleteArticleBySlug(slug);
+    }
+
+    @PostMapping("/{slug}/favorite")
+    public SingleArticleResponseDTO favoriteArticle(@PathVariable String slug) {
+        return articleService.findArticleBySlug(slug)
+                .map(favoriteService::favoriteArticleAndView)
+                .map(SingleArticleResponseDTO::fromArticleView)
+                .orElseThrow(NoSuchElementException::new);
+    }
+
+    @DeleteMapping("/{slug}/favorite")
+    public SingleArticleResponseDTO unfavoriteArticle(@PathVariable String slug) {
+        return articleService.findArticleBySlug(slug)
+                .map(favoriteService::unfavoriteArticleAndView)
+                .map(SingleArticleResponseDTO::fromArticleView)
+                .orElseThrow(NoSuchElementException::new);
     }
 
 }

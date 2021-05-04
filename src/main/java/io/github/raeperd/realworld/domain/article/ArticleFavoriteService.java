@@ -23,4 +23,12 @@ public class ArticleFavoriteService {
         final var articleFavorite = favoriteRepository.save(new ArticleFavorite(currentUser, article));
         return articleViewer.viewArticleFromUser(articleFavorite.getArticle(), currentUser);
     }
+
+    @Transactional
+    public ArticleView unfavoriteArticleAndView(Article article) {
+        final var currentUser = userContextHolder.getCurrentUser().orElseThrow(IllegalStateException::new);
+        favoriteRepository.findFirstByUserAndArticle(currentUser, article)
+                .ifPresent(favoriteRepository::delete);
+        return articleViewer.viewArticleFromUser(article, currentUser);
+    }
 }
