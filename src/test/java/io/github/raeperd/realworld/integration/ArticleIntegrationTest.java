@@ -4,10 +4,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import io.github.raeperd.realworld.application.article.ArticlePostRequestDTO;
 import io.github.raeperd.realworld.application.article.ArticlePutRequestDTO;
 import io.github.raeperd.realworld.domain.user.User;
-import org.junit.jupiter.api.BeforeAll;
-import org.junit.jupiter.api.Tag;
-import org.junit.jupiter.api.Test;
-import org.junit.jupiter.api.TestInstance;
+import org.junit.jupiter.api.*;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.Arguments;
 import org.junit.jupiter.params.provider.MethodSource;
@@ -40,6 +37,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 class ArticleIntegrationTest {
 
     private static final Pattern ISO_8601_PATTERN = compile("^\\d{4,}-[01]\\d-[0-3]\\dT[0-2]\\d:[0-5]\\d:[0-5]\\d.\\d+(?:[+-][0-2]\\d:[0-5]\\d|Z)$");
+    private static final String SAMPLE_ARTICLE_SLUG = "SAMPLE_ARTICLE_SLUG";
 
     @Autowired
     private MockMvc mockMvc;
@@ -56,10 +54,41 @@ class ArticleIntegrationTest {
         userToken = loginAndRememberToken(mockMvc, userSaved);
     }
 
+    @BeforeEach
+    void createSampleArticle() throws Exception {
+        postSampleArticle().andExpect(status().isOk());
+    }
+
+    private ResultActions postSampleArticle() throws Exception {
+        return postArticle(new ArticlePostRequestDTO(SAMPLE_ARTICLE_SLUG, "description", "body", emptySet()));
+    }
+
+    private ResultActions postArticle(ArticlePostRequestDTO postRequestDTO) throws Exception {
+        return mockMvc.perform(post("/articles")
+                .accept(APPLICATION_JSON).contentType(APPLICATION_JSON)
+                .header(AUTHORIZATION, "Token " + userToken)
+                .content(objectMapper.writeValueAsString(postRequestDTO)));
+    }
+
+    @AfterEach
+    void cleanSampleArticle() throws Exception {
+        deleteSampleArticle();
+    }
+
+    private ResultActions deleteSampleArticle() throws Exception {
+        return deleteArticleBySlug(SAMPLE_ARTICLE_SLUG);
+    }
+
+    private ResultActions deleteArticleBySlug(String slug) throws Exception {
+        return mockMvc.perform(delete("/articles/{slug}", slug)
+                .accept(APPLICATION_JSON)
+                .header(AUTHORIZATION, "Token " + userToken));
+    }
+
     @MethodSource("provideArticlePostRequests")
     @ParameterizedTest
     void when_create_article_expect_return_valid_response(ArticlePostRequestDTO requestDTO) throws Exception {
-        final var resultActions = createArticle(requestDTO);
+        final var resultActions = postArticle(requestDTO);
 
         andExpectValidSingleArticleResponse(resultActions)
                 .andExpect(jsonPath("article.slug", is(requestDTO.getTitle())))
@@ -74,13 +103,6 @@ class ArticleIntegrationTest {
         return Stream.of(
                 Arguments.of(new ArticlePostRequestDTO("null-tag-title", "description", "body", null)),
                 Arguments.of(new ArticlePostRequestDTO("empty-tag-title", "description", "body", emptySet())));
-    }
-
-    private ResultActions createArticle(ArticlePostRequestDTO postRequestDTO) throws Exception {
-        return mockMvc.perform(post("/articles")
-                .accept(APPLICATION_JSON).contentType(APPLICATION_JSON)
-                .header(AUTHORIZATION, "Token " + userToken)
-                .content(objectMapper.writeValueAsString(postRequestDTO)));
     }
 
     private ResultActions andExpectValidSingleArticleResponse(ResultActions resultActions) throws Exception {
@@ -103,42 +125,28 @@ class ArticleIntegrationTest {
                 .andExpect(jsonPath(articlePath + ".favoritesCount").isNumber());
     }
 
-    private ResultActions deleteArticleBySlug(String slug) throws Exception {
-        return mockMvc.perform(delete("/articles/{slug}", slug)
-                .accept(APPLICATION_JSON)
-                .header(AUTHORIZATION, "Token " + userToken));
-    }
-
     @Test
     void when_get_article_expect_return_valid_response() throws Exception {
-        final var requestDTO = new ArticlePostRequestDTO("title-to-get", "description", "body", emptySet());
-        createArticle(requestDTO);
-
-        final var resultActions = mockMvc.perform(get("/articles/{slug}", requestDTO.getTitle())
+        final var resultActions = mockMvc.perform(get("/articles/{slug}", SAMPLE_ARTICLE_SLUG)
                 .accept(APPLICATION_JSON)
                 .header(AUTHORIZATION, "Token " + userToken));
 
         andExpectValidSingleArticleResponse(resultActions);
-        deleteArticleBySlug(requestDTO.getTitle());
     }
 
     @Test
     void when_get_articles_expect_return_valid_response() throws Exception {
-        final var requestDTO = new ArticlePostRequestDTO("title-to-get", "description", "body", emptySet());
-        createArticle(requestDTO);
-
         final var resultActions = mockMvc.perform(get("/articles")
                 .accept(APPLICATION_JSON)
                 .header(AUTHORIZATION, "Token " + userToken));
 
         andExpectValidArticleResponse(resultActions, "$.articles[0]");
-        deleteArticleBySlug(requestDTO.getTitle());
     }
 
     @Test
     void when_put_article_expect_return_valid_response() throws Exception {
-        final var articlePostRequestDTO = new ArticlePostRequestDTO("title-to-update", "description", "body", emptySet());
-        createArticle(articlePostRequestDTO);
+        final var articlePostRequestDTO = new ArticlePostRequestDTO("title-to-updated", "description", "body", null);
+        postArticle(articlePostRequestDTO);
         final var articlePutRequestDTO = new ArticlePutRequestDTO("title-updated", null, null);
 
         final var resultActions = mockMvc.perform(put("/articles/{slug}", articlePostRequestDTO.getTitle())
@@ -147,50 +155,44 @@ class ArticleIntegrationTest {
                 .content(objectMapper.writeValueAsString(articlePutRequestDTO)));
 
         andExpectValidSingleArticleResponse(resultActions);
-        deleteArticleBySlug(articlePutRequestDTO.getTitle())
-                .andExpect(status().isOk());
+        deleteArticleBySlug(articlePutRequestDTO.getTitle()).andExpect(status().isOk());
     }
 
     @Test
     void when_delete_article_expect_status_ok() throws Exception {
-        final var requestDTO = new ArticlePostRequestDTO("title-to-delete", "description", "body", emptySet());
-        createArticle(requestDTO);
+        final var articlePostRequestDTO = new ArticlePostRequestDTO("title-to-be-deleted", "description", "body", null);
+        postArticle(articlePostRequestDTO);
 
-        deleteArticleBySlug(requestDTO.getTitle())
+        deleteArticleBySlug(articlePostRequestDTO.getTitle())
                 .andExpect(status().isOk());
     }
 
     @Test
     void when_favorite_article_expect_valid_response() throws Exception {
-        final var requestDTO = new ArticlePostRequestDTO("title-to-delete", "description", "body", emptySet());
-        createArticle(requestDTO);
-
-        final var resultActions = postArticleFavoriteBySlug(requestDTO.getTitle());
+        final var resultActions = postSampleArticleFavorite();
 
         andExpectValidSingleArticleResponse(resultActions)
                 .andExpect(jsonPath("article.favorited", is(true)));
     }
 
-    private ResultActions postArticleFavoriteBySlug(String slug) throws Exception {
-        return mockMvc.perform(post("/articles/{slug}/favorite", slug)
+    private ResultActions postSampleArticleFavorite() throws Exception {
+        return mockMvc.perform(post("/articles/{slug}/favorite", SAMPLE_ARTICLE_SLUG)
                 .accept(APPLICATION_JSON)
                 .header(AUTHORIZATION, "Token " + userToken));
     }
 
     @Test
     void when_delete_favorite_article_expect_valid_response() throws Exception {
-        final var requestDTO = new ArticlePostRequestDTO("title-to-delete", "description", "body", emptySet());
-        createArticle(requestDTO);
-        postArticleFavoriteBySlug(requestDTO.getTitle());
+        postSampleArticleFavorite();
 
-        final var resultActions = deleteArticleFavoriteBySlug(requestDTO.getTitle());
+        final var resultActions = deleteArticleFavoriteBySlug();
 
         andExpectValidSingleArticleResponse(resultActions)
                 .andExpect(jsonPath("article.favorited", is(false)));
     }
 
-    private ResultActions deleteArticleFavoriteBySlug(String slug) throws Exception {
-        return mockMvc.perform(delete("/articles/{slug}/favorite", slug)
+    private ResultActions deleteArticleFavoriteBySlug() throws Exception {
+        return mockMvc.perform(delete("/articles/{slug}/favorite", SAMPLE_ARTICLE_SLUG)
                 .accept(APPLICATION_JSON)
                 .header(AUTHORIZATION, "Token " + userToken));
     }
