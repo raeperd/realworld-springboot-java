@@ -39,6 +39,10 @@ public class Comment {
         this.body = body;
     }
 
+    public boolean isAuthor(User user) {
+        return author.equals(user);
+    }
+
     public Long getId() {
         return id;
     }

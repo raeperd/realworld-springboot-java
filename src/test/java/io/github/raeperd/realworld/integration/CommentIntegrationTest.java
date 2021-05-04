@@ -21,8 +21,7 @@ import static io.github.raeperd.realworld.integration.IntegrationTestUtils.saveU
 import static org.junit.jupiter.api.TestInstance.Lifecycle.PER_CLASS;
 import static org.springframework.http.HttpHeaders.AUTHORIZATION;
 import static org.springframework.http.MediaType.APPLICATION_JSON;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
 @Tag("integration")
@@ -72,12 +71,31 @@ class CommentIntegrationTest {
 
     @Test
     void when_get_comment_expect_return_valid_comment() throws Exception {
-        postCommentInSampleArticle("some-comment");
+        final var commentIdCreated = postCommentsToSampleArticleAndRememberID("some-comment");
 
         mockMvc.perform(get("/articles/{slug}/comments", SAMPLE_ARTICLE_SLUG)
                 .accept(APPLICATION_JSON)
                 .header(AUTHORIZATION, "Token " + userToken))
                 .andExpect(status().isOk());
+
+        deleteCommentsInSampleById(commentIdCreated);
+    }
+
+    @Test
+    void when_delete_comment_with_id_expect_return_no_content() throws Exception {
+        final var commentId = postCommentsToSampleArticleAndRememberID("some-comment-body");
+
+        deleteCommentsInSampleById(commentId).andExpect(status().isNoContent());
+    }
+
+    private long postCommentsToSampleArticleAndRememberID(String body) throws Exception {
+        final var responseBody = postCommentInSampleArticle(body).andReturn().getResponse().getContentAsString();
+        return objectMapper.readTree(responseBody).get("comment").get("id").asLong();
+    }
+
+    private ResultActions deleteCommentsInSampleById(long id) throws Exception {
+        return mockMvc.perform(delete("/articles/{slug}/comments/{id}", SAMPLE_ARTICLE_SLUG, id)
+                .header(AUTHORIZATION, "Token " + userToken));
     }
 
 }
