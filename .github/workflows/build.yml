@@ -30,6 +30,9 @@ jobs:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}  # Needed to get PR information, if any
           SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
         run: ./gradlew build sonarqube --info
+      - uses: actions/upload-artifact@v2
+        with:
+          path: build/libs/*.jar
   deploy:
     runs-on: ubuntu-latest
     needs: build
