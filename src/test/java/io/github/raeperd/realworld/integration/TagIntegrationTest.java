@@ -16,7 +16,7 @@ import org.springframework.test.web.servlet.ResultActions;
 import java.util.Set;
 
 import static io.github.raeperd.realworld.integration.IntegrationTestUtils.saveUserAndRememberToken;
-import static org.hamcrest.Matchers.is;
+import static org.hamcrest.Matchers.hasItem;
 import static org.springframework.http.HttpHeaders.AUTHORIZATION;
 import static org.springframework.http.MediaType.APPLICATION_JSON;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
@@ -28,6 +28,8 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 @AutoConfigureMockMvc
 @SpringBootTest
 class TagIntegrationTest {
+
+    private static final String SAMPLE_TAG_NAME = "sample-tag-with-article";
 
     @Autowired
     private MockMvc mockMvc;
@@ -43,17 +45,16 @@ class TagIntegrationTest {
 
     @Test
     void when_get_tags_expect_return_valid() throws Exception {
-        final var tagToSave = "tag-to-save";
-        postSampleArticleWithTag(tagToSave).andExpect(status().isOk());
+        postSampleArticleWithTag().andExpect(status().isOk());
 
         mockMvc.perform(get("/tags")
                 .accept(APPLICATION_JSON))
                 .andExpect(status().isOk())
-                .andExpect(jsonPath("$.tags[0]", is(tagToSave)));
+                .andExpect(jsonPath("$.tags", hasItem(SAMPLE_TAG_NAME)));
     }
 
-    private ResultActions postSampleArticleWithTag(String tagName) throws Exception {
-        final var requestDTO = new ArticlePostRequestDTO("some-title", "description", "body", Set.of(tagName));
+    private ResultActions postSampleArticleWithTag() throws Exception {
+        final var requestDTO = new ArticlePostRequestDTO("some-title", "description", "body", Set.of(SAMPLE_TAG_NAME));
         return mockMvc.perform(post("/articles")
                 .accept(APPLICATION_JSON).contentType(APPLICATION_JSON)
                 .header(AUTHORIZATION, "Token " + userToken)

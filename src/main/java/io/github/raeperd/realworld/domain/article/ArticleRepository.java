@@ -10,7 +10,7 @@ import java.util.Collection;
 import java.util.Optional;
 
 @Repository
-interface ArticleRepository extends JpaRepository<Article, Long> {
+public interface ArticleRepository extends JpaRepository<Article, Long> {
 
     Optional<Article> findFirstBySlug(String title);
 

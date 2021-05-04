@@ -1,5 +1,6 @@
 package io.github.raeperd.realworld.domain.article;
 
+import io.github.raeperd.realworld.domain.article.comment.Comment;
 import io.github.raeperd.realworld.domain.article.tag.Tag;
 import io.github.raeperd.realworld.domain.user.User;
 import org.springframework.data.annotation.CreatedBy;
@@ -9,10 +10,7 @@ import org.springframework.data.jpa.domain.support.AuditingEntityListener;
 
 import javax.persistence.*;
 import java.time.LocalDateTime;
-import java.util.Collection;
-import java.util.HashSet;
-import java.util.Objects;
-import java.util.Set;
+import java.util.*;
 
 import static java.util.Collections.emptySet;
 import static javax.persistence.GenerationType.IDENTITY;
@@ -32,6 +30,9 @@ public class Article {
 
     @OneToMany(fetch = FetchType.LAZY, cascade = CascadeType.ALL)
     private final Collection<Tag> tagList = new HashSet<>();
+
+    @OneToMany(fetch = FetchType.LAZY, cascade = CascadeType.ALL)
+    private final Collection<Comment> comments = new ArrayList<>();
 
     @CreatedDate
     private LocalDateTime createdAt;
@@ -60,7 +61,7 @@ public class Article {
         this.tagList.addAll(tagList);
     }
 
-    public static String slugFromTitle(String title) {
+    private static String slugFromTitle(String title) {
         return title.toLowerCase().replaceAll("\\$,'\"|\\s|\\.|\\?", "-");
     }
 
@@ -72,6 +73,11 @@ public class Article {
         updateCommand.getDescriptionToUpdate().ifPresent(descriptionToUpdate -> description = descriptionToUpdate);
         updateCommand.getBodyToUpdate().ifPresent(bodyToUpdate -> body = bodyToUpdate);
         return this;
+    }
+
+    public Comment addComment(Comment comment) {
+        comments.add(comment);
+        return comment;
     }
 
     public String getSlug() {
