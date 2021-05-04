@@ -49,7 +49,7 @@ public class SingleArticleResponseDTO {
         }
 
         private static ArticleResponseDTOBuilder fromArticle(Article article) {
-            return builder().slug(article.getTitle())
+            return builder().slug(article.getSlug())
                     .title(article.getTitle())
                     .description(article.getDescription())
                     .body(article.getBody())

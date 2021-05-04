@@ -38,7 +38,7 @@ public class ArticleService {
 
     @Transactional
     public Optional<Article> findArticleBySlug(String slug) {
-        return articleRepository.findFirstByTitle(slug);
+        return articleRepository.findFirstBySlug(slug);
     }
 
     @Transactional
@@ -49,7 +49,7 @@ public class ArticleService {
 
     @Transactional
     public ArticleView updateArticleAndView(String slug, ArticleUpdateCommand articleUpdateCommand) {
-        return articleRepository.findFirstByTitle(slug)
+        return articleRepository.findFirstBySlug(slug)
                 .map(article -> article.updateArticle(articleUpdateCommand))
                 .map(this::viewArticleFromCurrentUser)
                 .orElseThrow(NoSuchElementException::new);

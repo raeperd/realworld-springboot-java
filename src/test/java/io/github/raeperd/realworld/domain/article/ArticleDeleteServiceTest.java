@@ -48,7 +48,7 @@ class ArticleDeleteServiceTest {
     @Test
     void when_delete_by_not_exists_slug_expect_NoSuchElementException(@Mock User user) {
         when(userContextHolder.getCurrentUser()).thenReturn(of(user));
-        when(articleRepository.findFirstByTitle(anyString())).thenReturn(empty());
+        when(articleRepository.findFirstBySlug(anyString())).thenReturn(empty());
 
         assertThatThrownBy(() ->
                 deleteService.deleteArticleBySlug("slug")
@@ -58,7 +58,7 @@ class ArticleDeleteServiceTest {
     @Test
     void when_delete_by_slug_from_not_author_expect_IllegalAccessError(@Mock Article article, @Mock User user) {
         when(userContextHolder.getCurrentUser()).thenReturn(of(user));
-        when(articleRepository.findFirstByTitle(anyString())).thenReturn(of(article));
+        when(articleRepository.findFirstBySlug(anyString())).thenReturn(of(article));
         when(article.isAuthor(user)).thenReturn(false);
 
         assertThatThrownBy(() ->
@@ -69,7 +69,7 @@ class ArticleDeleteServiceTest {
     @Test
     void when_delete_by_slug_from_author_expect_to_delete(@Mock User currentUser, @Mock Article article) {
         given(userContextHolder.getCurrentUser()).willReturn(of(currentUser));
-        given(articleRepository.findFirstByTitle(anyString())).willReturn(of(article));
+        given(articleRepository.findFirstBySlug(anyString())).willReturn(of(article));
         given(article.isAuthor(currentUser)).willReturn(true);
 
         deleteService.deleteArticleBySlug("some-slug");
