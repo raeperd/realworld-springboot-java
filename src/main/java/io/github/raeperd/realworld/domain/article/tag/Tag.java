@@ -1,4 +1,4 @@
-package io.github.raeperd.realworld.domain.article;
+package io.github.raeperd.realworld.domain.article.tag;
 
 import javax.persistence.Entity;
 import javax.persistence.Id;
@@ -15,6 +15,10 @@ public class Tag {
 
     public Tag(String name) {
         this.name = name;
+    }
+
+    public String getName() {
+        return name;
     }
 
     @Override

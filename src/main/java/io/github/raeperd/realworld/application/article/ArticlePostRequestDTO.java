@@ -3,7 +3,7 @@ package io.github.raeperd.realworld.application.article;
 import com.fasterxml.jackson.annotation.JsonTypeInfo;
 import com.fasterxml.jackson.annotation.JsonTypeName;
 import io.github.raeperd.realworld.domain.article.Article;
-import io.github.raeperd.realworld.domain.article.Tag;
+import io.github.raeperd.realworld.domain.article.tag.Tag;
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 

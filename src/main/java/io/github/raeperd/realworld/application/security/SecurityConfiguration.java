@@ -33,7 +33,7 @@ public class SecurityConfiguration extends WebSecurityConfigurerAdapter {
                 .exceptionHandling().authenticationEntryPoint(new HttpStatusEntryPoint(UNAUTHORIZED)).and()
                 .authorizeRequests()
                 .antMatchers(POST, "/users", "/users/login").permitAll()
-                .antMatchers(GET, "/articles").permitAll()
+                .antMatchers(GET, "/articles", "/tags").permitAll()
                 .anyRequest().authenticated();
     }
 
