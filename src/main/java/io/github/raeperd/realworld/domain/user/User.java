@@ -68,6 +68,10 @@ public class User {
                 followingUsers.contains(otherUser));
     }
 
+    public Collection<User> getFollowingUsers() {
+        return followingUsers;
+    }
+
     public Long getId() {
         return id;
     }

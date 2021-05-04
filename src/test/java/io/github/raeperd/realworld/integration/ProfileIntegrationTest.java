@@ -10,6 +10,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.test.web.servlet.MockMvc;
+import org.springframework.test.web.servlet.ResultActions;
 
 import static io.github.raeperd.realworld.integration.IntegrationTestUtils.loginAndRememberToken;
 import static io.github.raeperd.realworld.integration.IntegrationTestUtils.saveUser;
@@ -57,8 +58,7 @@ class ProfileIntegrationTest {
 
     @Test
     void when_follow_user_expect_return_following_profile() throws Exception {
-        mockMvc.perform(post("/profiles/{username}/follow", celebrity.getUsername())
-                .header(AUTHORIZATION, "Token " + userToken))
+        queryFollowUser(mockMvc, celebrity, userToken)
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("profile").exists())
                 .andExpect(jsonPath("profile.following", is(true)));
@@ -69,11 +69,20 @@ class ProfileIntegrationTest {
                 .andExpect(jsonPath("profile").exists())
                 .andExpect(jsonPath("profile.following", is(true)));
 
-        mockMvc.perform(delete("/profiles/{username}/follow", celebrity.getUsername())
-                .header(AUTHORIZATION, "Token " + userToken))
+        queryUnfollowUser(mockMvc, celebrity, userToken)
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("profile").exists())
                 .andExpect(jsonPath("profile.following", is(false)));
+    }
+
+    static ResultActions queryFollowUser(MockMvc mockMvc, User userToFollow, String userToken) throws Exception {
+        return mockMvc.perform(post("/profiles/{username}/follow", userToFollow.getUsername())
+                .header(AUTHORIZATION, "Token " + userToken));
+    }
+
+    static ResultActions queryUnfollowUser(MockMvc mockMvc, User userToUnfollow, String userToken) throws Exception {
+        return mockMvc.perform(delete("/profiles/{username}/follow", userToUnfollow.getUsername())
+                .header(AUTHORIZATION, "Token " + userToken));
     }
 
 }

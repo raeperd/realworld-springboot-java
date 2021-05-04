@@ -18,8 +18,8 @@ import java.util.Set;
 import java.util.regex.Pattern;
 import java.util.stream.Stream;
 
-import static io.github.raeperd.realworld.integration.IntegrationTestUtils.loginAndRememberToken;
-import static io.github.raeperd.realworld.integration.IntegrationTestUtils.saveUser;
+import static io.github.raeperd.realworld.integration.IntegrationTestUtils.*;
+import static io.github.raeperd.realworld.integration.ProfileIntegrationTest.queryFollowUser;
 import static java.util.Collections.emptySet;
 import static java.util.regex.Pattern.compile;
 import static org.hamcrest.Matchers.is;
@@ -112,11 +112,11 @@ class ArticleIntegrationTest {
         return andExpectValidArticleResponse(resultActions, "article");
     }
 
-    private void andExpectValidMultipleArticleResponse(ResultActions resultActions) throws Exception {
-        andExpectValidArticleResponse(resultActions, "$.articles[0]");
+    public static ResultActions andExpectValidMultipleArticleResponse(ResultActions resultActions) throws Exception {
+        return andExpectValidArticleResponse(resultActions, "$.articles[0]");
     }
 
-    private ResultActions andExpectValidArticleResponse(ResultActions resultActions, String articlePath) throws Exception {
+    private static ResultActions andExpectValidArticleResponse(ResultActions resultActions, String articlePath) throws Exception {
         return resultActions.andExpect(status().isOk())
                 .andExpect(jsonPath(articlePath).exists())
                 .andExpect(jsonPath(articlePath + ".author").exists())
@@ -156,6 +156,20 @@ class ArticleIntegrationTest {
                 .accept(APPLICATION_JSON));
 
         andExpectValidMultipleArticleResponse(resultActions);
+    }
+
+    @Test
+    void when_get_feed_expect_return_valid_response() throws Exception {
+        final var reader = new User("reader@gmail.com", "reader", "password");
+        final var readerToken = saveUserAndRememberToken(mockMvc, reader);
+        queryFollowUser(mockMvc, userSaved, readerToken);
+
+        final var resultActions = mockMvc.perform(get("/articles/feed")
+                .accept(APPLICATION_JSON).contentType(APPLICATION_JSON)
+                .header(AUTHORIZATION, "Token " + readerToken));
+
+        andExpectValidMultipleArticleResponse(resultActions)
+                .andExpect(jsonPath("$.articles[0].author.following", is(true)));
     }
 
     @Test

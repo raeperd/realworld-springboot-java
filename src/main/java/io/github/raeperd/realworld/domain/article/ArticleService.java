@@ -36,7 +36,15 @@ public class ArticleService {
                 .orElseGet(() -> articles.map(articleViewer::viewArticle));
     }
 
-    @Transactional
+    @Transactional(readOnly = true)
+    public Page<ArticleView> viewFeedFromCurrentUser(Pageable pageable) {
+        final var currentUser = userContextHolder.getCurrentUser()
+                .orElseThrow(IllegalStateException::new);
+        return articleRepository.findAllByAuthorIn(currentUser.getFollowingUsers(), pageable)
+                .map(article -> articleViewer.viewArticleFromUser(article, currentUser));
+    }
+
+    @Transactional(readOnly = true)
     public Optional<Article> findArticleBySlug(String slug) {
         return articleRepository.findFirstBySlug(slug);
     }
