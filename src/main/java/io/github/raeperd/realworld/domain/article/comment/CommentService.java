@@ -45,4 +45,13 @@ public class CommentService {
                 .map(this::viewCommentFromCurrentUser)
                 .collect(toList());
     }
+
+    @Transactional
+    public boolean deleteCommentInArticleById(String slug, long id) {
+        final var currentUser = userContextHolder.getCurrentUser()
+                .orElseThrow(IllegalStateException::new);
+        return articleRepository.findFirstBySlug(slug)
+                .map(article -> article.deleteCommentByIdAndUser(id, currentUser))
+                .orElseThrow(NoSuchElementException::new);
+    }
 }

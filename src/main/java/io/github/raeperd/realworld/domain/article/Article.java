@@ -75,6 +75,10 @@ public class Article {
         return this;
     }
 
+    public boolean deleteCommentByIdAndUser(long id, User user) {
+        return comments.removeIf(comment -> comment.getId() == id && comment.isAuthor(user));
+    }
+
     public Comment addComment(Comment comment) {
         comments.add(comment);
         return comment;

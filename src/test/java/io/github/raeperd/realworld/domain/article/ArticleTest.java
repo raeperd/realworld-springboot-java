@@ -1,9 +1,16 @@
 package io.github.raeperd.realworld.domain.article;
 
+import io.github.raeperd.realworld.domain.article.comment.Comment;
+import io.github.raeperd.realworld.domain.user.User;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
+import org.mockito.Mock;
+import org.mockito.junit.jupiter.MockitoExtension;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.mockito.Mockito.when;
 
+@ExtendWith(MockitoExtension.class)
 class ArticleTest {
 
     @Test
@@ -34,6 +41,16 @@ class ArticleTest {
         final var article = new Article("some title", null, null);
 
         assertThat(article.getSlug()).isEqualTo("some-title");
+    }
+
+    @Test
+    void when_delete_comment_by_id_with_another_user_expect_return_false(@Mock Comment comment, @Mock User user) {
+        when(comment.getId()).thenReturn(0L);
+        when(comment.isAuthor(user)).thenReturn(false);
+        final var article = new Article("some title", null, null);
+        article.addComment(comment);
+
+        assertThat(article.deleteCommentByIdAndUser(0L, user)).isFalse();
     }
 
 }
