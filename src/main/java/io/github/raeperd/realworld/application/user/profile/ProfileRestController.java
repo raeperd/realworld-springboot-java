@@ -27,7 +27,7 @@ public class ProfileRestController {
                 profileService.followByUsername(username));
     }
 
-    @DeleteMapping("/{username}/unfollow")
+    @DeleteMapping("/{username}/follow")
     public ProfileResponseDTO unfollowUser(@PathVariable String username) {
         return fromProfile(
                 profileService.unfollowByUsername(username));

@@ -69,7 +69,7 @@ class ProfileIntegrationTest {
                 .andExpect(jsonPath("profile").exists())
                 .andExpect(jsonPath("profile.following", is(true)));
 
-        mockMvc.perform(delete("/profiles/{username}/unfollow", celebrity.getUsername())
+        mockMvc.perform(delete("/profiles/{username}/follow", celebrity.getUsername())
                 .header(AUTHORIZATION, "Token " + userToken))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("profile").exists())
