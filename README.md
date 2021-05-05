@@ -52,7 +52,7 @@ And also, pure `gradle test` covers almost every lines of code.
 
 More details can be found in [`./doc/README.md`](./doc/README.md) and  [original source](https://github.com/gothinkster/realworld/tree/master/spec)
 
-# Architecture overview
+# Overview
 
 ## Design Principal
 
@@ -113,7 +113,13 @@ More details can be found in [`./doc/README.md`](./doc/README.md) and  [original
 
 
 
-# What can be done
+## Performance
+
+![performance](./doc/image/performance.png)
+
+- Result of [`./doc/run-api-tests.sh`](./doc/run-api-tests.sh)
+
+# What can be done more
 
 - More strict validation in application layer
 - Profile view logic can be imporved.
