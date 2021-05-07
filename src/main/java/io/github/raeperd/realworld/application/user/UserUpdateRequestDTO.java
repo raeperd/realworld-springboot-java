@@ -3,6 +3,7 @@ package io.github.raeperd.realworld.application.user;
 import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.annotation.JsonTypeInfo;
 import com.fasterxml.jackson.annotation.JsonTypeName;
+import io.github.raeperd.realworld.domain.user.Email;
 import io.github.raeperd.realworld.domain.user.UserUpdateCommand;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
@@ -26,7 +27,7 @@ public class UserUpdateRequestDTO {
 
     public UserUpdateCommand toUpdateCommand() {
         return new UserUpdateCommand.Builder()
-                .email(email)
+                .email(Email.of(email))
                 .username(username)
                 .password(password)
                 .bio(bio)

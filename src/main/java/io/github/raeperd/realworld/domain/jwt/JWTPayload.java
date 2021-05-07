@@ -12,7 +12,7 @@ public class JWTPayload {
     private final long iat;
 
     static JWTPayload fromUser(User user, long expireEpochSecond) {
-        return new JWTPayload(user.getId(), user.getEmail(), expireEpochSecond);
+        return new JWTPayload(user.getId(), user.getEmail().toString(), expireEpochSecond);
     }
 
     JWTPayload(long sub, String name, long iat) {

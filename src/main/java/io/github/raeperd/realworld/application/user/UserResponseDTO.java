@@ -23,7 +23,7 @@ public class UserResponseDTO {
     }
 
     private UserResponseDTO(AuthorizedUser user) {
-        this.email = user.getEmail();
+        this.email = user.getEmail().toString();
         this.username = user.getUsername();
         this.bio = user.getBio();
         this.image = user.getImage();

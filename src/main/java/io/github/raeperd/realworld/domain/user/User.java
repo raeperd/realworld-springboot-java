@@ -2,10 +2,7 @@ package io.github.raeperd.realworld.domain.user;
 
 import io.github.raeperd.realworld.domain.user.profile.Profile;
 
-import javax.persistence.Entity;
-import javax.persistence.GeneratedValue;
-import javax.persistence.Id;
-import javax.persistence.OneToMany;
+import javax.persistence.*;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Objects;
@@ -22,18 +19,20 @@ public class User {
     @OneToMany
     private final Collection<User> followingUsers = new ArrayList<>();
 
-    private String email;
+    @Embedded
+    private Email email;
+
     private String username;
     private String bio;
     private String image;
     private String password;
 
-    public User(String email, String username, String password) {
+    public User(Email email, String username, String password) {
         this(email, username, null, null);
         this.password = password;
     }
 
-    User(String email, String username, String bio, String image) {
+    User(Email email, String username, String bio, String image) {
         this.id = null;
         this.email = email;
         this.username = username;
@@ -76,7 +75,7 @@ public class User {
         return id;
     }
 
-    public String getEmail() {
+    public Email getEmail() {
         return email;
     }
 

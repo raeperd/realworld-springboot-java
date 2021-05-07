@@ -3,6 +3,7 @@ package io.github.raeperd.realworld.integration;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import io.github.raeperd.realworld.application.article.ArticlePostRequestDTO;
 import io.github.raeperd.realworld.application.article.ArticlePutRequestDTO;
+import io.github.raeperd.realworld.domain.user.Email;
 import io.github.raeperd.realworld.domain.user.User;
 import org.junit.jupiter.api.*;
 import org.junit.jupiter.params.ParameterizedTest;
@@ -48,7 +49,7 @@ class ArticleIntegrationTest {
 
     private String userToken;
 
-    private final User userSaved = new User("raeperd@gmail.com", "raeperd", "password");
+    private final User userSaved = new User(Email.of("raeperd@gmail.com"), "raeperd", "password");
     private final String sampleTag = "some-tag";
 
     @BeforeAll
@@ -160,7 +161,7 @@ class ArticleIntegrationTest {
 
     @Test
     void when_get_feed_expect_return_valid_response() throws Exception {
-        final var reader = new User("reader@gmail.com", "reader", "password");
+        final var reader = new User(Email.of("reader@gmail.com"), "reader", "password");
         final var readerToken = saveUserAndRememberToken(mockMvc, reader);
         queryFollowUser(mockMvc, userSaved, readerToken);
 

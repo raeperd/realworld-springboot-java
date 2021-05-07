@@ -22,7 +22,7 @@ public class UserService {
     }
 
     @Transactional(readOnly = true)
-    public Optional<AuthorizedUser> login(String email, String password) {
+    public Optional<AuthorizedUser> login(Email email, String password) {
         return userRepository.findFirstByEmailAndPassword(email, password)
                 .map(this::authorizeUser);
     }

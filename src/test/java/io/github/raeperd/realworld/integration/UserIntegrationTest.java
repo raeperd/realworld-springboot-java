@@ -2,6 +2,7 @@ package io.github.raeperd.realworld.integration;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import io.github.raeperd.realworld.application.user.UserUpdateRequestDTO;
+import io.github.raeperd.realworld.domain.user.Email;
 import io.github.raeperd.realworld.domain.user.User;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Tag;
@@ -38,7 +39,7 @@ class UserIntegrationTest {
 
     private String userToken;
 
-    private final User userSaved = new User("raeperd@gmail.com", "raeperd", SAVED_USER_PASSWORD);
+    private final User userSaved = new User(Email.of("raeperd@gmail.com"), "raeperd", SAVED_USER_PASSWORD);
 
     @BeforeAll
     void initializeUserAndToken() throws Exception {
@@ -51,7 +52,7 @@ class UserIntegrationTest {
         saveUser(mockMvc, userSaved)
                 .andExpect(status().isCreated())
                 .andExpect(jsonPath("user").exists())
-                .andExpect(jsonPath("user.email", is(userSaved.getEmail())))
+                .andExpect(jsonPath("user.email", is(userSaved.getEmail().toString())))
                 .andExpect(jsonPath("user.username", is(userSaved.getUsername())))
                 .andExpect(jsonPath("user.token").isString())
                 .andExpect(jsonPath("user.bio").doesNotExist())
@@ -64,7 +65,7 @@ class UserIntegrationTest {
         login(mockMvc, userSaved)
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("user").exists())
-                .andExpect(jsonPath("user.email", is(userSaved.getEmail())))
+                .andExpect(jsonPath("user.email", is(userSaved.getEmail().toString())))
                 .andExpect(jsonPath("user.token").isString())
                 .andExpect(jsonPath("user.username", is(userSaved.getUsername())))
                 .andExpect(jsonPath("user.bio").hasJsonPath())
@@ -83,17 +84,17 @@ class UserIntegrationTest {
     @Test
     void when_put_user_after_login_expect_return_user_response() throws Exception {
         final var originalEmail = userSaved.getEmail();
-        final var emailToUpdate = "updatedUser@email.com";
+        final var emailToUpdate = Email.of("updatedUser@email.com");
 
         updateUserEmail(emailToUpdate)
                 .andExpect(jsonPath("user").exists())
-                .andExpect(jsonPath("user.email", is(emailToUpdate)));
+                .andExpect(jsonPath("user.email", is(emailToUpdate.toString())));
 
         updateUserEmail(originalEmail);
     }
 
-    private ResultActions updateUserEmail(String emailToUpdate) throws Exception {
-        final var userUpdateDTO = new UserUpdateRequestDTO(emailToUpdate, null, null, null, null);
+    private ResultActions updateUserEmail(Email emailToUpdate) throws Exception {
+        final var userUpdateDTO = new UserUpdateRequestDTO(emailToUpdate.toString(), null, null, null, null);
         return mockMvc.perform(put("/user")
                 .accept(APPLICATION_JSON).contentType(APPLICATION_JSON)
                 .header(AUTHORIZATION, "Token " + userToken)
