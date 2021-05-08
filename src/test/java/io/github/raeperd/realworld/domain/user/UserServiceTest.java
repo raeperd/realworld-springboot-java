@@ -1,7 +1,6 @@
 package io.github.raeperd.realworld.domain.user;
 
 import io.github.raeperd.realworld.domain.jwt.JWTGenerator;
-import io.github.raeperd.realworld.domain.user.*;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -12,6 +11,7 @@ import static java.util.Optional.empty;
 import static java.util.Optional.of;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
+import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.BDDMockito.given;
 import static org.mockito.BDDMockito.then;
@@ -57,7 +57,7 @@ class UserServiceTest {
 
     @Test
     void when_login_expect_userRepository_findFirstByEmailAndPassword_called() {
-        final var email = "email";
+        final var email = Email.of("email");
         final var password = "password";
 
         userService.login(email, password);
@@ -68,9 +68,9 @@ class UserServiceTest {
 
     @Test
     void when_login_expect_jwtService_to_generateToken(@Mock User user) {
-        given(userRepository.findFirstByEmailAndPassword(anyString(), anyString())).willReturn(of(user));
+        given(userRepository.findFirstByEmailAndPassword(any(Email.class), anyString())).willReturn(of(user));
 
-        userService.login("email", "password");
+        userService.login(Email.of("email"), "password");
 
         then(jwtGenerator).should(times(1)).generateTokenFromUser(user);
     }

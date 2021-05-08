@@ -1,6 +1,7 @@
 package io.github.raeperd.realworld.integration;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+import io.github.raeperd.realworld.domain.user.Email;
 import io.github.raeperd.realworld.domain.user.User;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Tag;
@@ -34,8 +35,8 @@ class ProfileIntegrationTest {
 
     private String userToken;
 
-    private final User userSaved = new User("raeperd@gmail.com", "raeperd", "password");
-    private final User celebrity = new User("celeb@gmail.com", "celebrity", "psasword");
+    private final User userSaved = new User(Email.of("raeperd@gmail.com"), "raeperd", "password");
+    private final User celebrity = new User(Email.of("celeb@gmail.com"), "celebrity", "psasword");
 
     @BeforeAll
     void initializeUserAndToken() throws Exception {

@@ -1,5 +1,6 @@
 package io.github.raeperd.realworld.domain.jwt;
 
+import io.github.raeperd.realworld.domain.user.Email;
 import io.github.raeperd.realworld.domain.user.User;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -25,7 +26,7 @@ class JWTGeneratorTest {
     @BeforeEach
     void initializeUser() {
         when(user.getId()).thenReturn(1L);
-        when(user.getEmail()).thenReturn("user@email.com");
+        when(user.getEmail()).thenReturn(Email.of("user@email.com"));
     }
 
     @Test

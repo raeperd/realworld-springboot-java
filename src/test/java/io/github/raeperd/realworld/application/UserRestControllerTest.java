@@ -6,10 +6,7 @@ import io.github.raeperd.realworld.application.user.UserPostRequestDTO;
 import io.github.raeperd.realworld.application.user.UserRestController;
 import io.github.raeperd.realworld.domain.jwt.JWTParser;
 import io.github.raeperd.realworld.domain.jwt.WithMockJWT;
-import io.github.raeperd.realworld.domain.user.AuthorizedUser;
-import io.github.raeperd.realworld.domain.user.User;
-import io.github.raeperd.realworld.domain.user.UserContextHolder;
-import io.github.raeperd.realworld.domain.user.UserService;
+import io.github.raeperd.realworld.domain.user.*;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.Mock;
@@ -61,38 +58,22 @@ class UserRestControllerTest {
     }
 
     @Test
-    void when_post_users_expect_valid_response_body(@Mock AuthorizedUser authorizedUser) throws Exception {
-        when(userService.signUp(any(User.class))).thenReturn(authorizedUser);
-
-        mockMvc.perform(post("/users")
-                .contentType(APPLICATION_JSON)
-                .content(objectMapper.writeValueAsString(new UserPostRequestDTO("username", "email", "password"))))
-                .andExpect(status().isCreated())
-                .andExpect(jsonPath("user").hasJsonPath())
-                .andExpect(jsonPath("user.email").hasJsonPath())
-                .andExpect(jsonPath("user.username").hasJsonPath())
-                .andExpect(jsonPath("user.bio").hasJsonPath())
-                .andExpect(jsonPath("user.image").hasJsonPath())
-                .andExpect(jsonPath("user.token").hasJsonPath());
-    }
-
-    @Test
     void when_post_login_expect_userService_login_called(@Mock AuthorizedUser user) throws Exception {
-        final var loginDTO = new UserLoginRequestDTO("email", "password");
-        given(userService.login(loginDTO.getEmail(), loginDTO.getPassword())).willReturn(of(user));
+        final var dto = new UserLoginRequestDTO("email", "password");
+        given(userService.login(Email.of(dto.getEmail()), dto.getPassword())).willReturn(of(user));
 
         mockMvc.perform(post("/users/login")
                 .contentType(APPLICATION_JSON)
-                .content(objectMapper.writeValueAsString(loginDTO)));
+                .content(objectMapper.writeValueAsString(dto)));
 
         then(userService).should(times(1))
-                .login(loginDTO.getEmail(), loginDTO.getPassword());
+                .login(any(Email.class), anyString());
     }
 
     @Test
     void when_post_login_expect_valid_response() throws Exception {
         final var authorizedUser = mockAuthorizedUser();
-        when(userService.login(anyString(), anyString())).thenReturn(of(authorizedUser));
+        when(userService.login(any(Email.class), anyString())).thenReturn(of(authorizedUser));
 
         mockMvc.perform(post("/users/login")
                 .contentType(APPLICATION_JSON)
@@ -126,7 +107,7 @@ class UserRestControllerTest {
     private AuthorizedUser mockAuthorizedUser() {
         final var mockedUser = mock(AuthorizedUser.class);
         when(mockedUser.getUsername()).thenReturn("");
-        when(mockedUser.getEmail()).thenReturn("");
+        when(mockedUser.getEmail()).thenReturn(Email.of(""));
         when(mockedUser.getBio()).thenReturn("");
         when(mockedUser.getImage()).thenReturn("");
         when(mockedUser.getToken()).thenReturn("");

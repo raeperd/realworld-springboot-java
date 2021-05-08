@@ -27,7 +27,7 @@ class UserTest {
     void when_update_all_possible_field_expect_return_user_updated() {
         final var user = new User(null, null, null);
         final var updateCommand = new UserUpdateCommand.Builder()
-                .email("updated-email")
+                .email(Email.of("updated-email"))
                 .username("updated-username")
                 .bio("updated-bio")
                 .image("updated-image")
@@ -42,7 +42,7 @@ class UserTest {
     @MethodSource("provideUserUpdateCommandWithName")
     @ParameterizedTest
     void when_update_user_with_single_property_expect_return_user_updated(UserUpdateCommand command, String property) {
-        final var user = new User("some-email", "some-username", "some-password");
+        final var user = new User(Email.of("some-email"), "some-username", "some-password");
 
         user.updateUser(command);
 
@@ -51,7 +51,6 @@ class UserTest {
 
     private static Stream<Arguments> provideUserUpdateCommandWithName() {
         return Stream.of(
-                Arguments.of(new UserUpdateCommand.Builder().email("updated-email").build(), "email"),
                 Arguments.of(new UserUpdateCommand.Builder().username("updated-username").build(), "username"),
                 Arguments.of(new UserUpdateCommand.Builder().bio("updated-bio").build(), "bio"),
                 Arguments.of(new UserUpdateCommand.Builder().image("updated-image").build(), "image"),
@@ -61,8 +60,8 @@ class UserTest {
 
     @Test
     void when_follow_user_expect_following_profile() {
-        final var user = new User("some-email", "some-username", "some-password");
-        final var celebrity = new User("other-email", "celeb", "some-password");
+        final var user = new User(Email.of("some-email"), "some-username", "some-password");
+        final var celebrity = new User(Email.of("other-email"), "celeb", "some-password");
 
         user.followUser(celebrity);
 
@@ -71,7 +70,7 @@ class UserTest {
 
     @Test
     void same_user_generate_same_hash_code() {
-        final var user = new User("some-email", "some-username", "some-password");
+        final var user = new User(Email.of("some-email"), "some-username", "some-password");
 
         assertThat(user).hasSameHashCodeAs(user);
     }

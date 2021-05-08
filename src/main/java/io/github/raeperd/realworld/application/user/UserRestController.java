@@ -1,5 +1,6 @@
 package io.github.raeperd.realworld.application.user;
 
+import io.github.raeperd.realworld.domain.user.Email;
 import io.github.raeperd.realworld.domain.user.UserService;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -24,8 +25,8 @@ public class UserRestController {
     }
 
     @PostMapping("/users/login")
-    public ResponseEntity<UserResponseDTO> login(@RequestBody UserLoginRequestDTO loginRequest) {
-        return of(userService.login(loginRequest.getEmail(), loginRequest.getPassword())
+    public ResponseEntity<UserResponseDTO> login(@RequestBody UserLoginRequestDTO dto) {
+        return of(userService.login(Email.of(dto.getEmail()), dto.getPassword())
                 .map(UserResponseDTO::fromAuthorizedUser));
     }
 

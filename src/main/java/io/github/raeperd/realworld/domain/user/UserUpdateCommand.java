@@ -6,7 +6,7 @@ import static java.util.Optional.ofNullable;
 
 public class UserUpdateCommand {
 
-    private final String email;
+    private final Email email;
     private final String username;
     private final String password;
     private final String bio;
@@ -14,7 +14,7 @@ public class UserUpdateCommand {
 
     public static class Builder {
 
-        private String email;
+        private Email email;
         private String username;
         private String password;
         private String bio;
@@ -24,7 +24,7 @@ public class UserUpdateCommand {
             // no essential fields
         }
 
-        public Builder email(String email) {
+        public Builder email(Email email) {
             this.email = email;
             return this;
         }
@@ -63,7 +63,7 @@ public class UserUpdateCommand {
         this.image = builder.image;
     }
 
-    public Optional<String> getEmailToUpdate() {
+    public Optional<Email> getEmailToUpdate() {
         return ofNullable(email);
     }
 

@@ -8,7 +8,7 @@ public class AuthorizedUser extends User {
         return new AuthorizedUser(user.getEmail(), user.getUsername(), user.getBio(), user.getImage(), token);
     }
 
-    private AuthorizedUser(String email, String username, String bio, String image, String token) {
+    private AuthorizedUser(Email email, String username, String bio, String image, String token) {
         super(email, username, bio, image);
         this.token = token;
     }

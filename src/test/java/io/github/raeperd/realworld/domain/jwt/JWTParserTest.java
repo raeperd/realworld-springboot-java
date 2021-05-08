@@ -1,7 +1,8 @@
 package io.github.raeperd.realworld.domain.jwt;
 
-import io.github.raeperd.realworld.domain.user.User;
 import io.github.raeperd.realworld.domain.jwt.exception.InvalidJWTException;
+import io.github.raeperd.realworld.domain.user.Email;
+import io.github.raeperd.realworld.domain.user.User;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.Mock;
@@ -70,7 +71,7 @@ class JWTParserTest {
     @Test
     void when_token_has_expired_expect_InvalidJWTException(@Mock User user) {
         when(user.getId()).thenReturn(1L);
-        when(user.getEmail()).thenReturn("user@email.com");
+        when(user.getEmail()).thenReturn(Email.of("user@email.com"));
         final var expiredToken = generateExpiredToken(user);
 
         assertThatThrownBy(() ->
@@ -90,7 +91,7 @@ class JWTParserTest {
     @Test
     void when_valid_token_expect_return_jwtPayload(@Mock User user) {
         when(user.getId()).thenReturn(1L);
-        when(user.getEmail()).thenReturn("user@email.com");
+        when(user.getEmail()).thenReturn(Email.of("user@email.com"));
         final var token = generateToken(user, 2L);
 
         assertThat(jwtParser.validateToken(token))

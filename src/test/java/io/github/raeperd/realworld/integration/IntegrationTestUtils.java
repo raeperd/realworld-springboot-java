@@ -22,7 +22,7 @@ class IntegrationTestUtils {
     public static ResultActions saveUser(MockMvc mockMvc, User user) throws Exception {
         return mockMvc.perform(post("/users")
                 .accept(APPLICATION_JSON).contentType(APPLICATION_JSON)
-                .content(OBJECT_MAPPER.writeValueAsString(new UserPostRequestDTO(user.getUsername(), user.getEmail(), "password"))));
+                .content(OBJECT_MAPPER.writeValueAsString(new UserPostRequestDTO(user.getUsername(), user.getEmail().toString(), "password"))));
     }
 
     public static String loginAndRememberToken(MockMvc mockMvc, User user) throws Exception {
@@ -33,6 +33,6 @@ class IntegrationTestUtils {
     public static ResultActions login(MockMvc mockMvc, User user) throws Exception {
         return mockMvc.perform(post("/users/login")
                 .accept(APPLICATION_JSON).contentType(APPLICATION_JSON)
-                .content(OBJECT_MAPPER.writeValueAsString(new UserLoginRequestDTO(user.getEmail(), "password"))));
+                .content(OBJECT_MAPPER.writeValueAsString(new UserLoginRequestDTO(user.getEmail().toString(), "password"))));
     }
 }

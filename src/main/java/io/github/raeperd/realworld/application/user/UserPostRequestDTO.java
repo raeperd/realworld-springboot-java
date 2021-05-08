@@ -2,6 +2,7 @@ package io.github.raeperd.realworld.application.user;
 
 import com.fasterxml.jackson.annotation.JsonTypeInfo;
 import com.fasterxml.jackson.annotation.JsonTypeName;
+import io.github.raeperd.realworld.domain.user.Email;
 import io.github.raeperd.realworld.domain.user.User;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
@@ -20,7 +21,7 @@ public class UserPostRequestDTO {
     private final String password;
 
     public User toUser() {
-        return new User(email, username, password);
+        return new User(Email.of(email), username, password);
     }
 
 }

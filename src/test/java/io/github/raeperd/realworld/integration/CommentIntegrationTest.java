@@ -4,6 +4,7 @@ package io.github.raeperd.realworld.integration;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import io.github.raeperd.realworld.application.article.ArticlePostRequestDTO;
 import io.github.raeperd.realworld.application.article.comment.CommentPostRequestDTO;
+import io.github.raeperd.realworld.domain.user.Email;
 import io.github.raeperd.realworld.domain.user.User;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Tag;
@@ -41,10 +42,10 @@ class CommentIntegrationTest {
 
     @BeforeAll
     void initializeArticle() throws Exception {
-        final var authorToken = saveUserAndRememberToken(mockMvc, new User("author@email.com", "author", "password"));
+        final var authorToken = saveUserAndRememberToken(mockMvc, new User(Email.of("author@email.com"), "author", "password"));
         postSampleArticle(authorToken).andExpect(status().isOk());
 
-        userToken = saveUserAndRememberToken(mockMvc, new User("user@email.com", "user", "password"));
+        userToken = saveUserAndRememberToken(mockMvc, new User(Email.of("user@email.com"), "user", "password"));
     }
 
     private ResultActions postSampleArticle(String authorToken) throws Exception {
