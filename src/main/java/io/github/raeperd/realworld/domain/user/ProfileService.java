@@ -1,7 +1,5 @@
-package io.github.raeperd.realworld.domain.user.profile;
+package io.github.raeperd.realworld.domain.user;
 
-import io.github.raeperd.realworld.domain.user.UserContextHolder;
-import io.github.raeperd.realworld.domain.user.UserRepository;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -18,7 +16,7 @@ public class ProfileService {
 
     @Transactional
     public Profile viewProfileByUsername(String username) {
-        final var userToSee = userRepository.findFirstByUsername(username)
+        final var userToSee = userRepository.findFirstByProfileUsername(username)
                 .orElseThrow(IllegalArgumentException::new);
         return userContextHolder.getCurrentUser()
                 .map(currentUser -> currentUser.viewProfile(userToSee))
@@ -27,7 +25,7 @@ public class ProfileService {
 
     @Transactional
     public Profile followByUsername(String username) {
-        final var userToFollow = userRepository.findFirstByUsername(username)
+        final var userToFollow = userRepository.findFirstByProfileUsername(username)
                 .orElseThrow(IllegalArgumentException::new);
         return userContextHolder.getCurrentUser()
                 .map(currentUser -> currentUser.followUser(userToFollow))
@@ -37,7 +35,7 @@ public class ProfileService {
 
     @Transactional
     public Profile unfollowByUsername(String username) {
-        final var userToUnfollow = userRepository.findFirstByUsername(username)
+        final var userToUnfollow = userRepository.findFirstByProfileUsername(username)
                 .orElseThrow(IllegalArgumentException::new);
         return userContextHolder.getCurrentUser()
                 .map(currentUser -> currentUser.unfollowUser(userToUnfollow))

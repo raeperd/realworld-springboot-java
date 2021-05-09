@@ -1,6 +1,6 @@
 package io.github.raeperd.realworld.domain.article.comment;
 
-import io.github.raeperd.realworld.domain.user.profile.Profile;
+import io.github.raeperd.realworld.domain.user.Profile;
 
 import java.time.LocalDateTime;
 

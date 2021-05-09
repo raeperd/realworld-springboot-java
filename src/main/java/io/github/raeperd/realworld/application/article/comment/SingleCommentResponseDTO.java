@@ -1,7 +1,7 @@
 package io.github.raeperd.realworld.application.article.comment;
 
 import io.github.raeperd.realworld.domain.article.comment.CommentView;
-import io.github.raeperd.realworld.domain.user.profile.Profile;
+import io.github.raeperd.realworld.domain.user.Profile;
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 

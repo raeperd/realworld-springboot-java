@@ -1,6 +1,6 @@
 package io.github.raeperd.realworld.domain.article;
 
-import io.github.raeperd.realworld.domain.user.profile.Profile;
+import io.github.raeperd.realworld.domain.user.Profile;
 
 public class ArticleView {
 
