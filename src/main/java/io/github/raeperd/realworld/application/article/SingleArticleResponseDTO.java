@@ -3,7 +3,7 @@ package io.github.raeperd.realworld.application.article;
 import io.github.raeperd.realworld.domain.article.Article;
 import io.github.raeperd.realworld.domain.article.ArticleView;
 import io.github.raeperd.realworld.domain.article.tag.Tag;
-import io.github.raeperd.realworld.domain.user.profile.Profile;
+import io.github.raeperd.realworld.domain.user.Profile;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;

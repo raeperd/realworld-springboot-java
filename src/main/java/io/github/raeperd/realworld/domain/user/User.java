@@ -1,7 +1,5 @@
 package io.github.raeperd.realworld.domain.user;
 
-import io.github.raeperd.realworld.domain.user.profile.Profile;
-
 import javax.persistence.*;
 import java.util.ArrayList;
 import java.util.Collection;
@@ -22,9 +20,9 @@ public class User {
     @Embedded
     private Email email;
 
-    private String username;
-    private String bio;
-    private String image;
+    @Embedded
+    private Profile profile;
+
     private String password;
 
     public User(Email email, String username, String password) {
@@ -35,20 +33,18 @@ public class User {
     User(Email email, String username, String bio, String image) {
         this.id = null;
         this.email = email;
-        this.username = username;
-        this.bio = bio;
-        this.image = image;
+        this.profile = Profile.of(username, bio, image);
     }
 
     protected User() {
     }
 
     User updateUser(UserUpdateCommand updateCommand) {
-        updateCommand.getEmailToUpdate().ifPresent(emailToUpdate -> this.email = emailToUpdate);
-        updateCommand.getUsernameToUpdate().ifPresent(usernameToUpdate -> this.username = usernameToUpdate);
-        updateCommand.getBioToUpdate().ifPresent(bioToUpdate -> this.bio = bioToUpdate);
-        updateCommand.getImageToUpdate().ifPresent(imageToUpdate -> this.image = imageToUpdate);
-        updateCommand.getPasswordToUpdate().ifPresent(passwordToUpdate -> this.password = passwordToUpdate);
+        updateCommand.getEmailToUpdate().ifPresent(emailToUpdate -> email = emailToUpdate);
+        updateCommand.getUsernameToUpdate().ifPresent(usernameToUpdate -> profile.setUsername(usernameToUpdate));
+        updateCommand.getBioToUpdate().ifPresent(bioToUpdate -> profile.setBio(bioToUpdate));
+        updateCommand.getImageToUpdate().ifPresent(imageToUpdate -> profile.setImage(imageToUpdate));
+        updateCommand.getPasswordToUpdate().ifPresent(passwordToUpdate -> password = passwordToUpdate);
         return this;
     }
 
@@ -63,8 +59,11 @@ public class User {
     }
 
     public Profile viewProfile(User otherUser) {
-        return new Profile(otherUser.getUsername(), otherUser.getBio(), otherUser.getImage(),
-                followingUsers.contains(otherUser));
+        return otherUser.getProfile().withFollowing(followingUsers.contains(otherUser));
+    }
+
+    public Profile getProfile() {
+        return profile;
     }
 
     public Collection<User> getFollowingUsers() {
@@ -80,15 +79,15 @@ public class User {
     }
 
     public String getUsername() {
-        return username;
+        return profile.getUsername();
     }
 
     public String getBio() {
-        return bio;
+        return profile.getBio();
     }
 
     public String getImage() {
-        return image;
+        return profile.getImage();
     }
 
     @Override

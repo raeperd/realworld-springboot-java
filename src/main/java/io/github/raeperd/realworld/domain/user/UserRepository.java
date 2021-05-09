@@ -10,6 +10,6 @@ public interface UserRepository extends JpaRepository<User, Long> {
 
     Optional<User> findFirstByEmailAndPassword(Email email, String password);
 
-    Optional<User> findFirstByUsername(String username);
+    Optional<User> findFirstByProfileUsername(String username);
 
 }
