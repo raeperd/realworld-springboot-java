@@ -20,7 +20,7 @@ public class UserUpdateCommand {
         private String bio;
         private String image;
 
-        public Builder() {
+        private Builder() {
             // no essential fields
         }
 
@@ -52,7 +52,10 @@ public class UserUpdateCommand {
         public UserUpdateCommand build() {
             return new UserUpdateCommand(this);
         }
+    }
 
+    public static Builder builder() {
+        return new Builder();
     }
 
     private UserUpdateCommand(Builder builder) {

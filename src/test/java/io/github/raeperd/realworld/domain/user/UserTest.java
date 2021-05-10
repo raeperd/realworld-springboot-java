@@ -1,14 +1,21 @@
 package io.github.raeperd.realworld.domain.user;
 
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.Arguments;
 import org.junit.jupiter.params.provider.MethodSource;
+import org.mockito.Mock;
+import org.mockito.junit.jupiter.MockitoExtension;
+import org.springframework.security.crypto.password.PasswordEncoder;
 
 import java.util.stream.Stream;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.mockito.BDDMockito.then;
+import static org.mockito.Mockito.times;
 
+@ExtendWith(MockitoExtension.class)
 class UserTest {
 
     @Test
@@ -23,22 +30,6 @@ class UserTest {
         assertThat(childUser).isInstanceOf(User.class);
     }
 
-    @Test
-    void when_update_all_possible_field_expect_return_user_updated() {
-        final var user = new User(null, null, null);
-        final var updateCommand = new UserUpdateCommand.Builder()
-                .email(Email.of("updated-email"))
-                .username("updated-username")
-                .bio("updated-bio")
-                .image("updated-image")
-                .password("updated-password")
-                .build();
-
-        user.updateUser(updateCommand);
-
-        assertThat(user).hasNoNullFieldsOrPropertiesExcept("id", "followingUsers");
-    }
-
     @MethodSource("provideUserUpdateCommandWithName")
     @ParameterizedTest
     void when_update_user_with_single_property_expect_return_user_updated(UserUpdateCommand command, String property) {
@@ -51,10 +42,9 @@ class UserTest {
 
     private static Stream<Arguments> provideUserUpdateCommandWithName() {
         return Stream.of(
-                Arguments.of(new UserUpdateCommand.Builder().username("updated-username").build(), "username"),
-                Arguments.of(new UserUpdateCommand.Builder().bio("updated-bio").build(), "bio"),
-                Arguments.of(new UserUpdateCommand.Builder().image("updated-image").build(), "image"),
-                Arguments.of(new UserUpdateCommand.Builder().password("updated-password").build(), "password")
+                Arguments.of(UserUpdateCommand.builder().username("updated-username").build(), "username"),
+                Arguments.of(UserUpdateCommand.builder().bio("updated-bio").build(), "bio"),
+                Arguments.of(UserUpdateCommand.builder().image("updated-image").build(), "image")
         );
     }
 
@@ -73,6 +63,16 @@ class UserTest {
         final var user = new User(Email.of("some-email"), "some-username", "some-password");
 
         assertThat(user).hasSameHashCodeAs(user);
+    }
+
+    @Test
+    void when_change_password_expect_encode_new_password(@Mock PasswordEncoder passwordEncoder) {
+        final var newRawString = "newRawPassword";
+        final var user = new User(Email.of("some-email"), "some-username", "some-password");
+
+        user.changePassword("newRawPassword", passwordEncoder);
+
+        then(passwordEncoder).should(times(1)).encode(newRawString);
     }
 
 }

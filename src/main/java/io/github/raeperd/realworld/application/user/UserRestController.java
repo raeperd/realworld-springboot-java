@@ -21,7 +21,7 @@ public class UserRestController {
     @PostMapping("/users")
     public UserResponseDTO postUser(@RequestBody UserPostRequestDTO postRequest) {
         return UserResponseDTO.fromAuthorizedUser(
-                userService.signUp(postRequest.toUser()));
+                userService.signIn(postRequest.toSignInRequest()));
     }
 
     @PostMapping("/users/login")
