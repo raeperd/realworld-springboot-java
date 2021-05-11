@@ -1,6 +1,7 @@
 package io.github.raeperd.realworld.domain.user;
 
 import io.github.raeperd.realworld.domain.jwt.JWTGenerator;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -14,22 +15,25 @@ public class UserService {
     private final UserRepository userRepository;
     private final JWTGenerator jwtGenerator;
     private final UserContextHolder userContextHolder;
+    private final PasswordEncoder passwordEncoder;
 
-    public UserService(UserRepository userRepository, JWTGenerator jwtGenerator, UserContextHolder userContextHolder) {
+    public UserService(UserRepository userRepository, JWTGenerator jwtGenerator, UserContextHolder userContextHolder, PasswordEncoder passwordEncoder) {
         this.userRepository = userRepository;
         this.jwtGenerator = jwtGenerator;
         this.userContextHolder = userContextHolder;
+        this.passwordEncoder = passwordEncoder;
     }
 
     @Transactional(readOnly = true)
     public Optional<AuthorizedUser> login(Email email, String password) {
-        return userRepository.findFirstByEmailAndPassword(email, password)
+        return userRepository.findFirstByEmail(email)
+                .filter(user -> user.matchPassword(password, passwordEncoder))
                 .map(this::authorizeUser);
     }
 
     @Transactional
-    public AuthorizedUser signUp(User user) {
-        return authorizeUser(userRepository.save(user));
+    public AuthorizedUser signIn(UserSignInRequest request) {
+        return authorizeUser(userRepository.save(userFromSignInRequest(request)));
     }
 
     @Transactional(readOnly = true)
@@ -39,13 +43,21 @@ public class UserService {
                 .orElseThrow(IllegalStateException::new);
     }
 
+    // TODO: This can be improved using Profile class
     @Transactional
     public AuthorizedUser updateUser(UserUpdateCommand updateCommand) {
-        return userContextHolder.getCurrentUser()
-                .map(user -> user.updateUser(updateCommand))
-                .map(userRepository::save)
-                .map(this::authorizeUser)
+        final var currentUser = userContextHolder.getCurrentUser()
                 .orElseThrow(IllegalStateException::new);
+        updateCommand.getPasswordToUpdate()
+                .ifPresent(passwordToUpdate -> currentUser.changePassword(passwordToUpdate, passwordEncoder));
+        currentUser.updateUser(updateCommand);
+        return authorizeUser(currentUser);
+    }
+
+    private User userFromSignInRequest(UserSignInRequest request) {
+        return User.of(request.getEmail(),
+                request.getUsername(),
+                Password.of(request.getRawPassword(), passwordEncoder));
     }
 
     private AuthorizedUser authorizeUser(User user) {

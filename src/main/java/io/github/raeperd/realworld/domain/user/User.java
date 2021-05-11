@@ -1,5 +1,7 @@
 package io.github.raeperd.realworld.domain.user;
 
+import org.springframework.security.crypto.password.PasswordEncoder;
+
 import javax.persistence.*;
 import java.util.ArrayList;
 import java.util.Collection;
@@ -23,11 +25,23 @@ public class User {
     @Embedded
     private Profile profile;
 
-    private String password;
+    @Embedded
+    private Password password;
 
-    public User(Email email, String username, String password) {
-        this(email, username, null, null);
+    static User of(Email email, String username, Password password) {
+        return new User(email, username, password);
+    }
+
+    private User(Email email, String username, Password password) {
+        this.email = email;
+        this.profile = Profile.of(username, null, null);
         this.password = password;
+    }
+
+    public User(Email email, String username, String encodedPassword) {
+        this(email, username, null, null);
+        // TODO
+        this.password = null;
     }
 
     User(Email email, String username, String bio, String image) {
@@ -39,12 +53,19 @@ public class User {
     protected User() {
     }
 
+    boolean matchPassword(String rawPassword, PasswordEncoder passwordEncoder) {
+        return password.matches(rawPassword, passwordEncoder);
+    }
+
+    public void changePassword(String newRawPassword, PasswordEncoder passwordEncoder) {
+        this.password = Password.of(newRawPassword, passwordEncoder);
+    }
+
     User updateUser(UserUpdateCommand updateCommand) {
         updateCommand.getEmailToUpdate().ifPresent(emailToUpdate -> email = emailToUpdate);
         updateCommand.getUsernameToUpdate().ifPresent(usernameToUpdate -> profile.setUsername(usernameToUpdate));
         updateCommand.getBioToUpdate().ifPresent(bioToUpdate -> profile.setBio(bioToUpdate));
         updateCommand.getImageToUpdate().ifPresent(imageToUpdate -> profile.setImage(imageToUpdate));
-        updateCommand.getPasswordToUpdate().ifPresent(passwordToUpdate -> password = passwordToUpdate);
         return this;
     }
 

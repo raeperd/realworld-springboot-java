@@ -26,7 +26,7 @@ public class UserUpdateRequestDTO {
     private final String image;
 
     public UserUpdateCommand toUpdateCommand() {
-        return new UserUpdateCommand.Builder()
+        return UserUpdateCommand.builder()
                 .email(Email.of(email))
                 .username(username)
                 .password(password)

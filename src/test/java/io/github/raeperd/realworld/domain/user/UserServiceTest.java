@@ -6,13 +6,12 @@ import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
+import org.springframework.security.crypto.password.PasswordEncoder;
 
 import static java.util.Optional.empty;
 import static java.util.Optional.of;
-import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
-import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.ArgumentMatchers.anyString;
+import static org.mockito.ArgumentMatchers.*;
 import static org.mockito.BDDMockito.given;
 import static org.mockito.BDDMockito.then;
 import static org.mockito.Mockito.times;
@@ -29,48 +28,41 @@ class UserServiceTest {
     private JWTGenerator jwtGenerator;
     @Mock
     private UserContextHolder userContextHolder;
+    @Mock
+    private PasswordEncoder passwordEncoder;
 
     @BeforeEach
     void initializeService() {
-        this.userService = new UserService(userRepository, jwtGenerator, userContextHolder);
+        this.userService = new UserService(userRepository, jwtGenerator, userContextHolder, passwordEncoder);
     }
 
     @Test
-    void when_signUp_expect_userRepository_save_called(@Mock User user) {
-        given(userRepository.save(user)).willReturn(user);
+    void when_signIn_expect_encode_password(@Mock User user) {
+        final var request = UserSignInRequest.of(Email.of("email"), "username", "rawPassword");
+        given(passwordEncoder.encode("rawPassword")).willReturn("encoded");
+        given(userRepository.save(any(User.class))).willReturn(user);
 
-        userService.signUp(user);
+        userService.signIn(request);
 
-        then(userRepository).should(times(1)).save(user);
+        then(passwordEncoder).should(times(1)).encode("rawPassword");
     }
 
     @Test
-    void when_signUp_expect_jwtService_to_generateToken(@Mock User user) {
-        final var mockedToken = "MOCKED_TOKEN";
-        when(userRepository.save(user)).thenReturn(user);
-        when(jwtGenerator.generateTokenFromUser(user)).thenReturn(mockedToken);
-
-        assertThat(userService.signUp(user))
-                .extracting(AuthorizedUser::getToken)
-                .isEqualTo(mockedToken);
-    }
-
-    @Test
-    void when_login_expect_userRepository_findFirstByEmailAndPassword_called() {
-        final var email = Email.of("email");
+    void when_login_expect_userRepository_findFirstByEmailAndPassword_called(@Mock Email email) {
         final var password = "password";
 
         userService.login(email, password);
 
         then(userRepository).should(times(1))
-                .findFirstByEmailAndPassword(email, password);
+                .findFirstByEmail(email);
     }
 
     @Test
-    void when_login_expect_jwtService_to_generateToken(@Mock User user) {
-        given(userRepository.findFirstByEmailAndPassword(any(Email.class), anyString())).willReturn(of(user));
+    void when_login_expect_jwtService_to_generateToken(@Mock Email email, @Mock User user) {
+        given(userRepository.findFirstByEmail(any(Email.class))).willReturn(of(user));
+        given(user.matchPassword(anyString(), eq(passwordEncoder))).willReturn(true);
 
-        userService.login(Email.of("email"), "password");
+        userService.login(email, "password");
 
         then(jwtGenerator).should(times(1)).generateTokenFromUser(user);
     }
@@ -82,6 +74,16 @@ class UserServiceTest {
         assertThatThrownBy(() ->
                 userService.updateUser(userUpdateCommand)
         ).isInstanceOf(IllegalStateException.class);
+    }
+
+    @Test
+    void when_there_is_password_to_update_expect_user_changes_password(@Mock User user) {
+        final var command = UserUpdateCommand.builder().password("passwordToUpdate").build();
+        given(userContextHolder.getCurrentUser()).willReturn(of(user));
+
+       userService.updateUser(command);
+
+       then(user).should(times(1)).changePassword("passwordToUpdate", passwordEncoder);
     }
 
 }

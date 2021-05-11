@@ -47,14 +47,14 @@ class UserRestControllerTest {
     private ObjectMapper objectMapper;
 
     @Test
-    void when_post_users_expect_userService_createUser_called(@Mock AuthorizedUser authorizedUser) throws Exception {
-        given(userService.signUp(any(User.class))).willReturn(authorizedUser);
+    void when_post_users_expect_userService_signIn_called(@Mock AuthorizedUser authorizedUser) throws Exception {
+        given(userService.signIn(any(UserSignInRequest.class))).willReturn(authorizedUser);
 
         mockMvc.perform(post("/users")
                 .contentType(APPLICATION_JSON)
                 .content(objectMapper.writeValueAsString(new UserPostRequestDTO("username", "email", "password"))));
 
-        then(userService).should(times(1)).signUp(any(User.class));
+        then(userService).should(times(1)).signIn(any(UserSignInRequest.class));
     }
 
     @Test
