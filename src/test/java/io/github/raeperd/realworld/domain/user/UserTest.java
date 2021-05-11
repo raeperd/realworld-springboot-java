@@ -33,7 +33,7 @@ class UserTest {
     @MethodSource("provideUserUpdateCommandWithName")
     @ParameterizedTest
     void when_update_user_with_single_property_expect_return_user_updated(UserUpdateCommand command, String property) {
-        final var user = new User(Email.of("some-email"), "some-username", "some-password");
+        final var user = new User(Email.of("some-email"), "some-username");
 
         user.updateUser(command);
 
@@ -50,8 +50,8 @@ class UserTest {
 
     @Test
     void when_follow_user_expect_following_profile() {
-        final var user = new User(Email.of("some-email"), "some-username", "some-password");
-        final var celebrity = new User(Email.of("other-email"), "celeb", "some-password");
+        final var user = new User(Email.of("some-email"), "some-username");
+        final var celebrity = new User(Email.of("other-email"), "celeb");
 
         user.followUser(celebrity);
 
@@ -60,7 +60,7 @@ class UserTest {
 
     @Test
     void same_user_generate_same_hash_code() {
-        final var user = new User(Email.of("some-email"), "some-username", "some-password");
+        final var user = new User(Email.of("some-email"), "some-username");
 
         assertThat(user).hasSameHashCodeAs(user);
     }
@@ -68,7 +68,7 @@ class UserTest {
     @Test
     void when_change_password_expect_encode_new_password(@Mock PasswordEncoder passwordEncoder) {
         final var newRawString = "newRawPassword";
-        final var user = new User(Email.of("some-email"), "some-username", "some-password");
+        final var user = new User(Email.of("some-email"), "some-username");
 
         user.changePassword("newRawPassword", passwordEncoder);
 

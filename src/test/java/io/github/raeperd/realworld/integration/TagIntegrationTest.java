@@ -3,8 +3,7 @@ package io.github.raeperd.realworld.integration;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import io.github.raeperd.realworld.application.article.ArticlePostRequestDTO;
-import io.github.raeperd.realworld.domain.user.Email;
-import io.github.raeperd.realworld.domain.user.User;
+import io.github.raeperd.realworld.application.user.UserPostRequestDTO;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Tag;
 import org.junit.jupiter.api.Test;
@@ -41,7 +40,7 @@ class TagIntegrationTest {
 
     @BeforeEach
     void initializeToken() throws Exception {
-        userToken = saveUserAndRememberToken(mockMvc, new User(Email.of("some-user@email.com"), "user", "password"));
+        userToken = saveUserAndRememberToken(mockMvc, new UserPostRequestDTO("user", "some-user@email.com", "password"));
     }
 
     @Test

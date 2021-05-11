@@ -1,8 +1,8 @@
 package io.github.raeperd.realworld.integration;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
-import io.github.raeperd.realworld.domain.user.Email;
-import io.github.raeperd.realworld.domain.user.User;
+import io.github.raeperd.realworld.application.user.UserLoginRequestDTO;
+import io.github.raeperd.realworld.application.user.UserPostRequestDTO;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Tag;
 import org.junit.jupiter.api.Test;
@@ -35,14 +35,14 @@ class ProfileIntegrationTest {
 
     private String userToken;
 
-    private final User userSaved = new User(Email.of("raeperd@gmail.com"), "raeperd", "password");
-    private final User celebrity = new User(Email.of("celeb@gmail.com"), "celebrity", "psasword");
+    private final UserPostRequestDTO userSaved = new UserPostRequestDTO("raeperd", "raeperd@gmail.com", "password");
+    private final UserPostRequestDTO celebrity = new UserPostRequestDTO("celebrity", "celeb@gmail.com", "password");
 
     @BeforeAll
     void initializeUserAndToken() throws Exception {
         saveUser(mockMvc, userSaved).andExpect(status().isCreated());
         saveUser(mockMvc, celebrity).andExpect(status().isCreated());
-        userToken = loginAndRememberToken(mockMvc, userSaved);
+        userToken = loginAndRememberToken(mockMvc, new UserLoginRequestDTO(userSaved.getEmail(), userSaved.getPassword()));
     }
 
     @Test
@@ -59,7 +59,7 @@ class ProfileIntegrationTest {
 
     @Test
     void when_follow_user_expect_return_following_profile() throws Exception {
-        queryFollowUser(mockMvc, celebrity, userToken)
+        queryFollowUser(mockMvc, celebrity.getUsername(), userToken)
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("profile").exists())
                 .andExpect(jsonPath("profile.following", is(true)));
@@ -70,19 +70,19 @@ class ProfileIntegrationTest {
                 .andExpect(jsonPath("profile").exists())
                 .andExpect(jsonPath("profile.following", is(true)));
 
-        queryUnfollowUser(mockMvc, celebrity, userToken)
+        queryUnfollowUser(mockMvc, celebrity.getUsername(), userToken)
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("profile").exists())
                 .andExpect(jsonPath("profile.following", is(false)));
     }
 
-    static ResultActions queryFollowUser(MockMvc mockMvc, User userToFollow, String userToken) throws Exception {
-        return mockMvc.perform(post("/profiles/{username}/follow", userToFollow.getUsername())
+    static ResultActions queryFollowUser(MockMvc mockMvc, String username, String userToken) throws Exception {
+        return mockMvc.perform(post("/profiles/{username}/follow", username)
                 .header(AUTHORIZATION, "Token " + userToken));
     }
 
-    static ResultActions queryUnfollowUser(MockMvc mockMvc, User userToUnfollow, String userToken) throws Exception {
-        return mockMvc.perform(delete("/profiles/{username}/follow", userToUnfollow.getUsername())
+    static ResultActions queryUnfollowUser(MockMvc mockMvc, String usernameToUnfollow, String userToken) throws Exception {
+        return mockMvc.perform(delete("/profiles/{username}/follow", usernameToUnfollow)
                 .header(AUTHORIZATION, "Token " + userToken));
     }
 
