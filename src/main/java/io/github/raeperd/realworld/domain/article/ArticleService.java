@@ -1,5 +1,6 @@
 package io.github.raeperd.realworld.domain.article;
 
+import io.github.raeperd.realworld.domain.article.title.ArticleTitle;
 import io.github.raeperd.realworld.domain.user.UserContextHolder;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -46,7 +47,7 @@ public class ArticleService {
 
     @Transactional(readOnly = true)
     public Optional<Article> findArticleBySlug(String slug) {
-        return articleRepository.findFirstBySlug(slug);
+        return articleRepository.findFirstBySlug(ArticleTitle.of(slug).toSlug());
     }
 
     @Transactional
@@ -57,7 +58,7 @@ public class ArticleService {
 
     @Transactional
     public ArticleView updateArticleAndView(String slug, ArticleUpdateCommand articleUpdateCommand) {
-        return articleRepository.findFirstBySlug(slug)
+        return articleRepository.findFirstBySlug(ArticleTitle.of(slug).toSlug())
                 .map(article -> article.updateArticle(articleUpdateCommand))
                 .map(this::viewArticleFromCurrentUser)
                 .orElseThrow(NoSuchElementException::new);

@@ -6,8 +6,6 @@ import java.util.Objects;
 @Embeddable
 public class ArticleTitle {
 
-    private static final String SLUG_TRANSFORM_REGEX = "\\$,'\"|\\s|\\.|\\?";
-
     private String title;
 
     public static ArticleTitle of(String title) {
@@ -21,7 +19,7 @@ public class ArticleTitle {
     protected ArticleTitle() {
     }
 
-    Slug toSlug() {
+    public Slug toSlug() {
         return Slug.of(this);
     }
 
@@ -41,26 +39,6 @@ public class ArticleTitle {
     @Override
     public int hashCode() {
         return Objects.hash(title);
-    }
-
-    static class Slug {
-
-        private final String value;
-
-        private static Slug of(ArticleTitle articleTitle) {
-            return new Slug(articleTitle.toString()
-                    .toLowerCase()
-                    .replaceAll(SLUG_TRANSFORM_REGEX, "-"));
-        }
-
-        private Slug(String value) {
-            this.value = value;
-        }
-
-        @Override
-        public String toString() {
-            return value;
-        }
     }
 
 }

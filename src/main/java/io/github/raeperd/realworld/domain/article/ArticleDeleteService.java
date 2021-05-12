@@ -1,5 +1,6 @@
 package io.github.raeperd.realworld.domain.article;
 
+import io.github.raeperd.realworld.domain.article.title.ArticleTitle;
 import io.github.raeperd.realworld.domain.user.UserContextHolder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -25,7 +26,7 @@ public class ArticleDeleteService {
     public void deleteArticleBySlug(String slug) {
         final var currentUser = userContextHolder.getCurrentUser()
                 .orElseThrow(IllegalStateException::new);
-        final var articleToDelete = articleRepository.findFirstBySlug(slug)
+        final var articleToDelete = articleRepository.findFirstBySlug(ArticleTitle.of(slug).toSlug())
                 .orElseThrow(NoSuchElementException::new);
         if (!articleToDelete.isAuthor(currentUser)) {
             throw new IllegalAccessError(

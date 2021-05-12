@@ -3,6 +3,7 @@ package io.github.raeperd.realworld.domain.article;
 import io.github.raeperd.realworld.domain.article.comment.Comment;
 import io.github.raeperd.realworld.domain.article.tag.Tag;
 import io.github.raeperd.realworld.domain.article.title.ArticleTitle;
+import io.github.raeperd.realworld.domain.article.title.Slug;
 import io.github.raeperd.realworld.domain.user.User;
 import org.springframework.data.annotation.CreatedBy;
 import org.springframework.data.annotation.CreatedDate;
@@ -43,35 +44,30 @@ public class Article {
 
     @Embedded
     private ArticleTitle title;
+    @Embedded
+    private Slug slug;
     private String description;
     private String body;
-
-    private String slug;
 
     protected Article() {
     }
 
-    public Article(String title, String description, String body) {
+    public Article(ArticleTitle title, String description, String body) {
         this(title, description, body, emptySet());
     }
 
-    public Article(String title, String description, String body, Set<Tag> tagList) {
-        this.title = ArticleTitle.of(title);
-        this.slug = slugFromTitle(title);
+    public Article(ArticleTitle title, String description, String body, Set<Tag> tagList) {
+        this.title = title;
+        this.slug = title.toSlug();
         this.description = description;
         this.body = body;
         this.tagList.addAll(tagList);
     }
 
-    private static String slugFromTitle(String title) {
-        return title.toLowerCase().replaceAll("\\$,'\"|\\s|\\.|\\?", "-");
-    }
-
     Article updateArticle(ArticleUpdateCommand updateCommand) {
         updateCommand.getTitleToUpdate().ifPresent(titleToUpdate -> {
             title = ArticleTitle.of(titleToUpdate);
-            slug = slugFromTitle(titleToUpdate);
-        });
+            slug = title.toSlug(); });
         updateCommand.getDescriptionToUpdate().ifPresent(descriptionToUpdate -> description = descriptionToUpdate);
         updateCommand.getBodyToUpdate().ifPresent(bodyToUpdate -> body = bodyToUpdate);
         return this;
@@ -90,10 +86,6 @@ public class Article {
         return comments;
     }
 
-    public String getSlug() {
-        return slug;
-    }
-
     public boolean isAuthor(User user) {
         return author.equals(user);
     }
@@ -110,8 +102,12 @@ public class Article {
         return updatedAt;
     }
 
-    public String getTitle() {
-        return title.toString();
+    public ArticleTitle getTitle() {
+        return title;
+    }
+
+    public Slug getSlug() {
+        return slug;
     }
 
     public String getDescription() {

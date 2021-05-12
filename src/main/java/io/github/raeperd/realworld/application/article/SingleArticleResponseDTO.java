@@ -12,6 +12,7 @@ import java.time.ZonedDateTime;
 import java.util.HashSet;
 import java.util.Set;
 
+import static java.lang.String.valueOf;
 import static java.time.ZoneId.of;
 
 @Getter
@@ -49,8 +50,9 @@ public class SingleArticleResponseDTO {
         }
 
         private static ArticleResponseDTOBuilder fromArticle(Article article) {
-            return builder().slug(article.getSlug())
-                    .title(article.getTitle())
+            return builder()
+                    .slug(valueOf(article.getSlug()))
+                    .title(valueOf(article.getTitle()))
                     .description(article.getDescription())
                     .body(article.getBody())
                     .tagList(new HashSet<>(article.getTagList()))
