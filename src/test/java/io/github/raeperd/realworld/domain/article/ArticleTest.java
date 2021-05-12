@@ -7,8 +7,11 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 
+import java.time.LocalDateTime;
+
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.Mockito.when;
+import static org.springframework.test.util.ReflectionTestUtils.setField;
 
 @ExtendWith(MockitoExtension.class)
 class ArticleTest {
@@ -27,16 +30,6 @@ class ArticleTest {
     }
 
     @Test
-    void when_article_has_same_id_and_title_expect_equals() {
-        final var article = new Article("some title", null, null);
-        final var articleWithSameTitle = new Article(article.getTitle(), null, null);
-
-        assertThat(article)
-                .isEqualTo(articleWithSameTitle)
-                .hasSameHashCodeAs(articleWithSameTitle);
-    }
-
-    @Test
     void when_create_article_with_empty_space_title_expect_dash_separated_slug() {
         final var article = new Article("some title", null, null);
 
@@ -51,6 +44,21 @@ class ArticleTest {
         article.addComment(comment);
 
         assertThat(article.deleteCommentByIdAndUser(0L, user)).isFalse();
+    }
+
+    @Test
+    void when_article_with_same_title_and_createdAt_expect_equal_and_hashCode() {
+        final var article = articleWithTitleAndCreatedAt("title", LocalDateTime.MIN);
+
+        assertThat(articleWithTitleAndCreatedAt("title", LocalDateTime.MIN))
+                .isEqualTo(article)
+                .hasSameHashCodeAs(article);
+    }
+
+    private Article articleWithTitleAndCreatedAt(String title, LocalDateTime localDateTime) {
+        final var article = new Article(title, null, null);
+        setField(article, "createdAt", localDateTime);
+        return article;
     }
 
 }

@@ -2,6 +2,7 @@ package io.github.raeperd.realworld.domain.article;
 
 import io.github.raeperd.realworld.domain.article.comment.Comment;
 import io.github.raeperd.realworld.domain.article.tag.Tag;
+import io.github.raeperd.realworld.domain.article.title.ArticleTitle;
 import io.github.raeperd.realworld.domain.user.User;
 import org.springframework.data.annotation.CreatedBy;
 import org.springframework.data.annotation.CreatedDate;
@@ -25,13 +26,13 @@ public class Article {
 
     @CreatedBy
     @JoinColumn
-    @ManyToOne(targetEntity = User.class)
+    @ManyToOne
     private User author;
 
-    @OneToMany(fetch = FetchType.LAZY, cascade = CascadeType.ALL)
+    @OneToMany(cascade = CascadeType.ALL)
     private final Collection<Tag> tagList = new HashSet<>();
 
-    @OneToMany(fetch = FetchType.LAZY, cascade = CascadeType.ALL)
+    @OneToMany(cascade = CascadeType.ALL)
     private final Collection<Comment> comments = new ArrayList<>();
 
     @CreatedDate
@@ -40,7 +41,8 @@ public class Article {
     @LastModifiedDate
     private LocalDateTime updatedAt;
 
-    private String title;
+    @Embedded
+    private ArticleTitle title;
     private String description;
     private String body;
 
@@ -54,7 +56,7 @@ public class Article {
     }
 
     public Article(String title, String description, String body, Set<Tag> tagList) {
-        this.title = title;
+        this.title = ArticleTitle.of(title);
         this.slug = slugFromTitle(title);
         this.description = description;
         this.body = body;
@@ -67,7 +69,7 @@ public class Article {
 
     Article updateArticle(ArticleUpdateCommand updateCommand) {
         updateCommand.getTitleToUpdate().ifPresent(titleToUpdate -> {
-            title = titleToUpdate;
+            title = ArticleTitle.of(titleToUpdate);
             slug = slugFromTitle(titleToUpdate);
         });
         updateCommand.getDescriptionToUpdate().ifPresent(descriptionToUpdate -> description = descriptionToUpdate);
@@ -109,7 +111,7 @@ public class Article {
     }
 
     public String getTitle() {
-        return title;
+        return title.toString();
     }
 
     public String getDescription() {
@@ -129,11 +131,11 @@ public class Article {
         if (this == o) return true;
         if (o == null || getClass() != o.getClass()) return false;
         final var article = (Article) o;
-        return Objects.equals(id, article.id) && Objects.equals(title, article.title);
+        return createdAt.equals(article.createdAt) && title.equals(article.title);
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(id, title);
+        return Objects.hash(createdAt, title);
     }
 }
