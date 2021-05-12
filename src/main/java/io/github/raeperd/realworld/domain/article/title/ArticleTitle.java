@@ -20,7 +20,7 @@ public class ArticleTitle {
     }
 
     public Slug toSlug() {
-        return Slug.of(this);
+        return Slug.fromTitle(this);
     }
 
     @Override

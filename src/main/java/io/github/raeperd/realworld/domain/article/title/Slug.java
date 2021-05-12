@@ -11,7 +11,11 @@ public class Slug {
     @Column(name = "slug")
     private String value;
 
-    static Slug of(ArticleTitle articleTitle) {
+    public static Slug fromString(String value) {
+        return new Slug(value);
+    }
+
+    static Slug fromTitle(ArticleTitle articleTitle) {
         return new Slug(articleTitle.toString()
                 .toLowerCase()
                 .replaceAll(SLUG_TRANSFORM_REGEX, "-"));

@@ -2,7 +2,7 @@ package io.github.raeperd.realworld.domain.article.comment;
 
 import io.github.raeperd.realworld.domain.article.Article;
 import io.github.raeperd.realworld.domain.article.ArticleRepository;
-import io.github.raeperd.realworld.domain.article.title.ArticleTitle;
+import io.github.raeperd.realworld.domain.article.title.Slug;
 import io.github.raeperd.realworld.domain.user.UserContextHolder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -24,8 +24,8 @@ public class CommentService {
     }
 
     @Transactional
-    public Comment commentArticleBySlug(String slug, Comment comment) {
-        return articleRepository.findFirstBySlug(ArticleTitle.of(slug).toSlug())
+    public Comment commentArticleBySlug(Slug slug, Comment comment) {
+        return articleRepository.findFirstBySlug(slug)
                 .map(article -> article.addComment(comment))
                 .orElseThrow(NoSuchElementException::new);
     }
@@ -39,8 +39,8 @@ public class CommentService {
     }
 
     @Transactional(readOnly = true)
-    public List<CommentView> viewAllCommentsBySlugFromCurrentUser(String slug) {
-        return articleRepository.findFirstBySlug(ArticleTitle.of(slug).toSlug())
+    public List<CommentView> viewAllCommentsBySlugFromCurrentUser(Slug slug) {
+        return articleRepository.findFirstBySlug(slug)
                 .map(Article::getComments).orElseThrow(NoSuchElementException::new)
                 .stream()
                 .map(this::viewCommentFromCurrentUser)
@@ -48,10 +48,10 @@ public class CommentService {
     }
 
     @Transactional
-    public boolean deleteCommentInArticleById(String slug, long id) {
+    public boolean deleteCommentInArticleById(Slug slug, long id) {
         final var currentUser = userContextHolder.getCurrentUser()
                 .orElseThrow(IllegalStateException::new);
-        return articleRepository.findFirstBySlug(ArticleTitle.of(slug).toSlug())
+        return articleRepository.findFirstBySlug(slug)
                 .map(article -> article.deleteCommentByIdAndUser(id, currentUser))
                 .orElseThrow(NoSuchElementException::new);
     }

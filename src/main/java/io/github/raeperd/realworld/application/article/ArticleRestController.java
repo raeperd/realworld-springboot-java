@@ -3,6 +3,7 @@ package io.github.raeperd.realworld.application.article;
 import io.github.raeperd.realworld.domain.article.ArticleDeleteService;
 import io.github.raeperd.realworld.domain.article.ArticleFavoriteService;
 import io.github.raeperd.realworld.domain.article.ArticleService;
+import io.github.raeperd.realworld.domain.article.title.Slug;
 import org.springframework.data.domain.Pageable;
 import org.springframework.web.bind.annotation.*;
 
@@ -60,7 +61,7 @@ public class ArticleRestController {
 
     @DeleteMapping("/{slug}")
     public void deleteArticleBySlug(@PathVariable String slug) {
-        deleteService.deleteArticleBySlug(slug);
+        deleteService.deleteArticleBySlug(Slug.fromString(slug));
     }
 
     @PostMapping("/{slug}/favorite")
