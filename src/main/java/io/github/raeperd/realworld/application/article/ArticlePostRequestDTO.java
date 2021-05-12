@@ -4,6 +4,7 @@ import com.fasterxml.jackson.annotation.JsonTypeInfo;
 import com.fasterxml.jackson.annotation.JsonTypeName;
 import io.github.raeperd.realworld.domain.article.Article;
 import io.github.raeperd.realworld.domain.article.tag.Tag;
+import io.github.raeperd.realworld.domain.article.title.ArticleTitle;
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 
@@ -26,9 +27,9 @@ public class ArticlePostRequestDTO {
 
     public Article toArticle() {
         if (tagList == null) {
-            return new Article(title, description, body);
+            return new Article(ArticleTitle.of(title), description, body);
         }
-        return new Article(title, description, body, tagList.stream().map(Tag::new).collect(toSet()));
+        return new Article(ArticleTitle.of(title), description, body, tagList.stream().map(Tag::new).collect(toSet()));
     }
 
 }

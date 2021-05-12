@@ -38,9 +38,8 @@ public class User {
         this.password = password;
     }
 
-    public User(Email email, String username, String encodedPassword) {
+    User(Email email, String username) {
         this(email, username, null, null);
-        // TODO
         this.password = null;
     }
 

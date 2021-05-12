@@ -2,6 +2,8 @@ package io.github.raeperd.realworld.domain.article;
 
 import io.github.raeperd.realworld.domain.article.comment.Comment;
 import io.github.raeperd.realworld.domain.article.tag.Tag;
+import io.github.raeperd.realworld.domain.article.title.ArticleTitle;
+import io.github.raeperd.realworld.domain.article.title.Slug;
 import io.github.raeperd.realworld.domain.user.User;
 import org.springframework.data.annotation.CreatedBy;
 import org.springframework.data.annotation.CreatedDate;
@@ -25,13 +27,13 @@ public class Article {
 
     @CreatedBy
     @JoinColumn
-    @ManyToOne(targetEntity = User.class)
+    @ManyToOne
     private User author;
 
-    @OneToMany(fetch = FetchType.LAZY, cascade = CascadeType.ALL)
+    @OneToMany(cascade = CascadeType.ALL)
     private final Collection<Tag> tagList = new HashSet<>();
 
-    @OneToMany(fetch = FetchType.LAZY, cascade = CascadeType.ALL)
+    @OneToMany(cascade = CascadeType.ALL)
     private final Collection<Comment> comments = new ArrayList<>();
 
     @CreatedDate
@@ -40,36 +42,32 @@ public class Article {
     @LastModifiedDate
     private LocalDateTime updatedAt;
 
-    private String title;
+    @Embedded
+    private ArticleTitle title;
+    @Embedded
+    private Slug slug;
     private String description;
     private String body;
-
-    private String slug;
 
     protected Article() {
     }
 
-    public Article(String title, String description, String body) {
+    public Article(ArticleTitle title, String description, String body) {
         this(title, description, body, emptySet());
     }
 
-    public Article(String title, String description, String body, Set<Tag> tagList) {
+    public Article(ArticleTitle title, String description, String body, Set<Tag> tagList) {
         this.title = title;
-        this.slug = slugFromTitle(title);
+        this.slug = title.toSlug();
         this.description = description;
         this.body = body;
         this.tagList.addAll(tagList);
     }
 
-    private static String slugFromTitle(String title) {
-        return title.toLowerCase().replaceAll("\\$,'\"|\\s|\\.|\\?", "-");
-    }
-
     Article updateArticle(ArticleUpdateCommand updateCommand) {
         updateCommand.getTitleToUpdate().ifPresent(titleToUpdate -> {
-            title = titleToUpdate;
-            slug = slugFromTitle(titleToUpdate);
-        });
+            title = ArticleTitle.of(titleToUpdate);
+            slug = title.toSlug(); });
         updateCommand.getDescriptionToUpdate().ifPresent(descriptionToUpdate -> description = descriptionToUpdate);
         updateCommand.getBodyToUpdate().ifPresent(bodyToUpdate -> body = bodyToUpdate);
         return this;
@@ -88,10 +86,6 @@ public class Article {
         return comments;
     }
 
-    public String getSlug() {
-        return slug;
-    }
-
     public boolean isAuthor(User user) {
         return author.equals(user);
     }
@@ -108,8 +102,12 @@ public class Article {
         return updatedAt;
     }
 
-    public String getTitle() {
+    public ArticleTitle getTitle() {
         return title;
+    }
+
+    public Slug getSlug() {
+        return slug;
     }
 
     public String getDescription() {
@@ -129,11 +127,11 @@ public class Article {
         if (this == o) return true;
         if (o == null || getClass() != o.getClass()) return false;
         final var article = (Article) o;
-        return Objects.equals(id, article.id) && Objects.equals(title, article.title);
+        return createdAt.equals(article.createdAt) && title.equals(article.title);
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(id, title);
+        return Objects.hash(createdAt, title);
     }
 }

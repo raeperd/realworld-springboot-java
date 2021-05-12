@@ -3,8 +3,8 @@ package io.github.raeperd.realworld.integration;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import io.github.raeperd.realworld.application.article.ArticlePostRequestDTO;
 import io.github.raeperd.realworld.application.article.ArticlePutRequestDTO;
-import io.github.raeperd.realworld.domain.user.Email;
-import io.github.raeperd.realworld.domain.user.User;
+import io.github.raeperd.realworld.application.user.UserLoginRequestDTO;
+import io.github.raeperd.realworld.application.user.UserPostRequestDTO;
 import org.junit.jupiter.api.*;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.Arguments;
@@ -49,13 +49,13 @@ class ArticleIntegrationTest {
 
     private String userToken;
 
-    private final User userSaved = new User(Email.of("raeperd@gmail.com"), "raeperd", "password");
+    private final UserPostRequestDTO userSaved = new UserPostRequestDTO("raeperd", "raeperd@gmail.com", "password");
     private final String sampleTag = "some-tag";
 
     @BeforeAll
     void initializeUser() throws Exception {
         saveUser(mockMvc, userSaved).andExpect(status().isCreated());
-        userToken = loginAndRememberToken(mockMvc, userSaved);
+        userToken = loginAndRememberToken(mockMvc, new UserLoginRequestDTO(userSaved.getEmail(), userSaved.getPassword()));
     }
 
     @BeforeEach
@@ -161,9 +161,9 @@ class ArticleIntegrationTest {
 
     @Test
     void when_get_feed_expect_return_valid_response() throws Exception {
-        final var reader = new User(Email.of("reader@gmail.com"), "reader", "password");
+        final var reader = new UserPostRequestDTO("user", "reader@gmail.com", "password");
         final var readerToken = saveUserAndRememberToken(mockMvc, reader);
-        queryFollowUser(mockMvc, userSaved, readerToken);
+        queryFollowUser(mockMvc, userSaved.getUsername(), readerToken);
 
         final var resultActions = mockMvc.perform(get("/articles/feed")
                 .accept(APPLICATION_JSON).contentType(APPLICATION_JSON)

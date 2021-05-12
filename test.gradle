@@ -49,10 +49,8 @@ jacocoTestCoverageVerification {
             }
 
             excludes = [
-                    'io.github.raeperd.realworld.RealWorldApplication.main*',
-                    'io.github.raeperd.realworld.domain.article.tag.Tag.equals(java.lang.Object)',
-                    'io.github.raeperd.realworld.domain.user.User.equals(java.lang.Object)',
-                    'io.github.raeperd.realworld.domain.article.Article.equals(java.lang.Object)'
+                    'io.github.raeperd.realworld.**main**',
+                    'io.github.raeperd.realworld.**equals(java.lang.Object)'
             ]
         }
         rule {
