@@ -4,15 +4,20 @@ import javax.persistence.Column;
 import javax.persistence.Embeddable;
 
 @Embeddable
-class UserName {
+public class UserName {
 
     @Column(name = "name", nullable = false)
     private String name;
 
-    UserName(String name) {
+    public UserName(String name) {
         this.name = name;
     }
 
     protected UserName() {
+    }
+
+    @Override
+    public String toString() {
+        return name;
     }
 }

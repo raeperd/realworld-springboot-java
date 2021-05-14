@@ -4,15 +4,20 @@ import javax.persistence.Column;
 import javax.persistence.Embeddable;
 
 @Embeddable
-class Email {
+public class Email {
 
     @Column(name = "email", nullable = false)
     private String address;
 
-    Email(String address) {
+    public Email(String address) {
         this.address = address;
     }
 
     protected Email() {
+    }
+
+    @Override
+    public String toString() {
+        return address;
     }
 }

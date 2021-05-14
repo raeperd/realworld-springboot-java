@@ -6,7 +6,7 @@ import static javax.persistence.GenerationType.IDENTITY;
 
 @Table(name = "users")
 @Entity
-class User {
+public class User {
 
     @GeneratedValue(strategy = IDENTITY)
     @Id
@@ -28,5 +28,13 @@ class User {
     }
 
     protected User() {
+    }
+
+    public Email getEmail() {
+        return email;
+    }
+
+    public UserName getName() {
+        return name;
     }
 }
