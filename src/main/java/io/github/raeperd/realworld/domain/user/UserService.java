@@ -4,6 +4,8 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.util.Optional;
+
 @Service
 public class UserService {
 
@@ -21,6 +23,11 @@ public class UserService {
         return userRepository.save(new User(request.getEmail(),
                 request.getUserName(),
                 encodedPassword));
+    }
+
+    @Transactional(readOnly = true)
+    public Optional<User> getUserById(long id) {
+        return userRepository.findById(id);
     }
 
 }

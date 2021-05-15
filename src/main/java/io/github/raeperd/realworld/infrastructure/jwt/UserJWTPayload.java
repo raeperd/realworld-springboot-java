@@ -7,17 +7,17 @@ import static java.lang.String.format;
 import static java.lang.String.valueOf;
 import static java.time.Instant.now;
 
-class JWTPayloadImpl implements JWTPayload {
+public class UserJWTPayload implements JWTPayload {
 
     private final long sub;
     private final String name;
     private final long iat;
 
-    static JWTPayloadImpl of(User user, long epochSecondExpired) {
-        return new JWTPayloadImpl(user.getId(), valueOf(user.getEmail()), epochSecondExpired);
+    static UserJWTPayload of(User user, long epochSecondExpired) {
+        return new UserJWTPayload(user.getId(), valueOf(user.getEmail()), epochSecondExpired);
     }
 
-    JWTPayloadImpl(long sub, String name, long iat) {
+    UserJWTPayload(long sub, String name, long iat) {
         this.sub = sub;
         this.name = name;
         this.iat = iat;

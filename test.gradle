@@ -36,7 +36,8 @@ jacocoTestCoverageVerification {
             }
 
             excludes = [
-                    'io.github.raeperd.realworld.RealWorldApplication'
+                    'io.github.raeperd.realworld.RealWorldApplication',
+                    'io.github.raeperd.realworld.application.security.JWTAuthenticationFilter.JWT'
             ]
         }
         rule {
@@ -50,7 +51,8 @@ jacocoTestCoverageVerification {
 
             excludes = [
                     'io.github.raeperd.realworld.**main**',
-                    'io.github.raeperd.realworld.**equals(java.lang.Object)'
+                    'io.github.raeperd.realworld.**equals(java.lang.Object)',
+                    'io.github.raeperd.realworld.application.security.JWTAuthenticationFilter.JWT.getCredentials()'
             ]
         }
         rule {

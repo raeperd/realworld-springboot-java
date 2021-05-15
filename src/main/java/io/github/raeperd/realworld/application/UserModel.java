@@ -20,12 +20,11 @@ class UserModel {
     String bio;
     String image;
 
-    // TODO: Return valid token
-    static UserModel fromUser(User user) {
+    static UserModel fromUserAndToken(User user, String token) {
         return new UserModel(
                 valueOf(user.getEmail()),
-                "",
                 valueOf(user.getName()),
+                token,
                 "",
                 "");
     }
