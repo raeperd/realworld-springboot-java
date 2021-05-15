@@ -4,6 +4,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import io.github.raeperd.realworld.application.security.WithMockJWTUser;
 import io.github.raeperd.realworld.domain.jwt.JWTDeserializer;
 import io.github.raeperd.realworld.domain.jwt.JWTSerializer;
+import io.github.raeperd.realworld.domain.user.Email;
 import io.github.raeperd.realworld.domain.user.User;
 import io.github.raeperd.realworld.domain.user.UserService;
 import io.github.raeperd.realworld.domain.user.UserSignUpRequest;
@@ -71,6 +72,17 @@ class UserRestControllerTest {
                 .andExpect(validUserModel());
     }
 
+    @Test
+    void when_login_user_expect_valid_userModel() throws Exception {
+        when(userService.login(new Email("user@email.com"), "password")).thenReturn(of(sampleUser()));
+
+        mockMvc.perform(post("/users/login")
+                .contentType(APPLICATION_JSON)
+                .content(objectMapper.writeValueAsString(sampleLoginDTO())))
+                .andExpect(status().isOk())
+                .andExpect(validUserModel());
+    }
+
     @WithMockJWTUser
     @Test
     void when_get_user_expect_valid_userModel() throws Exception {
@@ -92,6 +104,10 @@ class UserRestControllerTest {
 
     private User sampleUser() {
         return userWithEmailAndName("user@email.com", "username");
+    }
+
+    private UserLoginRequestDTO sampleLoginDTO() {
+        return new UserLoginRequestDTO("user@email.com", "password");
     }
 
     private UserPostRequestDTO samplePostDTO() {

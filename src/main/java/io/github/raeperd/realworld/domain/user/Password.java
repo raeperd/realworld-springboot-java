@@ -22,4 +22,8 @@ class Password {
     protected Password() {
     }
 
+    boolean matchesPassword(String rawPassword, PasswordEncoder passwordEncoder) {
+        return passwordEncoder.matches(rawPassword, encodedPassword);
+    }
+
 }
