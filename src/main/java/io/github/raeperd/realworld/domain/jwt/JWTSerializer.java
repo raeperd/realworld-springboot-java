@@ -4,6 +4,6 @@ import io.github.raeperd.realworld.domain.user.User;
 
 public interface JWTSerializer {
 
-    String JWTFromUser(User user);
+    String jwtFromUser(User user);
 
 }

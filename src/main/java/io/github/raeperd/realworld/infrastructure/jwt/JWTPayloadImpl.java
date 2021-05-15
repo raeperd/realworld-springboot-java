@@ -1,22 +1,26 @@
 package io.github.raeperd.realworld.infrastructure.jwt;
 
 import io.github.raeperd.realworld.domain.jwt.JWTPayload;
-import io.github.raeperd.realworld.domain.user.Email;
 import io.github.raeperd.realworld.domain.user.User;
 
 import static java.lang.String.format;
+import static java.lang.String.valueOf;
 import static java.time.Instant.now;
 
 class JWTPayloadImpl implements JWTPayload {
 
     private final long sub;
-    private final Email name;
+    private final String name;
     private final long iat;
 
-    JWTPayloadImpl(User user, long epochSecondExpired) {
-        this.sub = user.getId();
-        this.name = user.getEmail();
-        this.iat = epochSecondExpired;
+    static JWTPayloadImpl of(User user, long epochSecondExpired) {
+        return new JWTPayloadImpl(user.getId(), valueOf(user.getEmail()), epochSecondExpired);
+    }
+
+    JWTPayloadImpl(long sub, String name, long iat) {
+        this.sub = sub;
+        this.name = name;
+        this.iat = iat;
     }
 
     @Override

@@ -9,8 +9,12 @@ class Base64URL {
     }
 
     static String base64URLFromString(String rawString) {
+        return base64URLFromBytes(rawString.getBytes(StandardCharsets.UTF_8));
+    }
+
+    static String base64URLFromBytes(byte[] bytes) {
         return Base64.getUrlEncoder().withoutPadding()
-                .encodeToString(rawString.getBytes(StandardCharsets.UTF_8));
+                .encodeToString(bytes);
     }
 
     static String stringFromBase64URL(String base64URL) {
