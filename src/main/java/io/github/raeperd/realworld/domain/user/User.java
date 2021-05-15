@@ -30,6 +30,10 @@ public class User {
     protected User() {
     }
 
+    public Long getId() {
+        return id;
+    }
+
     public Email getEmail() {
         return email;
     }
