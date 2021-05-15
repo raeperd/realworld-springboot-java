@@ -38,7 +38,7 @@ class HmacSHA256JWTService implements JWTSerializer, JWTDeserializer {
     }
 
     private String jwtPayloadFromUser(User user) {
-        var jwtPayload = JWTPayloadImpl.of(user, now().getEpochSecond() + durationSeconds);
+        var jwtPayload = UserJWTPayload.of(user, now().getEpochSecond() + durationSeconds);
         return base64URLFromString(jwtPayload.toString());
     }
 
@@ -60,7 +60,7 @@ class HmacSHA256JWTService implements JWTSerializer, JWTDeserializer {
 
         try {
             final var decodedPayload = stringFromBase64URL(splintedTokens[1]);
-            final var jwtPayload = objectMapper.readValue(decodedPayload, JWTPayloadImpl.class);
+            final var jwtPayload = objectMapper.readValue(decodedPayload, UserJWTPayload.class);
             if (jwtPayload.isExpired()) {
                 throw new IllegalArgumentException("Token expired");
             }
