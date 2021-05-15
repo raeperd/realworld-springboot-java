@@ -41,6 +41,22 @@ class UserIntegrationTest {
                 .andExpect(validUserModel());
     }
 
+    @Test
+    void when_login_with_invalid_credential_expect_notFound_status() throws Exception {
+        postUserLogin("not-saved-user@email.com", "password")
+                .andExpect(status().isNotFound());
+    }
+
+    @Test
+    void when_login_expect_status_ok() throws Exception {
+        postUser("userSaved@email.com", "usernameSaved", "password-saved")
+                .andExpect(status().isOk());
+
+        postUserLogin("userSaved@email.com", "password-saved")
+                .andExpect(status().isOk())
+                .andExpect(validUserModel());
+    }
+
     private String postUserAndRememberToken(String email, String username, String password) throws Exception {
         final var contentAsString = postUser(email, username, password)
                 .andExpect(status().isOk())
@@ -52,6 +68,13 @@ class UserIntegrationTest {
     private ResultActions postUser(String email, String username, String password) throws Exception {
         final var dto = new UserPostRequestDTO(email, username, password);
         return mockMvc.perform(post("/users")
+                .contentType(APPLICATION_JSON)
+                .content(objectMapper.writeValueAsString(dto)));
+    }
+
+    private ResultActions postUserLogin(String email, String password) throws Exception {
+        final var dto = new UserLoginRequestDTO(email, password);
+        return mockMvc.perform(post("/users/login")
                 .contentType(APPLICATION_JSON)
                 .content(objectMapper.writeValueAsString(dto)));
     }

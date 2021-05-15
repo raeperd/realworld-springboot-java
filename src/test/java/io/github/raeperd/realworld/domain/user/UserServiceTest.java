@@ -7,7 +7,10 @@ import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.security.crypto.password.PasswordEncoder;
 
-import static org.mockito.Mockito.*;
+import static java.util.Optional.of;
+import static org.mockito.BDDMockito.given;
+import static org.mockito.BDDMockito.then;
+import static org.mockito.Mockito.times;
 
 @ExtendWith(MockitoExtension.class)
 class UserServiceTest {
@@ -27,10 +30,19 @@ class UserServiceTest {
 
     @Test
     void when_signUp_expect_password_encoded(@Mock UserSignUpRequest request) {
-        when(request.getRawPassword()).thenReturn("rawPassword");
+        given(request.getRawPassword()).willReturn("raw-password");
 
         userService.signUp(request);
 
-        verify(passwordEncoder, times(1)).encode("rawPassword");
+        then(passwordEncoder).should(times(1)).encode("raw-password");
+    }
+
+    @Test
+    void when_login_expect_user_matches_password(@Mock Email email, @Mock User user) {
+        given(userRepository.findFirstByEmail(email)).willReturn(of(user));
+
+        userService.login(email, "raw-password");
+
+        then(user).should(times(1)).matchesPassword("raw-password", passwordEncoder);
     }
 }

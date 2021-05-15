@@ -1,5 +1,7 @@
 package io.github.raeperd.realworld.domain.user;
 
+import org.springframework.security.crypto.password.PasswordEncoder;
+
 import javax.persistence.*;
 
 import static javax.persistence.GenerationType.IDENTITY;
@@ -28,6 +30,10 @@ public class User {
     }
 
     protected User() {
+    }
+
+    boolean matchesPassword(String rawPassword, PasswordEncoder passwordEncoder) {
+        return password.matchesPassword(rawPassword, passwordEncoder);
     }
 
     public Long getId() {

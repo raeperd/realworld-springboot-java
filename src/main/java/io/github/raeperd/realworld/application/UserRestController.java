@@ -1,6 +1,7 @@
 package io.github.raeperd.realworld.application;
 
 import io.github.raeperd.realworld.domain.jwt.JWTSerializer;
+import io.github.raeperd.realworld.domain.user.Email;
 import io.github.raeperd.realworld.domain.user.UserService;
 import io.github.raeperd.realworld.infrastructure.jwt.UserJWTPayload;
 import org.springframework.http.ResponseEntity;
@@ -31,6 +32,12 @@ class UserRestController {
     public UserModel postUser(@Valid @RequestBody UserPostRequestDTO dto) {
         final var userSaved = userService.signUp(dto.toSignUpRequest());
         return fromUserAndToken(userSaved, jwtSerializer.jwtFromUser(userSaved));
+    }
+
+    @PostMapping("/users/login")
+    public ResponseEntity<UserModel> loginUser(@Valid @RequestBody UserLoginRequestDTO dto) {
+        return of(userService.login(new Email(dto.getEmail()), dto.getPassword())
+                .map(user -> fromUserAndToken(user, jwtSerializer.jwtFromUser(user))));
     }
 
     @GetMapping("/user")

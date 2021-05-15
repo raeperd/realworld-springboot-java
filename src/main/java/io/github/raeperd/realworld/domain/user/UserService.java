@@ -26,6 +26,12 @@ public class UserService {
     }
 
     @Transactional(readOnly = true)
+    public Optional<User> login(Email email, String rawPassword) {
+        return userRepository.findFirstByEmail(email)
+                .filter(user -> user.matchesPassword(rawPassword, passwordEncoder));
+    }
+
+    @Transactional(readOnly = true)
     public Optional<User> getUserById(long id) {
         return userRepository.findById(id);
     }
