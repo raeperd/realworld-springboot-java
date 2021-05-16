@@ -18,14 +18,18 @@ public class User {
     private Email email;
 
     @Embedded
-    private UserName name;
+    private Profile profile;
 
     @Embedded
     private Password password;
 
-    User(Email email, UserName name, Password password) {
+    static User of(Email email, UserName name, Password password) {
+        return new User(email, new Profile(name), password);
+    }
+
+    private User(Email email, Profile profile, Password password) {
         this.email = email;
-        this.name = name;
+        this.profile = profile;
         this.password = password;
     }
 
@@ -34,6 +38,26 @@ public class User {
 
     boolean matchesPassword(String rawPassword, PasswordEncoder passwordEncoder) {
         return password.matchesPassword(rawPassword, passwordEncoder);
+    }
+
+    void changeEmail(Email email) {
+        this.email = email;
+    }
+
+    void changePassword(Password password) {
+        this.password = password;
+    }
+
+    void changeName(UserName userName) {
+        profile.changeUserName(userName);
+    }
+
+    void changeBio(String bio) {
+        profile.changeBio(bio);
+    }
+
+    void changeImage(Image image) {
+        profile.changeImage(image);
     }
 
     public Long getId() {
@@ -45,6 +69,14 @@ public class User {
     }
 
     public UserName getName() {
-        return name;
+        return profile.getUserName();
+    }
+
+    String getBio() {
+        return profile.getBio();
+    }
+
+    Image getImage() {
+        return profile.getImage();
     }
 }

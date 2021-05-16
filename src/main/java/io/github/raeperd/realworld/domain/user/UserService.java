@@ -20,7 +20,7 @@ public class UserService {
     @Transactional
     public User signUp(UserSignUpRequest request) {
         final var encodedPassword = Password.of(request.getRawPassword(), passwordEncoder);
-        return userRepository.save(new User(request.getEmail(),
+        return userRepository.save(User.of(request.getEmail(),
                 request.getUserName(),
                 encodedPassword));
     }

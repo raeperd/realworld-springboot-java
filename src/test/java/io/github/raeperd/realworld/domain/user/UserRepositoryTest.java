@@ -18,12 +18,26 @@ class UserRepositoryTest {
 
     @Test
     void when_save_user_expect_saved() {
-        var userToSave = new User(new Email("user@email.com"),
+        var userToSave = User.of(new Email("user@email.com"),
                 new UserName("name"),
                 Password.of("rawPassword", PASSWORD_ENCODER));
 
         assertThat(userRepository.save(userToSave))
                 .hasFieldOrPropertyWithValue("id", 1L);
+    }
+
+    @Test
+    void when_save_user_with_image_expect_saved() {
+        var userToSave = User.of(new Email("user@email.com"),
+                new UserName("name"),
+                Password.of("rawPassword", PASSWORD_ENCODER));
+        var imageToSave = new Image("some-image");
+
+        userToSave.changeImage(imageToSave);
+
+        assertThat(userRepository.save(userToSave))
+                .extracting(User::getImage)
+                .isEqualTo(imageToSave);
     }
 
 }

@@ -5,33 +5,33 @@ import javax.persistence.Embeddable;
 import java.util.Objects;
 
 @Embeddable
-public class UserName {
+public class Image {
 
-    @Column(name = "name", nullable = false)
-    private String name;
+    @Column(name = "image")
+    private String address;
 
-    public UserName(String name) {
-        this.name = name;
+    public Image(String address) {
+        this.address = address;
     }
 
-    protected UserName() {
+    protected Image() {
     }
 
     @Override
     public String toString() {
-        return name;
+        return address;
     }
 
     @Override
     public boolean equals(Object o) {
         if (this == o) return true;
         if (o == null || getClass() != o.getClass()) return false;
-        final var userName = (UserName) o;
-        return name.equals(userName.name);
+        final var image = (Image) o;
+        return address.equals(image.address);
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(name);
+        return Objects.hash(address);
     }
 }
