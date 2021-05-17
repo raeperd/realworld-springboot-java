@@ -4,10 +4,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import io.github.raeperd.realworld.application.security.WithMockJWTUser;
 import io.github.raeperd.realworld.domain.jwt.JWTDeserializer;
 import io.github.raeperd.realworld.domain.jwt.JWTSerializer;
-import io.github.raeperd.realworld.domain.user.Email;
-import io.github.raeperd.realworld.domain.user.User;
-import io.github.raeperd.realworld.domain.user.UserService;
-import io.github.raeperd.realworld.domain.user.UserSignUpRequest;
+import io.github.raeperd.realworld.domain.user.*;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
@@ -28,8 +25,7 @@ import static org.mockito.ArgumentMatchers.anyLong;
 import static org.mockito.Mockito.when;
 import static org.springframework.http.MediaType.APPLICATION_JSON;
 import static org.springframework.test.web.servlet.ResultMatcher.matchAll;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
@@ -94,6 +90,18 @@ class UserRestControllerTest {
                 .andExpect(validUserModel());
     }
 
+    @WithMockJWTUser
+    @Test
+    void when_put_user_expect_status_ok() throws Exception {
+        when(userService.updateUser(anyLong(), any(UserUpdateRequest.class))).thenReturn(sampleUser());
+
+        mockMvc.perform(put("/user")
+                .contentType(APPLICATION_JSON)
+                .content(objectMapper.writeValueAsString(samplePutDTO())))
+                .andExpect(status().isOk())
+                .andExpect(validUserModel());
+    }
+
     private static Stream<Arguments> provideInvalidPostDTO() {
         return Stream.of(
                 Arguments.of(new UserPostRequestDTO("not-email", "username", "password")),
@@ -112,6 +120,10 @@ class UserRestControllerTest {
 
     private UserPostRequestDTO samplePostDTO() {
         return new UserPostRequestDTO("user@email.com", "username", "password");
+    }
+
+    private UserPutRequestDTO samplePutDTO() {
+        return new UserPutRequestDTO("new-user@email.com", null, null, null, null);
     }
 
     static ResultMatcher validUserModel() {

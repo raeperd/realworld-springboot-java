@@ -4,7 +4,7 @@ import java.util.Optional;
 
 import static java.util.Optional.ofNullable;
 
-class UserUpdateRequest {
+public class UserUpdateRequest {
 
     private final Email emailToUpdate;
     private final UserName userNameToUpdate;
@@ -12,7 +12,7 @@ class UserUpdateRequest {
     private final Image imageToUpdate;
     private final String bioToUpdate;
 
-    static UserUpdateRequestBuilder builder() {
+    public static UserUpdateRequestBuilder builder() {
         return new UserUpdateRequestBuilder();
     }
 
@@ -44,39 +44,39 @@ class UserUpdateRequest {
         this.bioToUpdate = builder.bioToUpdate;
     }
 
-    static class UserUpdateRequestBuilder {
+    public static class UserUpdateRequestBuilder {
         private Email emailToUpdate;
         private UserName userNameToUpdate;
         private String passwordToUpdate;
         private Image imageToUpdate;
         private String bioToUpdate;
 
-        UserUpdateRequestBuilder emailToUpdate(Email emailToUpdate) {
+        public UserUpdateRequestBuilder emailToUpdate(Email emailToUpdate) {
             this.emailToUpdate = emailToUpdate;
             return this;
         }
 
-        UserUpdateRequestBuilder userNameToUpdate(UserName userNameToUpdate) {
+        public UserUpdateRequestBuilder userNameToUpdate(UserName userNameToUpdate) {
             this.userNameToUpdate = userNameToUpdate;
             return this;
         }
 
-        UserUpdateRequestBuilder passwordToUpdate(String passwordToUpdate) {
+        public UserUpdateRequestBuilder passwordToUpdate(String passwordToUpdate) {
             this.passwordToUpdate = passwordToUpdate;
             return this;
         }
 
-        UserUpdateRequestBuilder imageToUpdate(Image imageToUpdate) {
+        public UserUpdateRequestBuilder imageToUpdate(Image imageToUpdate) {
             this.imageToUpdate = imageToUpdate;
             return this;
         }
 
-        UserUpdateRequestBuilder bioToUpdate(String bioToUpdate) {
+        public UserUpdateRequestBuilder bioToUpdate(String bioToUpdate) {
             this.bioToUpdate = bioToUpdate;
             return this;
         }
 
-        UserUpdateRequest build() {
+        public UserUpdateRequest build() {
             return new UserUpdateRequest(this);
         }
     }

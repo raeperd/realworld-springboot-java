@@ -9,9 +9,10 @@ import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.ResultActions;
 
 import static io.github.raeperd.realworld.application.UserRestControllerTest.validUserModel;
+import static org.hamcrest.Matchers.is;
 import static org.springframework.http.MediaType.APPLICATION_JSON;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
 @AutoConfigureMockMvc
@@ -55,6 +56,19 @@ class UserIntegrationTest {
         postUserLogin("userSaved@email.com", "password-saved")
                 .andExpect(status().isOk())
                 .andExpect(validUserModel());
+    }
+
+    @Test
+    void when_put_user_expect_status_ok() throws Exception {
+        final var token = postUserAndRememberToken("user@email.com", "username", "password");
+
+        mockMvc.perform(put("/user")
+                .contentType(APPLICATION_JSON)
+                .header("Authorization", "Token " + token)
+                .content(objectMapper.writeValueAsString(new UserPutRequestDTO("new-user@email.com", null, null, null, null))))
+                .andExpect(status().isOk())
+                .andExpect(validUserModel())
+                .andExpect(jsonPath("user.email", is("new-user@email.com")));
     }
 
     private String postUserAndRememberToken(String email, String username, String password) throws Exception {
