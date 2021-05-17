@@ -51,6 +51,20 @@ class UserServiceTest {
     }
 
     @Test
+    void when_findById_expect_repository_findById() {
+        userService.findById(1L);
+
+        verify(userRepository, times(1)).findById(1L);
+    }
+
+    @Test
+    void when_findByUsername_expect_repository_findFirstByProfileUserName(@Mock UserName userName) {
+        userService.findByUsername(userName);
+
+        verify(userRepository, times(1)).findFirstByProfileUserName(userName);
+    }
+
+    @Test
     void when_updateUser_with_invalid_id_expect_NoSuchElementException(@Mock UserUpdateRequest request) {
         when(userRepository.findById(1L)).thenReturn(empty());
 

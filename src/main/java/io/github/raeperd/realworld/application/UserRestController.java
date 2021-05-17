@@ -39,7 +39,7 @@ class UserRestController {
 
     @GetMapping("/user")
     public ResponseEntity<UserModel> getUser(@AuthenticationPrincipal UserJWTPayload jwtPayload) {
-        return of(userService.getUserById(jwtPayload.getUserId())
+        return of(userService.findById(jwtPayload.getUserId())
                 .map(user -> UserModel.fromUserAndToken(user, getCurrentCredential())));
     }
 

@@ -38,6 +38,37 @@ class UserTest {
     }
 
     @Test
+    void when_user_have_different_email_expect_not_equal_and_hashCode(
+            @Mock Email otherEmail, @Mock UserName otherName, @Mock Password otherPassword) {
+        final var user = User.of(emailMock, userNameMock, passwordMock);
+        final var userWithSameEmail = User.of(otherEmail, otherName, otherPassword);
+
+        assertThat(userWithSameEmail)
+                .isNotEqualTo(user)
+                .extracting(User::hashCode)
+                .isNotEqualTo(user.hashCode());
+    }
+
+    @Test
+    void when_user_have_same_email_expect_equal_and_hashCode(@Mock UserName otherName, @Mock Password otherPassword) {
+        final var user = User.of(emailMock, userNameMock, passwordMock);
+        final var userWithSameEmail = User.of(emailMock, otherName, otherPassword);
+
+        assertThat(userWithSameEmail)
+                .isEqualTo(user)
+                .hasSameHashCodeAs(user);
+    }
+
+    @Test
+    void when_view_profile_not_following_user_expect_following_false(@Mock Email otherEmail) {
+        final var user = User.of(emailMock, userNameMock, passwordMock);
+        final var otherUser = User.of(otherEmail, userNameMock, passwordMock);
+
+        assertThat(user.viewProfile(otherUser))
+                .hasFieldOrPropertyWithValue("following", false);
+    }
+
+    @Test
     void when_matches_password_expect_password_matches_password() {
         final var user = User.of(emailMock, userNameMock, passwordMock);
 

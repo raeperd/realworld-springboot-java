@@ -82,7 +82,7 @@ class UserRestControllerTest {
     @WithMockJWTUser
     @Test
     void when_get_user_expect_valid_userModel() throws Exception {
-        when(userService.getUserById(anyLong())).thenReturn(of(sampleUser()));
+        when(userService.findById(anyLong())).thenReturn(of(sampleUser()));
 
         mockMvc.perform(get("/user")
                 .accept(APPLICATION_JSON))
