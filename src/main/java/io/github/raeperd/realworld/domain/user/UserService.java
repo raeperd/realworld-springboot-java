@@ -4,6 +4,7 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.util.NoSuchElementException;
 import java.util.Optional;
 
 @Service
@@ -20,7 +21,7 @@ public class UserService {
     @Transactional
     public User signUp(UserSignUpRequest request) {
         final var encodedPassword = Password.of(request.getRawPassword(), passwordEncoder);
-        return userRepository.save(new User(request.getEmail(),
+        return userRepository.save(User.of(request.getEmail(),
                 request.getUserName(),
                 encodedPassword));
     }
@@ -34,6 +35,23 @@ public class UserService {
     @Transactional(readOnly = true)
     public Optional<User> getUserById(long id) {
         return userRepository.findById(id);
+    }
+
+    @Transactional
+    public User updateUser(long id, UserUpdateRequest request) {
+        final var user = userRepository.findById(id).orElseThrow(NoSuchElementException::new);
+        request.getEmailToUpdate()
+                .ifPresent(user::changeEmail);
+        request.getUserNameToUpdate()
+                .ifPresent(user::changeName);
+        request.getPasswordToUpdate()
+                .map(rawPassword -> Password.of(rawPassword, passwordEncoder))
+                .ifPresent(user::changePassword);
+        request.getImageToUpdate()
+                .ifPresent(user::changeImage);
+        request.getBioToUpdate()
+                .ifPresent(user::changeBio);
+        return userRepository.save(user);
     }
 
 }

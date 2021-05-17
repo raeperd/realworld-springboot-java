@@ -5,7 +5,7 @@ import org.springframework.test.util.ReflectionTestUtils;
 public class UserTestUtils {
 
     public static User userWithEmailAndName(String email, String name) {
-        return new User(
+        return User.of(
                 new Email(email),
                 new UserName(name),
                 null

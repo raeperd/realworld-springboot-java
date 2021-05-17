@@ -7,10 +7,7 @@ import io.github.raeperd.realworld.infrastructure.jwt.UserJWTPayload;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.security.core.context.SecurityContextHolder;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 import javax.validation.Valid;
 
@@ -44,6 +41,13 @@ class UserRestController {
     public ResponseEntity<UserModel> getUser(@AuthenticationPrincipal UserJWTPayload jwtPayload) {
         return of(userService.getUserById(jwtPayload.getUserId())
                 .map(user -> UserModel.fromUserAndToken(user, getCurrentCredential())));
+    }
+
+    @PutMapping("/user")
+    public UserModel putUser(@AuthenticationPrincipal UserJWTPayload jwtPayload,
+                             @Valid @RequestBody UserPutRequestDTO dto) {
+        final var userUpdated = userService.updateUser(jwtPayload.getUserId(), dto.toUpdateRequest());
+        return fromUserAndToken(userUpdated, getCurrentCredential());
     }
 
     private static String getCurrentCredential() {
