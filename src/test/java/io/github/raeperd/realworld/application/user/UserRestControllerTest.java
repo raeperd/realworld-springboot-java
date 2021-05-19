@@ -1,4 +1,4 @@
-package io.github.raeperd.realworld.application;
+package io.github.raeperd.realworld.application.user;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import io.github.raeperd.realworld.application.security.WithMockJWTUser;

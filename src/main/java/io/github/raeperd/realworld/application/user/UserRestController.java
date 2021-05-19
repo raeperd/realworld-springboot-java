@@ -1,4 +1,4 @@
-package io.github.raeperd.realworld.application;
+package io.github.raeperd.realworld.application.user;
 
 import io.github.raeperd.realworld.domain.jwt.JWTSerializer;
 import io.github.raeperd.realworld.domain.user.Email;
@@ -11,7 +11,7 @@ import org.springframework.web.bind.annotation.*;
 
 import javax.validation.Valid;
 
-import static io.github.raeperd.realworld.application.UserModel.fromUserAndToken;
+import static io.github.raeperd.realworld.application.user.UserModel.fromUserAndToken;
 import static org.springframework.http.ResponseEntity.of;
 
 @RestController
