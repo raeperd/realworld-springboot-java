@@ -34,6 +34,19 @@ public class Profile {
     protected Profile() {
     }
 
+    public UserName getUserName() {
+        return userName;
+    }
+    public String getBio() {
+        return bio;
+    }
+    public Image getImage() {
+        return image;
+    }
+    public boolean isFollowing() {
+        return following;
+    }
+
     Profile withFollowing(boolean following) {
         this.following = following;
         return this;
@@ -42,24 +55,10 @@ public class Profile {
     void changeUserName(UserName userName) {
         this.userName = userName;
     }
-
     void changeBio(String bio) {
         this.bio = bio;
     }
-
     void changeImage(Image image) {
         this.image = image;
-    }
-
-    UserName getUserName() {
-        return userName;
-    }
-
-    String getBio() {
-        return bio;
-    }
-
-    Image getImage() {
-        return image;
     }
 }

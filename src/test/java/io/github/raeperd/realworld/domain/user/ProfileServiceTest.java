@@ -60,4 +60,23 @@ class ProfileServiceTest {
 
         then(viewer).should(times(1)).viewProfile(userToView);
     }
+
+    @Test
+    void when_viewProfileWithUserName_with_not_exists_username_expect_NoSuchElementException(@Mock UserName userName) {
+        when(userFindService.findByUsername(userName)).thenReturn(empty());
+
+        assertThatThrownBy(() ->
+                profileService.viewProfileWithUserName(userName)
+        ).isInstanceOf(NoSuchElementException.class);
+    }
+
+    @Test
+    void when_viewProfileWithUserName_expect_user_getProfile(@Mock UserName userName, @Mock User user, @Mock Profile profile) {
+        given(userFindService.findByUsername(userName)).willReturn(of(user));
+        given(user.getProfile()).willReturn(profile);
+
+        profileService.viewProfileWithUserName(userName);
+
+        then(user).should(times(1)).getProfile();
+    }
 }

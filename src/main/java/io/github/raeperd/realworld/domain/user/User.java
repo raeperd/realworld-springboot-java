@@ -50,6 +50,10 @@ public class User {
         return user.profile.withFollowing(followingUsers.contains(user));
     }
 
+    Profile getProfile() {
+        return profile;
+    }
+
     boolean matchesPassword(String rawPassword, PasswordEncoder passwordEncoder) {
         return password.matchesPassword(rawPassword, passwordEncoder);
     }
