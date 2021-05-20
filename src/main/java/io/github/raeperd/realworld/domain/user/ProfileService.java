@@ -15,7 +15,7 @@ public class ProfileService {
     }
 
     @Transactional(readOnly = true)
-    public Profile viewProfileFromUser(long viewerId, UserName usernameToView) {
+    public Profile viewProfile(long viewerId, UserName usernameToView) {
         final var viewer = userFindService.findById(viewerId).orElseThrow(NoSuchElementException::new);
         return userFindService.findByUsername(usernameToView)
                 .map(viewer::viewProfile)
@@ -23,9 +23,18 @@ public class ProfileService {
     }
 
     @Transactional(readOnly = true)
-    public Profile viewProfileWithUserName(UserName userName) {
+    public Profile viewProfile(UserName userName) {
         return userFindService.findByUsername(userName)
                 .map(User::getProfile)
+                .orElseThrow(NoSuchElementException::new);
+    }
+
+    @Transactional
+    public Profile followAndViewProfile(long followerId, UserName followeeUserName) {
+        final var followee = userFindService.findByUsername(followeeUserName).orElseThrow(NoSuchElementException::new);
+        return userFindService.findById(followerId)
+                .map(follower -> follower.followUser(followee))
+                .map(follower -> follower.viewProfile(followee))
                 .orElseThrow(NoSuchElementException::new);
     }
 }

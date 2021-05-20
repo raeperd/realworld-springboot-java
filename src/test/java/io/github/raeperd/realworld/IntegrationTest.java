@@ -9,10 +9,12 @@ import org.springframework.test.web.servlet.MockMvc;
 
 import static io.github.raeperd.realworld.IntegrationTestUtils.*;
 import static java.lang.String.format;
+import static org.hamcrest.Matchers.is;
 import static org.junit.jupiter.api.TestInstance.Lifecycle.PER_CLASS;
 import static org.springframework.http.HttpHeaders.AUTHORIZATION;
 import static org.springframework.http.MediaType.APPLICATION_JSON;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
 /*
@@ -108,6 +110,16 @@ class IntegrationTest {
         mockMvc.perform(get("/profiles/{celeb_username}", CELEB_USERNAME))
                 .andExpect(status().isOk())
                 .andExpect(validProfileModel());
+    }
+
+    @Order(8)
+    @Test
+    void follow_profile() throws Exception {
+        mockMvc.perform(post("/profiles/{celeb_username}/follow", CELEB_USERNAME)
+                .header(AUTHORIZATION, "Token " + token))
+                .andExpect(status().isOk())
+                .andExpect(validProfileModel())
+                .andExpect(jsonPath("profile.following", is(true)));
     }
 
 }

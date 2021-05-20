@@ -15,6 +15,7 @@ import java.util.NoSuchElementException;
 import static org.mockito.ArgumentMatchers.*;
 import static org.mockito.Mockito.when;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
 @WebMvcTest(ProfileRestController.class)
@@ -29,7 +30,7 @@ class ProfileRestControllerTest {
 
     @Test
     void when_get_profile_with_not_exists_username_expect_notFound_status() throws Exception {
-        when(profileService.viewProfileWithUserName(any(UserName.class))).thenThrow(NoSuchElementException.class);
+        when(profileService.viewProfile(any(UserName.class))).thenThrow(NoSuchElementException.class);
 
         mockMvc.perform(get("/profiles/{username}", "user-name-not-exists"))
                 .andExpect(status().isNotFound());
@@ -37,7 +38,7 @@ class ProfileRestControllerTest {
 
     @Test
     void when_get_profile_with_username_expect_valid_ProfileModel() throws Exception {
-        when(profileService.viewProfileWithUserName(new UserName("sample-user-name"))).thenReturn(sampleProfile());
+        when(profileService.viewProfile(new UserName("sample-user-name"))).thenReturn(sampleProfile());
 
         mockMvc.perform(get("/profiles/{username}", "sample-user-name"))
                 .andExpect(status().isOk())
@@ -47,7 +48,7 @@ class ProfileRestControllerTest {
     @WithMockJWTUser
     @Test
     void when_get_profile_with_auth_and_not_exists_username_expect_notFound_status() throws Exception {
-        when(profileService.viewProfileFromUser(anyLong(), any(UserName.class))).thenThrow(NoSuchElementException.class);
+        when(profileService.viewProfile(anyLong(), any(UserName.class))).thenThrow(NoSuchElementException.class);
 
         mockMvc.perform(get("/profiles/{username}", "user-name-not-exists"))
                 .andExpect(status().isNotFound());
@@ -56,9 +57,25 @@ class ProfileRestControllerTest {
     @WithMockJWTUser
     @Test
     void when_get_profile_with_username_and_auth_expect_valid_ProfileModel() throws Exception {
-        when(profileService.viewProfileFromUser(anyLong(), eq(new UserName("sample-user-name")))).thenReturn(sampleProfile());
+        when(profileService.viewProfile(anyLong(), eq(new UserName("sample-username")))).thenReturn(sampleProfile());
 
-        mockMvc.perform(get("/profiles/{username}", "sample-user-name"))
+        mockMvc.perform(get("/profiles/{username}", "sample-username"))
+                .andExpect(status().isOk())
+                .andExpect(IntegrationTestUtils.validProfileModel());
+    }
+
+    @Test
+    void when_follow_user_without_authentication_expect_status_forbidden() throws Exception {
+        mockMvc.perform(post("/profiles/{username}/follow", "sample-username"))
+                .andExpect(status().isForbidden());
+    }
+
+    @WithMockJWTUser
+    @Test
+    void when_follow_user_expect_profileService_followAndViewProfile_called() throws Exception {
+        when(profileService.followAndViewProfile(anyLong(), eq(new UserName("sample-username")))).thenReturn(sampleProfile());
+
+        mockMvc.perform(post("/profiles/{username}/follow", "sample-username"))
                 .andExpect(status().isOk())
                 .andExpect(IntegrationTestUtils.validProfileModel());
     }
