@@ -1,5 +1,6 @@
 package io.github.raeperd.realworld.application.user;
 
+import io.github.raeperd.realworld.IntegrationTestUtils;
 import io.github.raeperd.realworld.application.security.WithMockJWTUser;
 import io.github.raeperd.realworld.domain.jwt.JWTDeserializer;
 import io.github.raeperd.realworld.domain.user.*;
@@ -8,15 +9,12 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.test.web.servlet.MockMvc;
-import org.springframework.test.web.servlet.ResultMatcher;
 
 import java.util.NoSuchElementException;
 
 import static org.mockito.ArgumentMatchers.*;
 import static org.mockito.Mockito.when;
-import static org.springframework.test.web.servlet.ResultMatcher.matchAll;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
 @WebMvcTest(ProfileRestController.class)
@@ -43,7 +41,7 @@ class ProfileRestControllerTest {
 
         mockMvc.perform(get("/profiles/{username}", "sample-user-name"))
                 .andExpect(status().isOk())
-                .andExpect(validProfileModel());
+                .andExpect(IntegrationTestUtils.validProfileModel());
     }
 
     @WithMockJWTUser
@@ -62,7 +60,7 @@ class ProfileRestControllerTest {
 
         mockMvc.perform(get("/profiles/{username}", "sample-user-name"))
                 .andExpect(status().isOk())
-                .andExpect(validProfileModel());
+                .andExpect(IntegrationTestUtils.validProfileModel());
     }
 
     private Profile sampleProfile() {
@@ -72,12 +70,4 @@ class ProfileRestControllerTest {
                 false);
     }
 
-    private ResultMatcher validProfileModel() {
-        return matchAll(
-                jsonPath("profile").hasJsonPath(),
-                jsonPath("profile.username").isString(),
-                jsonPath("profile.bio").isString(),
-                jsonPath("profile.image").isString(),
-                jsonPath("profile.following").isBoolean());
-    }
 }
