@@ -3,7 +3,11 @@ package io.github.raeperd.realworld.domain.user;
 import org.springframework.security.crypto.password.PasswordEncoder;
 
 import javax.persistence.*;
+import java.util.HashSet;
+import java.util.Objects;
+import java.util.Set;
 
+import static javax.persistence.CascadeType.REMOVE;
 import static javax.persistence.GenerationType.IDENTITY;
 
 @Table(name = "users")
@@ -23,6 +27,12 @@ public class User {
     @Embedded
     private Password password;
 
+    @JoinTable(name = "user_followings",
+            joinColumns = @JoinColumn(name = "follower_id", referencedColumnName = "id"),
+            inverseJoinColumns = @JoinColumn(name = "followee_id", referencedColumnName = "id"))
+    @OneToMany(cascade = REMOVE)
+    private Set<User> followingUsers = new HashSet<>();
+
     static User of(Email email, UserName name, Password password) {
         return new User(email, new Profile(name), password);
     }
@@ -34,6 +44,14 @@ public class User {
     }
 
     protected User() {
+    }
+
+    Profile viewProfile(User user) {
+        return user.profile.withFollowing(followingUsers.contains(user));
+    }
+
+    Profile getProfile() {
+        return profile;
     }
 
     boolean matchesPassword(String rawPassword, PasswordEncoder passwordEncoder) {
@@ -78,5 +96,18 @@ public class User {
 
     Image getImage() {
         return profile.getImage();
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+        final var user = (User) o;
+        return email.equals(user.email);
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(email);
     }
 }

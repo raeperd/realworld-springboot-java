@@ -1,6 +1,7 @@
-package io.github.raeperd.realworld.application;
+package io.github.raeperd.realworld.application.user;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+import io.github.raeperd.realworld.IntegrationTestUtils;
 import io.github.raeperd.realworld.application.security.WithMockJWTUser;
 import io.github.raeperd.realworld.domain.jwt.JWTDeserializer;
 import io.github.raeperd.realworld.domain.jwt.JWTSerializer;
@@ -14,7 +15,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.test.web.servlet.MockMvc;
-import org.springframework.test.web.servlet.ResultMatcher;
 
 import java.util.stream.Stream;
 
@@ -24,9 +24,7 @@ import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyLong;
 import static org.mockito.Mockito.when;
 import static org.springframework.http.MediaType.APPLICATION_JSON;
-import static org.springframework.test.web.servlet.ResultMatcher.matchAll;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
 @WebMvcTest(UserRestController.class)
@@ -65,7 +63,7 @@ class UserRestControllerTest {
                 .contentType(APPLICATION_JSON)
                 .content(objectMapper.writeValueAsString(samplePostDTO())))
                 .andExpect(status().isOk())
-                .andExpect(validUserModel());
+                .andExpect(IntegrationTestUtils.validUserModel());
     }
 
     @Test
@@ -76,18 +74,18 @@ class UserRestControllerTest {
                 .contentType(APPLICATION_JSON)
                 .content(objectMapper.writeValueAsString(sampleLoginDTO())))
                 .andExpect(status().isOk())
-                .andExpect(validUserModel());
+                .andExpect(IntegrationTestUtils.validUserModel());
     }
 
     @WithMockJWTUser
     @Test
     void when_get_user_expect_valid_userModel() throws Exception {
-        when(userService.getUserById(anyLong())).thenReturn(of(sampleUser()));
+        when(userService.findById(anyLong())).thenReturn(of(sampleUser()));
 
         mockMvc.perform(get("/user")
                 .accept(APPLICATION_JSON))
                 .andExpect(status().isOk())
-                .andExpect(validUserModel());
+                .andExpect(IntegrationTestUtils.validUserModel());
     }
 
     @WithMockJWTUser
@@ -99,7 +97,7 @@ class UserRestControllerTest {
                 .contentType(APPLICATION_JSON)
                 .content(objectMapper.writeValueAsString(samplePutDTO())))
                 .andExpect(status().isOk())
-                .andExpect(validUserModel());
+                .andExpect(IntegrationTestUtils.validUserModel());
     }
 
     private static Stream<Arguments> provideInvalidPostDTO() {
@@ -124,15 +122,6 @@ class UserRestControllerTest {
 
     private UserPutRequestDTO samplePutDTO() {
         return new UserPutRequestDTO("new-user@email.com", null, null, null, null);
-    }
-
-    static ResultMatcher validUserModel() {
-        return matchAll(jsonPath("user").hasJsonPath(),
-                jsonPath("user.email").isString(),
-                jsonPath("user.token").isString(),
-                jsonPath("user.username").isString(),
-                jsonPath("user.bio").isString(),
-                jsonPath("user.image").isString());
     }
 
 }

@@ -6,3 +6,11 @@ CREATE TABLE IF NOT EXISTS users (
     email VARCHAR(255) NOT NULL,
     password VARCHAR(255) NOT NULL
 );
+
+CREATE TABLE IF NOT EXISTS user_followings (
+    follower_id BIGINT NOT NULL,
+    followee_id BIGINT NOT NULL,
+    PRIMARY KEY (follower_id, followee_id),
+    CONSTRAINT fk_follower FOREIGN KEY(follower_id) REFERENCES users(id) ON DELETE CASCADE,
+    CONSTRAINT fk_followee FOREIGN KEY(followee_id) REFERENCES users(id) ON DELETE CASCADE
+);

@@ -8,7 +8,7 @@ import java.util.NoSuchElementException;
 import java.util.Optional;
 
 @Service
-public class UserService {
+public class UserService implements UserFindService {
 
     private final PasswordEncoder passwordEncoder;
     private final UserRepository userRepository;
@@ -32,9 +32,15 @@ public class UserService {
                 .filter(user -> user.matchesPassword(rawPassword, passwordEncoder));
     }
 
+    @Override
     @Transactional(readOnly = true)
-    public Optional<User> getUserById(long id) {
+    public Optional<User> findById(long id) {
         return userRepository.findById(id);
+    }
+
+    @Override
+    public Optional<User> findByUsername(UserName userName) {
+        return userRepository.findFirstByProfileUserName(userName);
     }
 
     @Transactional

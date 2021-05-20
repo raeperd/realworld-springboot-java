@@ -1,4 +1,4 @@
-package io.github.raeperd.realworld.application;
+package io.github.raeperd.realworld.application.user;
 
 import com.fasterxml.jackson.annotation.JsonTypeInfo;
 import com.fasterxml.jackson.annotation.JsonTypeName;
