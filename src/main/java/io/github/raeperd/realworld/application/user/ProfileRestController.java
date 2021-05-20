@@ -9,6 +9,7 @@ import org.springframework.web.bind.annotation.*;
 
 import java.util.NoSuchElementException;
 
+import static io.github.raeperd.realworld.application.user.ProfileModel.fromProfile;
 import static java.util.Optional.ofNullable;
 import static org.springframework.http.HttpStatus.NOT_FOUND;
 
@@ -27,9 +28,16 @@ class ProfileRestController {
                                              @PathVariable UserName username) {
         return ofNullable(jwtPayload)
                 .map(JWTPayload::getUserId)
-                .map(viewerId -> profileService.viewProfileFromUser(viewerId, username))
+                .map(viewerId -> profileService.viewProfile(viewerId, username))
                 .map(ProfileModel::fromProfile)
-                .orElseGet(() -> ProfileModel.fromProfile(profileService.viewProfileWithUserName(username)));
+                .orElseGet(() -> fromProfile(profileService.viewProfile(username)));
+    }
+
+    @PostMapping("/{username}/follow")
+    public ProfileModel followUser(@AuthenticationPrincipal UserJWTPayload followerPayload,
+                                   @PathVariable UserName username) {
+        return fromProfile(
+                profileService.followAndViewProfile(followerPayload.getUserId(), username));
     }
 
     @ResponseStatus(NOT_FOUND)

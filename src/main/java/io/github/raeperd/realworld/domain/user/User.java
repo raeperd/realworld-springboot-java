@@ -46,6 +46,11 @@ public class User {
     protected User() {
     }
 
+    User followUser(User followee) {
+        followingUsers.add(followee);
+        return this;
+    }
+
     Profile viewProfile(User user) {
         return user.profile.withFollowing(followingUsers.contains(user));
     }
