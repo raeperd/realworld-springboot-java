@@ -40,6 +40,14 @@ class ProfileRestController {
                 profileService.followAndViewProfile(followerPayload.getUserId(), username));
     }
 
+    @DeleteMapping("/{username}/follow")
+    public ProfileModel unfollowUser(@AuthenticationPrincipal UserJWTPayload followerPayload,
+                                     @PathVariable UserName username) {
+        return fromProfile(
+                profileService.unfollowAndViewProfile(followerPayload.getUserId(), username)
+        );
+    }
+
     @ResponseStatus(NOT_FOUND)
     @ExceptionHandler(NoSuchElementException.class)
     void handleNoSuchElementException(NoSuchElementException exception) {

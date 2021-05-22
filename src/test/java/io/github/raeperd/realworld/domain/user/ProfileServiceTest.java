@@ -113,4 +113,36 @@ class ProfileServiceTest {
         then(follower).should(times(1)).followUser(followee);
     }
 
+    @Test
+    void when_unfollowAndViewProfile_with_not_exists_followeeName_expect_NoSuchElementException(@Mock UserName followeeName) {
+        when(userFindService.findByUsername(followeeName)).thenReturn(empty());
+
+        assertThatThrownBy(() ->
+                profileService.unfollowAndViewProfile(1L, followeeName)
+        ).isInstanceOf(NoSuchElementException.class);
+    }
+
+    @Test
+    void when_unfollowAndViewProfile_with_not_exists_followerId_expect_NoSuchElementException(@Mock User followee, @Mock UserName followeeName) {
+        when(userFindService.findByUsername(followeeName)).thenReturn(of(followee));
+        when(userFindService.findById(anyLong())).thenReturn(empty());
+
+        assertThatThrownBy(() ->
+                profileService.unfollowAndViewProfile(1L, followeeName)
+        ).isInstanceOf(NoSuchElementException.class);
+    }
+
+    @Test
+    void when_unfollowAndViewProfile_expect_follower_unfollows_followee(
+            @Mock User follower, @Mock UserName followeeName, @Mock User followee, @Mock Profile followeeProfile) {
+        given(userFindService.findByUsername(followeeName)).willReturn(of(followee));
+        given(userFindService.findById(anyLong())).willReturn(of(follower));
+        given(follower.unfollowUser(followee)).willReturn(follower);
+        given(follower.viewProfile(followee)).willReturn(followeeProfile);
+
+        profileService.unfollowAndViewProfile(1L, followeeName);
+
+        then(follower).should(times(1)).unfollowUser(followee);
+    }
+
 }
