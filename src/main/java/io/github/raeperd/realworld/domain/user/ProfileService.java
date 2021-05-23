@@ -37,4 +37,13 @@ public class ProfileService {
                 .map(follower -> follower.viewProfile(followee))
                 .orElseThrow(NoSuchElementException::new);
     }
+
+    @Transactional
+    public Profile unfollowAndViewProfile(long followerId, UserName followeeUserName) {
+        final var followee = userFindService.findByUsername(followeeUserName).orElseThrow(NoSuchElementException::new);
+        return userFindService.findById(followerId)
+                .map(follower -> follower.unfollowUser(followee))
+                .map(follower -> follower.viewProfile(followee))
+                .orElseThrow(NoSuchElementException::new);
+    }
 }

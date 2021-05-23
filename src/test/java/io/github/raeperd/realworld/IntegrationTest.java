@@ -122,4 +122,14 @@ class IntegrationTest {
                 .andExpect(jsonPath("profile.following", is(true)));
     }
 
+    @Order(9)
+    @Test
+    void unfollow_profile() throws Exception {
+        mockMvc.perform(delete("/profiles/{celeb_username}/follow", CELEB_USERNAME)
+                .header(AUTHORIZATION, "Token " + token))
+                .andExpect(status().isOk())
+                .andExpect(validProfileModel())
+                .andExpect(jsonPath("profile.following", is(false)));
+    }
+
 }

@@ -51,6 +51,11 @@ public class User {
         return this;
     }
 
+    User unfollowUser(User followee) {
+        followingUsers.remove(followee);
+        return this;
+    }
+
     Profile viewProfile(User user) {
         return user.profile.withFollowing(followingUsers.contains(user));
     }
