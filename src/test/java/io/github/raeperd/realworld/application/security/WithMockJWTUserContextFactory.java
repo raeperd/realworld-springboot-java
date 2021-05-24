@@ -9,17 +9,13 @@ import org.springframework.security.test.context.support.WithSecurityContextFact
 
 import static java.util.Collections.singleton;
 import static org.mockito.Mockito.mock;
-import static org.mockito.Mockito.when;
 
 class WithMockJWTUserContextFactory implements WithSecurityContextFactory<WithMockJWTUser> {
 
     @Override
     public SecurityContext createSecurityContext(WithMockJWTUser annotation) {
-        final var payload = mock(UserJWTPayload.class);
-        when(payload.getUserId()).thenReturn(annotation.userId());
-
         final var context = SecurityContextHolder.createEmptyContext();
-        context.setAuthentication(new MockJWTAuthentication(payload));
+        context.setAuthentication(new MockJWTAuthentication(mock(UserJWTPayload.class)));
         return context;
     }
 
