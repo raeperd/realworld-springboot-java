@@ -132,4 +132,25 @@ class IntegrationTest {
                 .andExpect(jsonPath("profile.following", is(false)));
     }
 
+    @Order(10)
+    @Test
+    void create_article() throws Exception {
+        mockMvc.perform(post("/articles")
+                .header(AUTHORIZATION, "Token " + token)
+                .contentType(APPLICATION_JSON)
+                .content("{\n" +
+                        "    \"article\": {\n" +
+                        "        \"title\": \"How to train your dragon\",\n" +
+                        "        \"description\": \"Ever wonder how?\",\n" +
+                        "        \"body\": \"Very carefully.\",\n" +
+                        "        \"tagList\": [\n" +
+                        "            \"dragons\",\n" +
+                        "            \"training\"\n" +
+                        "        ]\n" +
+                        "    }\n" +
+                        "}"))
+                .andExpect(status().isCreated())
+                .andExpect(jsonPath("article").isMap());
+    }
+
 }
