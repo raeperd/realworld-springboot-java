@@ -8,14 +8,14 @@ import org.springframework.data.jpa.domain.support.AuditingEntityListener;
 import javax.persistence.*;
 import java.time.Instant;
 
-import static javax.persistence.GenerationType.AUTO;
+import static javax.persistence.GenerationType.IDENTITY;
 
 @Table(name = "articles")
 @EntityListeners(AuditingEntityListener.class)
 @Entity
-class Article {
+public class Article {
 
-    @GeneratedValue(strategy = AUTO)
+    @GeneratedValue(strategy = IDENTITY)
     @Id
     private Long id;
 
@@ -24,16 +24,20 @@ class Article {
     private User author;
 
     @Embedded
-    private ArticleTitle title;
-
-    @Embedded
     private ArticleContents contents;
 
+    @Column(name = "created_at")
     @CreatedDate
     private Instant createdAt;
 
+    @Column(name = "updated_at")
     @LastModifiedDate
-    private Instant updateAt;
+    private Instant updatedAt;
+
+    public Article(User author, ArticleContents contents) {
+        this.author = author;
+        this.contents = contents;
+    }
 
     protected Article() {
     }

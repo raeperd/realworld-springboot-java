@@ -22,8 +22,7 @@ class UserRepositoryTest {
                 new UserName("name"),
                 Password.of("rawPassword", PASSWORD_ENCODER));
 
-        assertThat(userRepository.save(userToSave))
-                .hasFieldOrPropertyWithValue("id", 1L);
+        assertThat(userRepository.save(userToSave)).hasNoNullFieldsOrProperties();
     }
 
     @Test
