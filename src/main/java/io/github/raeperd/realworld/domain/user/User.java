@@ -66,7 +66,7 @@ public class User {
         return user.profile.withFollowing(followingUsers.contains(user));
     }
 
-    Profile getProfile() {
+    public Profile getProfile() {
         return profile;
     }
 

@@ -4,7 +4,7 @@ import javax.persistence.Column;
 import javax.persistence.Embeddable;
 
 @Embeddable
-class ArticleTitle {
+public class ArticleTitle {
 
     @Column(nullable = false)
     private String title;
@@ -31,7 +31,11 @@ class ArticleTitle {
                 .replaceAll("(^-)|(-$)", "");
     }
 
-    String getSlug() {
+    public String getSlug() {
         return slug;
+    }
+
+    public String getTitle() {
+        return title;
     }
 }

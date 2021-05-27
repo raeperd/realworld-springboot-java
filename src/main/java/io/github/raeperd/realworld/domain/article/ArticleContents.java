@@ -16,12 +16,24 @@ public class ArticleContents {
     @Column(nullable = false)
     private String body;
 
-    ArticleContents(String description, ArticleTitle title, String body) {
+    public ArticleContents(String description, ArticleTitle title, String body) {
         this.description = description;
         this.title = title;
         this.body = body;
     }
 
     protected ArticleContents() {
+    }
+
+    public ArticleTitle getTitle() {
+        return title;
+    }
+
+    public String getDescription() {
+        return description;
+    }
+
+    public String getBody() {
+        return body;
     }
 }

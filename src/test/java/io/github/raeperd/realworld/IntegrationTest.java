@@ -149,8 +149,8 @@ class IntegrationTest {
                         "        ]\n" +
                         "    }\n" +
                         "}"))
-                .andExpect(status().isCreated())
-                .andExpect(jsonPath("article").isMap());
+                .andExpect(status().isOk())
+                .andExpect(validArticleModel());
     }
 
 }

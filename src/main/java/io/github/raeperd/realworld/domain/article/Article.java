@@ -8,6 +8,7 @@ import org.springframework.data.jpa.domain.support.AuditingEntityListener;
 import javax.persistence.*;
 import java.time.Instant;
 
+import static javax.persistence.FetchType.EAGER;
 import static javax.persistence.GenerationType.IDENTITY;
 
 @Table(name = "articles")
@@ -20,7 +21,7 @@ public class Article {
     private Long id;
 
     @JoinColumn(name = "author_id", referencedColumnName = "id", nullable = false)
-    @ManyToOne
+    @ManyToOne(fetch = EAGER)
     private User author;
 
     @Embedded
@@ -40,5 +41,21 @@ public class Article {
     }
 
     protected Article() {
+    }
+
+    public User getAuthor() {
+        return author;
+    }
+
+    public ArticleContents getContents() {
+        return contents;
+    }
+
+    public Instant getCreatedAt() {
+        return createdAt;
+    }
+
+    public Instant getUpdatedAt() {
+        return updatedAt;
     }
 }
