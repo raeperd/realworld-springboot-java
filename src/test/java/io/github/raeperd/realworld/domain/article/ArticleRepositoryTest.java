@@ -9,9 +9,11 @@ import org.springframework.boot.test.autoconfigure.orm.jpa.DataJpaTest;
 import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.data.jpa.repository.config.EnableJpaAuditing;
 
+import java.util.Collections;
 import java.util.stream.Stream;
 
 import static io.github.raeperd.realworld.domain.user.UserTestUtils.databaseUser;
+import static java.util.Collections.emptySet;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 
@@ -32,7 +34,7 @@ class ArticleRepositoryTest {
 
     @Test
     void when_save_article_expect_auditing_works() {
-        var contentsToSave = new ArticleContents("description", ArticleTitle.of("some title"), "body");
+        var contentsToSave = new ArticleContents("description", ArticleTitle.of("some title"), "body", emptySet());
         var articleToSave = databaseUser().writeArticle(contentsToSave);
 
         var articleSaved = repository.save(articleToSave);
@@ -48,10 +50,10 @@ class ArticleRepositoryTest {
 
     private static Stream<ArticleContents> provideInvalidArticleContents() {
         return Stream.of(
-                new ArticleContents(null, null, null),
-                new ArticleContents("description", null,  null),
-                new ArticleContents(null, ArticleTitle.of("title"),  null),
-                new ArticleContents(null, null,  "body")
+                new ArticleContents(null, null, null, emptySet()),
+                new ArticleContents("description", null,  null, emptySet()),
+                new ArticleContents(null, ArticleTitle.of("title"),  null, emptySet()),
+                new ArticleContents(null, null,  "body", emptySet())
         );
     }
 

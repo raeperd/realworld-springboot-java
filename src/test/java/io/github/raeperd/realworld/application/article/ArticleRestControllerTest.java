@@ -14,7 +14,7 @@ import org.springframework.test.web.servlet.MockMvc;
 
 import java.util.stream.Stream;
 
-import static java.util.Collections.emptyList;
+import static java.util.Collections.emptySet;
 import static org.springframework.http.MediaType.APPLICATION_JSON;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
@@ -45,12 +45,12 @@ class ArticleRestControllerTest {
 
     private static Stream<Arguments> provideInvalidPostDTO() {
         return Stream.of(
-                Arguments.of(new ArticlePostRequestDTO(null, "description", "body", emptyList())),
-                Arguments.of(new ArticlePostRequestDTO("title", null, "body", emptyList())),
-                Arguments.of(new ArticlePostRequestDTO("title", "description", null, emptyList())),
+                Arguments.of(new ArticlePostRequestDTO(null, "description", "body", emptySet())),
+                Arguments.of(new ArticlePostRequestDTO("title", null, "body", emptySet())),
+                Arguments.of(new ArticlePostRequestDTO("title", "description", null, emptySet())),
                 Arguments.of(new ArticlePostRequestDTO("title", "description", "body", null)),
-                Arguments.of(new ArticlePostRequestDTO(" ", "description", "body", emptyList())),
-                Arguments.of(new ArticlePostRequestDTO("title", " ", "body", emptyList())),
-                Arguments.of(new ArticlePostRequestDTO("title", "description", " ", emptyList())));
+                Arguments.of(new ArticlePostRequestDTO(" ", "description", "body", emptySet())),
+                Arguments.of(new ArticlePostRequestDTO("title", " ", "body", emptySet())),
+                Arguments.of(new ArticlePostRequestDTO("title", "description", " ", emptySet())));
     }
 }

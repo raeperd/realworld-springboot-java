@@ -4,11 +4,12 @@ import com.fasterxml.jackson.annotation.JsonTypeInfo;
 import com.fasterxml.jackson.annotation.JsonTypeName;
 import io.github.raeperd.realworld.domain.article.ArticleContents;
 import io.github.raeperd.realworld.domain.article.ArticleTitle;
+import io.github.raeperd.realworld.domain.article.tag.Tag;
 import lombok.Value;
 
 import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.NotNull;
-import java.util.List;
+import java.util.Set;
 
 import static com.fasterxml.jackson.annotation.JsonTypeInfo.As.WRAPPER_OBJECT;
 import static com.fasterxml.jackson.annotation.JsonTypeInfo.Id.NAME;
@@ -25,9 +26,9 @@ class ArticlePostRequestDTO {
     @NotBlank
     String body;
     @NotNull
-    List<String> tagList;
+    Set<Tag> tagList;
 
     ArticleContents toArticleContents() {
-        return new ArticleContents(description, ArticleTitle.of(title), body);
+        return new ArticleContents(description, ArticleTitle.of(title), body, tagList);
     }
 }

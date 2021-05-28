@@ -24,4 +24,24 @@ class TagTest {
 
         assertThat(tag).hasToString("some-tag");
     }
+
+    @Test
+    void when_tag_has_different_value_expect_not_equal_and_hashCode() {
+        final var tag = new Tag("some-vale");
+        final var tagWithDifferentValue = new Tag("some-different-value");
+
+        assertThat(tag)
+                .isNotEqualTo(tagWithDifferentValue)
+                .extracting(Tag::hashCode).isNotEqualTo(tagWithDifferentValue.hashCode());
+    }
+
+    @Test
+    void when_tag_has_same_value_expect_equal() {
+        final var tag = new Tag("some-value");
+        final var tagWithSameValue = new Tag("some-value");
+
+        assertThat(tag)
+                .isEqualTo(tagWithSameValue)
+                .hasSameHashCodeAs(tagWithSameValue);
+    }
 }
