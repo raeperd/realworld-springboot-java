@@ -6,6 +6,9 @@ import org.springframework.transaction.annotation.Transactional;
 import java.util.HashSet;
 import java.util.Set;
 
+import static java.lang.String.valueOf;
+import static java.util.stream.Collectors.toSet;
+
 @Service
 public class TagService {
 
@@ -18,5 +21,12 @@ public class TagService {
     @Transactional(readOnly = true)
     public Set<Tag> findAll() {
         return new HashSet<>(tagRepository.findAll());
+    }
+
+    @Transactional(readOnly = true)
+    public Set<Tag> reloadAllTagsIfAlreadyPresent(Set<Tag> tags) {
+        return tags.stream()
+                .map(tag -> tagRepository.findFirstByValue(valueOf(tag)).orElse(tag))
+                .collect(toSet());
     }
 }
