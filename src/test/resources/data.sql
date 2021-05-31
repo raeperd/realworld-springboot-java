@@ -1,0 +1,1 @@
+INSERT INTO users(id, name, email, password) VALUES (1, 'databaseUser', 'databaseUser@email.com', '$2y$10$Uw0vceuCbx3bVOsXZuP.5eh4cAGjIYdzBtYgAo3E1AE6B3.pG11uO ');
