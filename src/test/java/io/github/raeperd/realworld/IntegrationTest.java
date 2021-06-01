@@ -162,4 +162,14 @@ class IntegrationTest {
                 .andExpect(validMultipleArticleModel());
     }
 
+    @Order(12)
+    @Test
+    void get_all_articles_with_author() throws Exception {
+        mockMvc.perform(get("/articles")
+                .queryParam("author", USERNAME)
+                .header(AUTHORIZATION, "Token " + token))
+                .andExpect(status().isOk())
+                .andExpect(validMultipleArticleModel());
+    }
+
 }

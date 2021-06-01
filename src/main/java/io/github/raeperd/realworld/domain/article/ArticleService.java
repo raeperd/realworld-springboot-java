@@ -2,6 +2,7 @@ package io.github.raeperd.realworld.domain.article;
 
 import io.github.raeperd.realworld.domain.article.tag.TagService;
 import io.github.raeperd.realworld.domain.user.UserFindService;
+import io.github.raeperd.realworld.domain.user.UserName;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
@@ -35,5 +36,10 @@ public class ArticleService {
     @Transactional(readOnly = true)
     public Page<Article> getArticles(Pageable pageable) {
         return articleRepository.findAll(pageable);
+    }
+
+    @Transactional(readOnly = true)
+    public Page<Article> getArticlesByAuthorName(String authorName, Pageable pageable) {
+        return articleRepository.findAllByAuthorProfileUserName(new UserName(authorName), pageable);
     }
 }
