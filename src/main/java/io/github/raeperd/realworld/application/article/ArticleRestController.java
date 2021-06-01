@@ -35,4 +35,12 @@ class ArticleRestController {
         final var articles = articleService.getArticlesByAuthorName(author, pageable);
         return MultipleArticleModel.fromArticles(articles);
     }
+
+    @GetMapping(value = "/articles", params = {"tag"})
+    public MultipleArticleModel getArticlesByTag(@RequestParam String tag, Pageable pageable) {
+        final var articles = articleService.getArticlesByTag(tag, pageable);
+        return MultipleArticleModel.fromArticles(articles);
+    }
+
+    // TODO: GET /articles?favorited={username}
 }

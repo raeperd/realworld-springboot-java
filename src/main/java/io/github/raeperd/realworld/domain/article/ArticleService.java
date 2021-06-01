@@ -42,4 +42,11 @@ public class ArticleService {
     public Page<Article> getArticlesByAuthorName(String authorName, Pageable pageable) {
         return articleRepository.findAllByAuthorProfileUserName(new UserName(authorName), pageable);
     }
+
+    @Transactional(readOnly = true)
+    public Page<Article> getArticlesByTag(String tagValue, Pageable pageable) {
+        return tagService.findByValue(tagValue)
+                .map(tag -> articleRepository.findAllByContentsTagsContains(tag, pageable))
+                .orElse(Page.empty());
+    }
 }

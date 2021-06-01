@@ -1,5 +1,6 @@
 package io.github.raeperd.realworld.domain.article;
 
+import io.github.raeperd.realworld.domain.article.tag.Tag;
 import io.github.raeperd.realworld.domain.user.UserName;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -11,5 +12,6 @@ interface ArticleRepository extends Repository<Article, Long> {
 
     Page<Article> findAll(Pageable pageable);
     Page<Article> findAllByAuthorProfileUserName(UserName authorName, Pageable pageable);
+    Page<Article> findAllByContentsTagsContains(Tag tag, Pageable pageable);
 
 }
