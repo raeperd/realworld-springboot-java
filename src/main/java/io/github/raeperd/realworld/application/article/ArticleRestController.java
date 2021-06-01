@@ -3,10 +3,13 @@ package io.github.raeperd.realworld.application.article;
 import io.github.raeperd.realworld.domain.article.ArticleService;
 import io.github.raeperd.realworld.infrastructure.jwt.UserJWTPayload;
 import org.springframework.data.domain.Pageable;
+import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
 
 import javax.validation.Valid;
+
+import static org.springframework.http.ResponseEntity.of;
 
 @RestController
 class ArticleRestController {
@@ -43,4 +46,10 @@ class ArticleRestController {
     }
 
     // TODO: GET /articles?favorited={username}
+
+    @GetMapping("/articles/{slug}")
+    public ResponseEntity<ArticleModel> getArticleBySlug(@PathVariable String slug) {
+        return of(articleService.getArticleBySlug(slug)
+                .map(ArticleModel::fromArticle));
+    }
 }
