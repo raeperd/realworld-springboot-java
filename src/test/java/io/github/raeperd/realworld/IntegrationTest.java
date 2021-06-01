@@ -150,7 +150,36 @@ class IntegrationTest {
                         "    }\n" +
                         "}"))
                 .andExpect(status().isOk())
-                .andExpect(validArticleModel());
+                .andExpect(validSingleArticleModel());
+    }
+
+    @Order(11)
+    @Test
+    void get_all_articles() throws Exception {
+        mockMvc.perform(get("/articles?limit=20&offset=0")
+                .header(AUTHORIZATION, "Token " + token))
+                .andExpect(status().isOk())
+                .andExpect(validMultipleArticleModel());
+    }
+
+    @Order(11)
+    @Test
+    void get_all_articles_with_author() throws Exception {
+        mockMvc.perform(get("/articles")
+                .queryParam("author", USERNAME)
+                .header(AUTHORIZATION, "Token " + token))
+                .andExpect(status().isOk())
+                .andExpect(validMultipleArticleModel());
+    }
+
+    @Order(11)
+    @Test
+    void get_all_articles_with_tag() throws Exception {
+        mockMvc.perform(get("/articles")
+                .queryParam("tag", "dragons")
+                .header(AUTHORIZATION, "Token " + token))
+                .andExpect(status().isOk())
+                .andExpect(validMultipleArticleModel());
     }
 
 }

@@ -46,18 +46,30 @@ public class IntegrationTestUtils {
                 jsonPath(path + ".following").isBoolean());
     }
 
-    static ResultMatcher validArticleModel() {
+    static ResultMatcher validSingleArticleModel() {
         return matchAll(
                 jsonPath("article").isMap(),
-                jsonPath("article.slug").isString(),
-                jsonPath("article.title").isString(),
-                jsonPath("article.description").isString(),
-                jsonPath("article.body").isString(),
-                jsonPath("article.tagList").isNotEmpty(),
-                jsonPath("article.createdAt", matchesPattern(ISO_8601_PATTERN)),
-                jsonPath("article.updatedAt", matchesPattern(ISO_8601_PATTERN)),
-                jsonPath("article.favorited").isBoolean(),
-                jsonPath("article.favoritesCount").isNumber(),
-                validProfileModelInPath("article.author"));
+                validArticleModelInPath("article"));
+    }
+
+    static ResultMatcher validMultipleArticleModel() {
+        return matchAll(
+                jsonPath("articles").isArray(),
+                validArticleModelInPath("articles[0]")
+        );
+    }
+
+    private static ResultMatcher validArticleModelInPath(String path) {
+        return matchAll(
+                jsonPath(path + ".slug").isString(),
+                jsonPath(path + ".title").isString(),
+                jsonPath(path + ".description").isString(),
+                jsonPath(path + ".body").isString(),
+                jsonPath(path + ".tagList").isNotEmpty(),
+                jsonPath(path + ".createdAt", matchesPattern(ISO_8601_PATTERN)),
+                jsonPath(path + ".updatedAt", matchesPattern(ISO_8601_PATTERN)),
+                jsonPath(path + ".favorited").isBoolean(),
+                jsonPath(path + ".favoritesCount").isNumber(),
+                validProfileModelInPath(path + ".author"));
     }
 }

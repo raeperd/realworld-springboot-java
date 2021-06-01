@@ -4,6 +4,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.HashSet;
+import java.util.Optional;
 import java.util.Set;
 
 import static java.lang.String.valueOf;
@@ -26,7 +27,12 @@ public class TagService {
     @Transactional(readOnly = true)
     public Set<Tag> reloadAllTagsIfAlreadyPresent(Set<Tag> tags) {
         return tags.stream()
-                .map(tag -> tagRepository.findFirstByValue(valueOf(tag)).orElse(tag))
+                .map(tag -> findByValue(valueOf(tag)).orElse(tag))
                 .collect(toSet());
+    }
+
+    @Transactional(readOnly = true)
+    public Optional<Tag> findByValue(String value) {
+        return tagRepository.findFirstByValue(value);
     }
 }
