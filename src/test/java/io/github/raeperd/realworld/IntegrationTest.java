@@ -164,6 +164,14 @@ class IntegrationTest {
 
     @Order(11)
     @Test
+    void get_all_articles_without_auth() throws Exception {
+        mockMvc.perform(get("/articles?limit=20&offset=0"))
+                .andExpect(status().isOk())
+                .andExpect(validMultipleArticleModel());
+    }
+
+    @Order(11)
+    @Test
     void get_all_articles_with_author() throws Exception {
         mockMvc.perform(get("/articles")
                 .queryParam("author", USERNAME)
