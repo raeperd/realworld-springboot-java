@@ -1,5 +1,7 @@
 package io.github.raeperd.realworld.domain.article;
 
+import io.github.raeperd.realworld.domain.article.tag.Tag;
+import io.github.raeperd.realworld.domain.article.tag.TagService;
 import io.github.raeperd.realworld.domain.user.User;
 import io.github.raeperd.realworld.domain.user.UserFindService;
 import org.junit.jupiter.api.BeforeEach;
@@ -10,6 +12,7 @@ import org.mockito.Spy;
 import org.mockito.junit.jupiter.MockitoExtension;
 
 import java.util.NoSuchElementException;
+import java.util.Set;
 
 import static java.util.Optional.empty;
 import static java.util.Optional.of;
@@ -26,6 +29,8 @@ class ArticleServiceTest {
     @Mock
     private UserFindService userFindService;
     @Mock
+    private TagService tagService;
+    @Mock
     private ArticleRepository repository;
 
     @Spy
@@ -33,7 +38,7 @@ class ArticleServiceTest {
 
     @BeforeEach
     private void initializeService() {
-        articleService = new ArticleService(userFindService, repository);
+        articleService = new ArticleService(userFindService, tagService, repository);
     }
 
     @Test
@@ -43,6 +48,17 @@ class ArticleServiceTest {
         assertThatThrownBy(() ->
                 articleService.createNewArticle(1L, contents)
         ).isInstanceOf(NoSuchElementException.class);
+    }
+
+    @Test
+    void given_author_createNewArticle_then_tagService_reloadTags(@Mock ArticleContents contents, @Mock Set<Tag> tags) {
+        given(contents.getTags()).willReturn(tags);
+        given(userFindService.findById(1L)).willReturn(of(author));
+        given(repository.save(any())).willReturn(mock(Article.class));
+
+        articleService.createNewArticle(1L, contents);
+
+        then(tagService).should(times(1)).reloadAllTagsIfAlreadyPresent(tags);
     }
 
     @Test

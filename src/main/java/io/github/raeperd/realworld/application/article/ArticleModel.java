@@ -4,15 +4,16 @@ import com.fasterxml.jackson.annotation.JsonTypeInfo;
 import com.fasterxml.jackson.annotation.JsonTypeName;
 import io.github.raeperd.realworld.application.user.ProfileModel.ProfileModelNested;
 import io.github.raeperd.realworld.domain.article.Article;
+import io.github.raeperd.realworld.domain.article.tag.Tag;
 import lombok.Value;
 
 import java.time.ZoneId;
 import java.time.ZonedDateTime;
-import java.util.List;
+import java.util.Set;
 
 import static com.fasterxml.jackson.annotation.JsonTypeInfo.As.WRAPPER_OBJECT;
 import static com.fasterxml.jackson.annotation.JsonTypeInfo.Id.NAME;
-import static java.util.Collections.emptyList;
+import static java.util.stream.Collectors.toSet;
 
 @JsonTypeName("article")
 @JsonTypeInfo(include = WRAPPER_OBJECT, use = NAME)
@@ -23,14 +24,13 @@ class ArticleModel {
     String title;
     String description;
     String body;
-    List<String> tagList;
+    Set<String> tagList;
     ZonedDateTime createdAt;
     ZonedDateTime updatedAt;
     boolean favorited;
     int favoritesCount;
     ProfileModelNested author;
 
-    // TODO: apply tags
     // TODO: apply favorited, favoritesCount
     static ArticleModel fromArticle(Article article) {
         final var contents = article.getContents();
@@ -38,7 +38,7 @@ class ArticleModel {
         return new ArticleModel(
                 titleFromArticle.getSlug(), titleFromArticle.getTitle(),
                 contents.getDescription(), contents.getBody(),
-                emptyList(),
+                contents.getTags().stream().map(Tag::toString).collect(toSet()),
                 article.getCreatedAt().atZone(ZoneId.of("Asia/Seoul")),
                 article.getUpdatedAt().atZone(ZoneId.of("Asia/Seoul")),
                 false, 0,

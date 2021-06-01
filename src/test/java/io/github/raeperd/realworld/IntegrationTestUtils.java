@@ -53,7 +53,7 @@ public class IntegrationTestUtils {
                 jsonPath("article.title").isString(),
                 jsonPath("article.description").isString(),
                 jsonPath("article.body").isString(),
-                jsonPath("article.tagList").isArray(),
+                jsonPath("article.tagList").isNotEmpty(),
                 jsonPath("article.createdAt", matchesPattern(ISO_8601_PATTERN)),
                 jsonPath("article.updatedAt", matchesPattern(ISO_8601_PATTERN)),
                 jsonPath("article.favorited").isBoolean(),
