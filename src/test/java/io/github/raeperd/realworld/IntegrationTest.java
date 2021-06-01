@@ -190,4 +190,12 @@ class IntegrationTest {
                 .andExpect(validMultipleArticleModel());
     }
 
+    @Order(11)
+    @Test
+    void get_single_article_by_slug() throws Exception {
+        mockMvc.perform(get("/articles/{slug}", "how-to-train-your-dragon"))
+                .andExpect(status().isOk())
+                .andExpect(validSingleArticleModel());
+    }
+
 }

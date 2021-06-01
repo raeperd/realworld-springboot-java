@@ -9,6 +9,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.NoSuchElementException;
+import java.util.Optional;
 
 @Service
 public class ArticleService {
@@ -48,5 +49,10 @@ public class ArticleService {
         return tagService.findByValue(tagValue)
                 .map(tag -> articleRepository.findAllByContentsTagsContains(tag, pageable))
                 .orElse(Page.empty());
+    }
+
+    @Transactional(readOnly = true)
+    public Optional<Article> getArticleBySlug(String slug) {
+        return articleRepository.findFirstByContentsTitleSlug(slug);
     }
 }
