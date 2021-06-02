@@ -1,6 +1,7 @@
 package io.github.raeperd.realworld.domain.article;
 
 import io.github.raeperd.realworld.domain.article.tag.TagService;
+import io.github.raeperd.realworld.domain.user.User;
 import io.github.raeperd.realworld.domain.user.UserFindService;
 import io.github.raeperd.realworld.domain.user.UserName;
 import org.springframework.data.domain.Page;
@@ -10,6 +11,8 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.util.NoSuchElementException;
 import java.util.Optional;
+
+import static org.springframework.data.util.Optionals.mapIfAllPresent;
 
 @Service
 public class ArticleService {
@@ -31,6 +34,14 @@ public class ArticleService {
         return userFindService.findById(authorId)
                 .map(author -> author.writeArticle(contents))
                 .map(articleRepository::save)
+                .orElseThrow(NoSuchElementException::new);
+    }
+
+    @Transactional
+    public Article favoriteArticle(long userId, String articleSlugToFavorite) {
+        return mapIfAllPresent(
+                userFindService.findById(userId), getArticleBySlug(articleSlugToFavorite),
+                User::favoriteArticle)
                 .orElseThrow(NoSuchElementException::new);
     }
 

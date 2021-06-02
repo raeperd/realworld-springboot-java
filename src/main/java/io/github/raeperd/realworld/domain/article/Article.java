@@ -7,7 +7,11 @@ import org.springframework.data.jpa.domain.support.AuditingEntityListener;
 
 import javax.persistence.*;
 import java.time.Instant;
+import java.util.HashSet;
+import java.util.Objects;
+import java.util.Set;
 
+import static javax.persistence.CascadeType.PERSIST;
 import static javax.persistence.FetchType.EAGER;
 import static javax.persistence.GenerationType.IDENTITY;
 
@@ -35,12 +39,23 @@ public class Article {
     @LastModifiedDate
     private Instant updatedAt;
 
+    @JoinTable(name = "article_favorites",
+            joinColumns = @JoinColumn(name = "article_id", referencedColumnName = "id", nullable = false),
+            inverseJoinColumns = @JoinColumn(name = "user_id", referencedColumnName = "id", nullable = false))
+    @ManyToMany(fetch = EAGER, cascade = PERSIST)
+    private Set<User> userFavorited = new HashSet<>();
+
     public Article(User author, ArticleContents contents) {
         this.author = author;
         this.contents = contents;
     }
 
     protected Article() {
+    }
+
+    public Article afterUserFavoritesArticle(User user) {
+        userFavorited.add(user);
+        return this;
     }
 
     public User getAuthor() {
@@ -57,5 +72,22 @@ public class Article {
 
     public Instant getUpdatedAt() {
         return updatedAt;
+    }
+
+    public int getFavoritedCount() {
+        return userFavorited.size();
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+        var article = (Article) o;
+        return author.equals(article.author) && contents.getTitle().equals(article.contents.getTitle());
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(author, contents.getTitle());
     }
 }

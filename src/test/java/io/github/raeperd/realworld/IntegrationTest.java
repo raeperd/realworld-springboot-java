@@ -198,4 +198,13 @@ class IntegrationTest {
                 .andExpect(validSingleArticleModel());
     }
 
+    @Order(12)
+    @Test
+    void post_favorite_article() throws Exception {
+        mockMvc.perform(post("/articles/{slug}/favorite", "how-to-train-your-dragon")
+                .header(AUTHORIZATION, "Token " + token))
+                .andExpect(status().isOk())
+                .andExpect(validSingleArticleModel());
+    }
+
 }
