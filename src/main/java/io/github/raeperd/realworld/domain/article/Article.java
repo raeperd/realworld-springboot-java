@@ -53,6 +53,11 @@ public class Article {
     protected Article() {
     }
 
+    public Article afterUserFavoritesArticle(User user) {
+        userFavorited.add(user);
+        return this;
+    }
+
     public User getAuthor() {
         return author;
     }

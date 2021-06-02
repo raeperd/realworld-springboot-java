@@ -52,4 +52,11 @@ class ArticleRestController {
         return of(articleService.getArticleBySlug(slug)
                 .map(ArticleModel::fromArticle));
     }
+
+    @PostMapping("/articles/{slug}/favorite")
+    public ArticleModel favoriteArticleBySlug(@AuthenticationPrincipal UserJWTPayload jwtPayload,
+                                              @PathVariable String slug) {
+        var articleFavorited = articleService.favoriteArticle(jwtPayload.getUserId(), slug);
+        return ArticleModel.fromArticle(articleFavorited);
+    }
 }

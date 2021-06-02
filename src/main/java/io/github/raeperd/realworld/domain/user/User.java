@@ -55,6 +55,11 @@ public class User {
         return new Article(this, contents);
     }
 
+    public Article favoriteArticle(Article articleToFavorite) {
+        articleFavorited.add(articleToFavorite);
+        return articleToFavorite.afterUserFavoritesArticle(this);
+    }
+
     User followUser(User followee) {
         followingUsers.add(followee);
         return this;
