@@ -37,11 +37,20 @@ CREATE TABLE IF NOT EXISTS tags
     value VARCHAR(255) UNIQUE NOT NULL
 );
 
-create table IF NOT EXISTS articles_tags
+CREATE TABLE IF NOT EXISTS articles_tags
 (
     article_id BIGINT NOT NULL,
     tag_id BIGINT     NOT NULL,
     PRIMARY KEY (article_id, tag_id),
     CONSTRAINT fk_article FOREIGN KEY (article_id) REFERENCES articles (id) ON DELETE CASCADE,
     CONSTRAINT fk_tag FOREIGN KEY (tag_id) REFERENCES tags (id) ON DELETE CASCADE
+);
+
+CREATE TABLE IF NOT EXISTS article_favorites
+(
+    article_id BIGINT NOT NULL,
+    user_id BIGINT NOT NULL,
+    PRIMARY KEY (article_id, user_id),
+    CONSTRAINT fk_article_favorited FOREIGN KEY (article_id) REFERENCES articles (id) ON DELETE CASCADE,
+    CONSTRAINT fk_user FOREIGN KEY (user_id) REFERENCES users (id) ON DELETE CASCADE
 );

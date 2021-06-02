@@ -7,7 +7,10 @@ import org.springframework.data.jpa.domain.support.AuditingEntityListener;
 
 import javax.persistence.*;
 import java.time.Instant;
+import java.util.HashSet;
+import java.util.Set;
 
+import static javax.persistence.CascadeType.PERSIST;
 import static javax.persistence.FetchType.EAGER;
 import static javax.persistence.GenerationType.IDENTITY;
 
@@ -35,6 +38,12 @@ public class Article {
     @LastModifiedDate
     private Instant updatedAt;
 
+    @JoinTable(name = "article_favorites",
+            joinColumns = @JoinColumn(name = "article_id", referencedColumnName = "id", nullable = false),
+            inverseJoinColumns = @JoinColumn(name = "user_id", referencedColumnName = "id", nullable = false))
+    @ManyToMany(fetch = EAGER, cascade = PERSIST)
+    private Set<User> userFavorited = new HashSet<>();
+
     public Article(User author, ArticleContents contents) {
         this.author = author;
         this.contents = contents;
@@ -57,5 +66,9 @@ public class Article {
 
     public Instant getUpdatedAt() {
         return updatedAt;
+    }
+
+    public int getFavoritedCount() {
+        return userFavorited.size();
     }
 }

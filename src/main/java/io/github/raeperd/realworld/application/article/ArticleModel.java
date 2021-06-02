@@ -43,7 +43,7 @@ class ArticleModel {
                     contents.getTags().stream().map(Tag::toString).collect(toSet()),
                     article.getCreatedAt().atZone(ZoneId.of("Asia/Seoul")),
                     article.getUpdatedAt().atZone(ZoneId.of("Asia/Seoul")),
-                    false, 0,
+                    false, article.getFavoritedCount(),
                     ProfileModelNested.fromProfile(article.getAuthor().getProfile())
             );
         }
