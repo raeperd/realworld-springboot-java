@@ -8,6 +8,7 @@ import org.springframework.data.jpa.domain.support.AuditingEntityListener;
 import javax.persistence.*;
 import java.time.Instant;
 import java.util.HashSet;
+import java.util.Objects;
 import java.util.Set;
 
 import static javax.persistence.CascadeType.PERSIST;
@@ -70,5 +71,18 @@ public class Article {
 
     public int getFavoritedCount() {
         return userFavorited.size();
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+        var article = (Article) o;
+        return author.equals(article.author) && contents.getTitle().equals(article.contents.getTitle());
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(author, contents.getTitle());
     }
 }

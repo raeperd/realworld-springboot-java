@@ -35,6 +35,9 @@ public class User {
     @OneToMany(cascade = REMOVE)
     private Set<User> followingUsers = new HashSet<>();
 
+    @ManyToMany(mappedBy = "userFavorited")
+    private Set<Article> articleFavorited = new HashSet<>();
+
     static User of(Email email, UserName name, Password password) {
         return new User(email, new Profile(name), password);
     }
