@@ -33,7 +33,6 @@ class ArticleModel {
         int favoritesCount;
         ProfileModelNested author;
 
-        // TODO: apply favorited, favoritesCount
         static ArticleModelNested fromArticle(Article article) {
             final var contents = article.getContents();
             final var titleFromArticle = contents.getTitle();
@@ -43,7 +42,7 @@ class ArticleModel {
                     contents.getTags().stream().map(Tag::toString).collect(toSet()),
                     article.getCreatedAt().atZone(ZoneId.of("Asia/Seoul")),
                     article.getUpdatedAt().atZone(ZoneId.of("Asia/Seoul")),
-                    false, article.getFavoritedCount(),
+                    article.isFavorited(), article.getFavoritedCount(),
                     ProfileModelNested.fromProfile(article.getAuthor().getProfile())
             );
         }

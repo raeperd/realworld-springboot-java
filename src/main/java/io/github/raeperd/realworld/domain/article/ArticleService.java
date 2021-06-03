@@ -51,6 +51,14 @@ public class ArticleService {
     }
 
     @Transactional(readOnly = true)
+    public Page<Article> getArticleFavoritedByUsername(UserName username, Pageable pageable) {
+        return userFindService.findByUsername(username)
+                .map(user -> articleRepository.findAllByUserFavoritedContains(user, pageable)
+                        .map(article -> article.updateFavoriteByUser(user)))
+                .orElseThrow(NoSuchElementException::new);
+    }
+
+    @Transactional(readOnly = true)
     public Page<Article> getArticlesByAuthorName(String authorName, Pageable pageable) {
         return articleRepository.findAllByAuthorProfileUserName(new UserName(authorName), pageable);
     }

@@ -207,4 +207,14 @@ class IntegrationTest {
                 .andExpect(validSingleArticleModel());
     }
 
+    @Order(13)
+    @Test
+    void get_articles_favorited_by_username() throws Exception {
+        mockMvc.perform(get("/articles?favorited={username}", USERNAME)
+                .header(AUTHORIZATION, "Token " + token))
+                .andExpect(status().isOk())
+                .andExpect(validMultipleArticleModel())
+                .andExpect(jsonPath("articles[0].favorited", is(true)));
+    }
+
 }
