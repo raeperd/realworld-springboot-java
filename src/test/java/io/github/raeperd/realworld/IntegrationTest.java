@@ -217,4 +217,14 @@ class IntegrationTest {
                 .andExpect(jsonPath("articles[0].favorited", is(true)));
     }
 
+    @Order(13)
+    @Test
+    void get_feed() throws Exception {
+        mockMvc.perform(get("/articles/feed")
+                .header(AUTHORIZATION, "Token " + token))
+                .andExpect(status().isOk())
+                .andExpect(validMultipleArticleModel())
+                .andExpect(jsonPath("articles[0].favorited", is(true)));
+    }
+
 }

@@ -52,6 +52,12 @@ class ArticleRestController {
         return MultipleArticleModel.fromArticles(articles);
     }
 
+    @GetMapping("/articles/feed")
+    public MultipleArticleModel getFeed(@AuthenticationPrincipal UserJWTPayload jwtPayload, Pageable pageable) {
+        final var articles = articleService.getFeedByUserId(jwtPayload.getUserId(), pageable);
+        return MultipleArticleModel.fromArticles(articles);
+    }
+
     @GetMapping("/articles/{slug}")
     public ResponseEntity<ArticleModel> getArticleBySlug(@PathVariable String slug) {
         return of(articleService.getArticleBySlug(slug)
