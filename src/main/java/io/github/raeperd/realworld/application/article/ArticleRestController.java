@@ -1,6 +1,7 @@
 package io.github.raeperd.realworld.application.article;
 
 import io.github.raeperd.realworld.domain.article.ArticleService;
+import io.github.raeperd.realworld.domain.user.UserName;
 import io.github.raeperd.realworld.infrastructure.jwt.UserJWTPayload;
 import org.springframework.data.domain.Pageable;
 import org.springframework.http.ResponseEntity;
@@ -45,7 +46,17 @@ class ArticleRestController {
         return MultipleArticleModel.fromArticles(articles);
     }
 
-    // TODO: GET /articles?favorited={username}
+    @GetMapping(value = "/articles", params = {"favorited"})
+    public MultipleArticleModel getArticleByFavoritedUsername(@RequestParam UserName favorited, Pageable pageable) {
+        final var articles = articleService.getArticleFavoritedByUsername(favorited, pageable);
+        return MultipleArticleModel.fromArticles(articles);
+    }
+
+    @GetMapping("/articles/feed")
+    public MultipleArticleModel getFeed(@AuthenticationPrincipal UserJWTPayload jwtPayload, Pageable pageable) {
+        final var articles = articleService.getFeedByUserId(jwtPayload.getUserId(), pageable);
+        return MultipleArticleModel.fromArticles(articles);
+    }
 
     @GetMapping("/articles/{slug}")
     public ResponseEntity<ArticleModel> getArticleBySlug(@PathVariable String slug) {

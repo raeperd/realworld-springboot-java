@@ -45,6 +45,9 @@ public class Article {
     @ManyToMany(fetch = EAGER, cascade = PERSIST)
     private Set<User> userFavorited = new HashSet<>();
 
+    @Transient
+    private boolean favorited = false;
+
     public Article(User author, ArticleContents contents) {
         this.author = author;
         this.contents = contents;
@@ -55,7 +58,7 @@ public class Article {
 
     public Article afterUserFavoritesArticle(User user) {
         userFavorited.add(user);
-        return this;
+        return updateFavoriteByUser(user);
     }
 
     public User getAuthor() {
@@ -76,6 +79,15 @@ public class Article {
 
     public int getFavoritedCount() {
         return userFavorited.size();
+    }
+
+    public boolean isFavorited() {
+        return favorited;
+    }
+
+    public Article updateFavoriteByUser(User user) {
+        favorited = userFavorited.contains(user);
+        return this;
     }
 
     @Override
