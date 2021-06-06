@@ -81,4 +81,13 @@ class ArticleServiceTest {
 
         then(repository).should(times(1)).save(article);
     }
+
+    @Test
+    void when_delete_article_notExists_expect_NoSuchElementException() {
+        when(userFindService.findById(1L)).thenReturn(empty());
+
+        assertThatThrownBy(() ->
+                articleService.deleteArticleBySlug(1L, "not-exists")
+        ).isInstanceOf(NoSuchElementException.class);
+    }
 }

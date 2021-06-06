@@ -19,4 +19,6 @@ interface ArticleRepository extends Repository<Article, Long> {
     Page<Article> findAllByContentsTagsContains(Tag tag, Pageable pageable);
     Optional<Article> findFirstByContentsTitleSlug(String slug);
 
+    void deleteArticleByAuthorAndContentsTitleSlug(User author, String slug);
+
 }

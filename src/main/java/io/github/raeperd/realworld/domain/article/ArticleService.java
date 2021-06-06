@@ -90,4 +90,11 @@ public class ArticleService {
                 User::unfavoriteArticle)
                 .orElseThrow(NoSuchElementException::new);
     }
+
+    @Transactional
+    public void deleteArticleBySlug(long userId, String slug) {
+        userFindService.findById(userId)
+                .ifPresentOrElse(user -> articleRepository.deleteArticleByAuthorAndContentsTitleSlug(user, slug),
+                        () -> {throw new NoSuchElementException();});
+    }
 }
