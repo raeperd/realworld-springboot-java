@@ -237,5 +237,13 @@ class IntegrationTest {
                 .andExpect(jsonPath("article.favorited", is(false)));
     }
 
+    @Order(15)
+    @Test
+    void delete_article() throws Exception {
+        mockMvc.perform(delete("/articles/{slug}", "how-to-train-your-dragon")
+                .header(AUTHORIZATION, "Token " + token))
+                .andExpect(status().isNoContent());
+    }
+
 
 }

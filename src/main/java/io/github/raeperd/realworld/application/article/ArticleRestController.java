@@ -10,6 +10,7 @@ import org.springframework.web.bind.annotation.*;
 
 import javax.validation.Valid;
 
+import static org.springframework.http.HttpStatus.NO_CONTENT;
 import static org.springframework.http.ResponseEntity.of;
 
 @RestController
@@ -76,5 +77,12 @@ class ArticleRestController {
                                                 @PathVariable String slug) {
         var articleUnfavored = articleService.unfavoriteArticle(jwtPayload.getUserId(), slug);
         return ArticleModel.fromArticle(articleUnfavored);
+    }
+
+    @ResponseStatus(NO_CONTENT)
+    @DeleteMapping("/articles/{slug}")
+    public void deleteArticleBySlug(@AuthenticationPrincipal UserJWTPayload jwtPayload,
+                                    @PathVariable String slug) {
+        articleService.deleteArticleBySlug(jwtPayload.getUserId(), slug);
     }
 }
