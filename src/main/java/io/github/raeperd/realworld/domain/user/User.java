@@ -60,6 +60,11 @@ public class User {
         return articleToFavorite.afterUserFavoritesArticle(this);
     }
 
+    public Article unfavoriteArticle(Article articleToUnfavorite) {
+        articleFavorited.remove(articleToUnfavorite);
+        return articleToUnfavorite.afterUserUnFavoritesArticle(this);
+    }
+
     User followUser(User followee) {
         followingUsers.add(followee);
         return this;
