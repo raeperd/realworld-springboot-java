@@ -37,14 +37,6 @@ public class ArticleService {
                 .orElseThrow(NoSuchElementException::new);
     }
 
-    @Transactional
-    public Article favoriteArticle(long userId, String articleSlugToFavorite) {
-        return mapIfAllPresent(
-                userFindService.findById(userId), getArticleBySlug(articleSlugToFavorite),
-                User::favoriteArticle)
-                .orElseThrow(NoSuchElementException::new);
-    }
-
     @Transactional(readOnly = true)
     public Page<Article> getArticles(Pageable pageable) {
         return articleRepository.findAll(pageable);
@@ -81,5 +73,21 @@ public class ArticleService {
     @Transactional(readOnly = true)
     public Optional<Article> getArticleBySlug(String slug) {
         return articleRepository.findFirstByContentsTitleSlug(slug);
+    }
+
+    @Transactional
+    public Article favoriteArticle(long userId, String articleSlugToFavorite) {
+        return mapIfAllPresent(
+                userFindService.findById(userId), getArticleBySlug(articleSlugToFavorite),
+                User::favoriteArticle)
+                .orElseThrow(NoSuchElementException::new);
+    }
+
+    @Transactional
+    public Article unfavoriteArticle(long userId, String articleSlugToUnFavorite) {
+        return mapIfAllPresent(
+                userFindService.findById(userId), getArticleBySlug(articleSlugToUnFavorite),
+                User::unfavoriteArticle)
+                .orElseThrow(NoSuchElementException::new);
     }
 }

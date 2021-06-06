@@ -70,4 +70,11 @@ class ArticleRestController {
         var articleFavorited = articleService.favoriteArticle(jwtPayload.getUserId(), slug);
         return ArticleModel.fromArticle(articleFavorited);
     }
+
+    @DeleteMapping("/articles/{slug}/favorite")
+    public ArticleModel unfavoriteArticleBySlug(@AuthenticationPrincipal UserJWTPayload jwtPayload,
+                                                @PathVariable String slug) {
+        var articleUnfavored = articleService.unfavoriteArticle(jwtPayload.getUserId(), slug);
+        return ArticleModel.fromArticle(articleUnfavored);
+    }
 }

@@ -227,4 +227,15 @@ class IntegrationTest {
                 .andExpect(jsonPath("articles[0].favorited", is(true)));
     }
 
+    @Order(14)
+    @Test
+    void unfavorite_article() throws Exception {
+        mockMvc.perform(delete("/articles/{slug}/favorite", "how-to-train-your-dragon")
+                .header(AUTHORIZATION, "Token " + token))
+                .andExpect(status().isOk())
+                .andExpect(validSingleArticleModel())
+                .andExpect(jsonPath("article.favorited", is(false)));
+    }
+
+
 }

@@ -61,6 +61,11 @@ public class Article {
         return updateFavoriteByUser(user);
     }
 
+    public Article afterUserUnFavoritesArticle(User user) {
+        userFavorited.remove(user);
+        return updateFavoriteByUser(user);
+    }
+
     public User getAuthor() {
         return author;
     }
