@@ -53,6 +53,12 @@ public class ArticleContents {
         return tags;
     }
 
+    void updateArticleContentsIfPresent(ArticleUpdateRequest updateRequest) {
+        updateRequest.getTitleToUpdate().ifPresent(titleToUpdate -> title = titleToUpdate);
+        updateRequest.getDescriptionToUpdate().ifPresent(descriptionToUpdate -> description = descriptionToUpdate);
+        updateRequest.getBodyToUpdate().ifPresent(bodyToUpdate -> body = bodyToUpdate);
+    }
+
     public void setTags(Set<Tag> tags) {
         this.tags = tags;
     }

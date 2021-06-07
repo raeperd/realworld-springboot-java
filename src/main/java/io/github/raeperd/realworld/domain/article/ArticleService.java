@@ -76,6 +76,13 @@ public class ArticleService {
     }
 
     @Transactional
+    public Article updateArticle(long userId, String slug, ArticleUpdateRequest request) {
+        return mapIfAllPresent(userFindService.findById(userId), getArticleBySlug(slug),
+                (user, article) -> user.updateArticle(article, request))
+                .orElseThrow(NoSuchElementException::new);
+    }
+
+    @Transactional
     public Article favoriteArticle(long userId, String articleSlugToFavorite) {
         return mapIfAllPresent(
                 userFindService.findById(userId), getArticleBySlug(articleSlugToFavorite),

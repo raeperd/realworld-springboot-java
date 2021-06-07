@@ -66,6 +66,10 @@ public class Article {
         return updateFavoriteByUser(user);
     }
 
+    public void updateArticle(ArticleUpdateRequest updateRequest) {
+        contents.updateArticleContentsIfPresent(updateRequest);
+    }
+
     public User getAuthor() {
         return author;
     }
