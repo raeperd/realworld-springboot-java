@@ -35,4 +35,13 @@ public class CommentService {
                 User::viewArticleComments)
                 .orElseThrow(NoSuchElementException::new);
     }
+
+    @Transactional
+    public void deleteCommentById(long userId, String slug, long commentId) {
+        final var articleContainsComments = articleFindService.getArticleBySlug(slug)
+                .orElseThrow(NoSuchElementException::new);
+        userFindService.findById(userId)
+                .ifPresentOrElse(user -> user.deleteArticleComment(articleContainsComments, commentId),
+                        () -> {throw new NoSuchElementException();});
+    }
 }

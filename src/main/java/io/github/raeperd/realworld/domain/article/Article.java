@@ -9,6 +9,7 @@ import org.springframework.data.jpa.domain.support.AuditingEntityListener;
 import javax.persistence.*;
 import java.time.Instant;
 import java.util.HashSet;
+import java.util.NoSuchElementException;
 import java.util.Objects;
 import java.util.Set;
 
@@ -75,6 +76,17 @@ public class Article {
         final var commentToAdd = new Comment(this, author, body);
         comments.add(commentToAdd);
         return commentToAdd;
+    }
+
+    public void removeCommentByUser(User user, long commentId) {
+        final var commentsToDelete = comments.stream()
+                .filter(comment -> comment.getId().equals(commentId))
+                .findFirst()
+                .orElseThrow(NoSuchElementException::new);
+        if (!user.equals(author) || !user.equals(commentsToDelete.getAuthor())) {
+            throw new IllegalAccessError("Not authorized to delete comment");
+        }
+        comments.remove(commentsToDelete);
     }
 
     public void updateArticle(ArticleUpdateRequest updateRequest) {

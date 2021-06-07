@@ -90,6 +90,10 @@ public class User {
         return this;
     }
 
+    public void deleteArticleComment(Article article, long commentId) {
+        article.removeCommentByUser(this, commentId);
+    }
+
     public Set<Comment> viewArticleComments(Article article) {
         return article.getComments().stream()
                 .map(this::viewComment)

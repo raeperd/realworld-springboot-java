@@ -25,8 +25,14 @@ class CommentRestController {
 
     @GetMapping("/articles/{slug}/comments")
     public MultipleCommentModel getComments(@AuthenticationPrincipal UserJWTPayload jwtPayload,
-                                    @PathVariable String slug) {
+                                            @PathVariable String slug) {
         final var comments = commentService.getComments(jwtPayload.getUserId(), slug);
         return MultipleCommentModel.fromComments(comments);
+    }
+
+    @DeleteMapping("/articles/{slug}/comments/{id}")
+    public void deleteComment(@AuthenticationPrincipal UserJWTPayload jwtPayload,
+                              @PathVariable String slug, @PathVariable long id) {
+        commentService.deleteCommentById(jwtPayload.getUserId(), slug, id);
     }
 }
