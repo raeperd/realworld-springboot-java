@@ -241,6 +241,16 @@ class IntegrationTest {
 
     @Order(13)
     @Test
+    void get_articles_favorited_by_username_not_exists() throws Exception {
+        mockMvc.perform(get("/articles?favorited={username}", "jane")
+                .header(AUTHORIZATION, "Token " + token))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("articles").isEmpty())
+                .andExpect(jsonPath("articlesCount", is(0)));
+    }
+
+    @Order(13)
+    @Test
     void get_feed() throws Exception {
         mockMvc.perform(get("/articles/feed")
                 .header(AUTHORIZATION, "Token " + token))
