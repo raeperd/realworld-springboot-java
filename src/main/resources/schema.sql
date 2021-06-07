@@ -54,3 +54,15 @@ CREATE TABLE IF NOT EXISTS article_favorites
     CONSTRAINT fk_article_favorited FOREIGN KEY (article_id) REFERENCES articles (id) ON DELETE CASCADE,
     CONSTRAINT fk_user FOREIGN KEY (user_id) REFERENCES users (id) ON DELETE CASCADE
 );
+
+CREATE TABLE IF NOT EXISTS comments
+(
+    id          BIGSERIAL PRIMARY KEY,
+    author_id   BIGINT       NOT NULL,
+    article_id  BIGINT       NOT NULL,
+    body        VARCHAR      NOT NULL,
+    created_at  TIMESTAMP    NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    updated_at  TIMESTAMP    NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    CONSTRAINT fk_comment_author FOREIGN KEY (author_id) REFERENCES users (id),
+    CONSTRAINT fk_comment_article FOREIGN KEY (article_id) REFERENCES articles (id)
+);

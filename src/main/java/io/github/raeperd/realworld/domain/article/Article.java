@@ -45,6 +45,9 @@ public class Article {
     @ManyToMany(fetch = EAGER, cascade = PERSIST)
     private Set<User> userFavorited = new HashSet<>();
 
+    @OneToMany(mappedBy = "article", cascade = PERSIST)
+    private Set<Comment> comments = new HashSet<>();
+
     @Transient
     private boolean favorited = false;
 
