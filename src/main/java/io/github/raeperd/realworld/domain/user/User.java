@@ -11,6 +11,7 @@ import java.util.HashSet;
 import java.util.Objects;
 import java.util.Set;
 
+import static java.util.stream.Collectors.toSet;
 import static javax.persistence.CascadeType.REMOVE;
 import static javax.persistence.GenerationType.IDENTITY;
 
@@ -87,6 +88,17 @@ public class User {
     User unfollowUser(User followee) {
         followingUsers.remove(followee);
         return this;
+    }
+
+    public Set<Comment> viewArticleComments(Article article) {
+        return article.getComments().stream()
+                .map(this::viewComment)
+                .collect(toSet());
+    }
+
+    Comment viewComment(Comment comment) {
+        viewProfile(comment.getAuthor());
+        return comment;
     }
 
     Profile viewProfile(User user) {
