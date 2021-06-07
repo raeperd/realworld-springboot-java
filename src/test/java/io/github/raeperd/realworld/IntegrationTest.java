@@ -217,7 +217,18 @@ class IntegrationTest {
                 .header(AUTHORIZATION, "Token " + token)
                 .contentType(APPLICATION_JSON)
                 .content("{\"comment\":{\"body\":\"Thank you so much!\"}}"))
-                .andExpect(status().isOk());
+                .andExpect(status().isOk())
+                .andExpect(validSingleCommentModel())
+                .andExpect(jsonPath("comment.body", is("Thank you so much!")));
+    }
+
+    @Order(12)
+    @Test
+    void all_comments_for_article() throws Exception {
+        mockMvc.perform(get("/articles/{slug}/comments", "how-to-train-your-dragon")
+                .header(AUTHORIZATION, "Token " + token))
+                .andExpect(status().isOk())
+                .andExpect(validMultipleCommentModel());
     }
 
     @Order(12)

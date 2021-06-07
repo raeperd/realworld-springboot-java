@@ -81,6 +81,11 @@ public class Article {
         contents.updateArticleContentsIfPresent(updateRequest);
     }
 
+    public Article updateFavoriteByUser(User user) {
+        favorited = userFavorited.contains(user);
+        return this;
+    }
+
     public User getAuthor() {
         return author;
     }
@@ -105,9 +110,8 @@ public class Article {
         return favorited;
     }
 
-    public Article updateFavoriteByUser(User user) {
-        favorited = userFavorited.contains(user);
-        return this;
+    public Set<Comment> getComments() {
+        return comments;
     }
 
     @Override

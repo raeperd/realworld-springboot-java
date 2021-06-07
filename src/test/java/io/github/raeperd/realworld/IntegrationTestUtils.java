@@ -73,4 +73,25 @@ public class IntegrationTestUtils {
                 jsonPath(path + ".favoritesCount").isNumber(),
                 validProfileModelInPath(path + ".author"));
     }
+
+    static ResultMatcher validSingleCommentModel() {
+        return matchAll(
+                jsonPath("comment").isMap(),
+                validCommentModelInPath("comment"));
+    }
+
+    static ResultMatcher validMultipleCommentModel() {
+        return matchAll(
+                jsonPath("comments").isArray(),
+                validCommentModelInPath("comments[0]"));
+    }
+
+    private static ResultMatcher validCommentModelInPath(String path) {
+        return matchAll(
+                jsonPath(path + ".id").isNumber(),
+                jsonPath(path + ".body").isString(),
+                jsonPath(path + ".createdAt", matchesPattern(ISO_8601_PATTERN)),
+                jsonPath(path + ".updatedAt", matchesPattern(ISO_8601_PATTERN)),
+                validProfileModelInPath(path + ".author"));
+    }
 }
