@@ -55,6 +55,7 @@ public class IntegrationTestUtils {
     static ResultMatcher validMultipleArticleModel() {
         return matchAll(
                 jsonPath("articles").isArray(),
+                jsonPath("articlesCount").isNumber(),
                 validArticleModelInPath("articles[0]")
         );
     }

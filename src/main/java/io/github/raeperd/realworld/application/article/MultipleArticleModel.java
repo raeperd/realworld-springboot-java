@@ -13,10 +13,11 @@ import static java.util.stream.Collectors.toList;
 class MultipleArticleModel {
 
     List<ArticleModelNested> articles;
+    int articlesCount;
 
     static MultipleArticleModel fromArticles(Page<Article> articles) {
         final var articlesCollected = articles.map(ArticleModelNested::fromArticle)
                 .stream().collect(toList());
-        return new MultipleArticleModel(articlesCollected);
+        return new MultipleArticleModel(articlesCollected, articlesCollected.size());
     }
 }
