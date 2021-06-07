@@ -1,5 +1,6 @@
 package io.github.raeperd.realworld.domain.article;
 
+import io.github.raeperd.realworld.domain.article.comment.Comment;
 import io.github.raeperd.realworld.domain.user.User;
 import org.springframework.data.annotation.CreatedDate;
 import org.springframework.data.annotation.LastModifiedDate;
@@ -12,6 +13,7 @@ import java.util.Objects;
 import java.util.Set;
 
 import static javax.persistence.CascadeType.PERSIST;
+import static javax.persistence.CascadeType.REMOVE;
 import static javax.persistence.FetchType.EAGER;
 import static javax.persistence.GenerationType.IDENTITY;
 
@@ -45,6 +47,9 @@ public class Article {
     @ManyToMany(fetch = EAGER, cascade = PERSIST)
     private Set<User> userFavorited = new HashSet<>();
 
+    @OneToMany(mappedBy = "article", cascade = {PERSIST, REMOVE})
+    private Set<Comment> comments = new HashSet<>();
+
     @Transient
     private boolean favorited = false;
 
@@ -64,6 +69,12 @@ public class Article {
     public Article afterUserUnFavoritesArticle(User user) {
         userFavorited.remove(user);
         return updateFavoriteByUser(user);
+    }
+
+    public Comment addComment(User author, String body) {
+        final var commentToAdd = new Comment(this, author, body);
+        comments.add(commentToAdd);
+        return commentToAdd;
     }
 
     public void updateArticle(ArticleUpdateRequest updateRequest) {
