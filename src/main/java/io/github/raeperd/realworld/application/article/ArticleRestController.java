@@ -65,6 +65,14 @@ class ArticleRestController {
                 .map(ArticleModel::fromArticle));
     }
 
+    @PutMapping("/articles/{slug}")
+    public ArticleModel putArticleBySlug(@AuthenticationPrincipal UserJWTPayload jwtPayload,
+                                         @PathVariable String slug,
+                                         @RequestBody ArticlePutRequestDTO dto) {
+        final var articleUpdated = articleService.updateArticle(jwtPayload.getUserId(), slug, dto.toUpdateRequest());
+        return ArticleModel.fromArticle(articleUpdated);
+    }
+
     @PostMapping("/articles/{slug}/favorite")
     public ArticleModel favoriteArticleBySlug(@AuthenticationPrincipal UserJWTPayload jwtPayload,
                                               @PathVariable String slug) {

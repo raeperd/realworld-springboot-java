@@ -2,6 +2,7 @@ package io.github.raeperd.realworld.domain.user;
 
 import io.github.raeperd.realworld.domain.article.Article;
 import io.github.raeperd.realworld.domain.article.ArticleContents;
+import io.github.raeperd.realworld.domain.article.ArticleUpdateRequest;
 import org.springframework.security.crypto.password.PasswordEncoder;
 
 import javax.persistence.*;
@@ -53,6 +54,14 @@ public class User {
 
     public Article writeArticle(ArticleContents contents) {
         return new Article(this, contents);
+    }
+
+    public Article updateArticle(Article article, ArticleUpdateRequest request) {
+        if (article.getAuthor() != this) {
+            throw new IllegalAccessError("Not authorized to update this article");
+        }
+        article.updateArticle(request);
+        return article;
     }
 
     public Article favoriteArticle(Article articleToFavorite) {
