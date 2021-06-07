@@ -35,6 +35,7 @@ class IntegrationTest {
     private ObjectMapper objectMapper;
 
     private String token;
+    private int commentId;
 
     @Order(1)
     @Test
@@ -213,13 +214,16 @@ class IntegrationTest {
     @Order(11)
     @Test
     void create_comments_for_article() throws Exception {
-        mockMvc.perform(post("/articles/{slug}/comments", "how-to-train-your-dragon")
+        final var contentAsString = mockMvc.perform(post("/articles/{slug}/comments", "how-to-train-your-dragon")
                 .header(AUTHORIZATION, "Token " + token)
                 .contentType(APPLICATION_JSON)
                 .content("{\"comment\":{\"body\":\"Thank you so much!\"}}"))
                 .andExpect(status().isOk())
                 .andExpect(validSingleCommentModel())
-                .andExpect(jsonPath("comment.body", is("Thank you so much!")));
+                .andExpect(jsonPath("comment.body", is("Thank you so much!")))
+                .andReturn().getResponse().getContentAsString();
+
+        commentId = objectMapper.readTree(contentAsString).get("comment").get("id").intValue();
     }
 
     @Order(12)
@@ -229,6 +233,14 @@ class IntegrationTest {
                 .header(AUTHORIZATION, "Token " + token))
                 .andExpect(status().isOk())
                 .andExpect(validMultipleCommentModel());
+    }
+
+    @Order(13)
+    @Test
+    void delete_comment_for_article() throws Exception {
+        mockMvc.perform(delete("/articles/{slug}/comments/{id}", "how-to-train-your-dragon", commentId)
+                .header(AUTHORIZATION, "Token " + token))
+                .andExpect(status().isOk());
     }
 
     @Order(12)
