@@ -55,7 +55,7 @@ public class ArticleService implements ArticleFindService {
         return userFindService.findByUsername(username)
                 .map(user -> articleRepository.findAllByUserFavoritedContains(user, pageable)
                         .map(article -> article.updateFavoriteByUser(user)))
-                .orElseThrow(NoSuchElementException::new);
+                .orElse(Page.empty());
     }
 
     @Transactional(readOnly = true)
