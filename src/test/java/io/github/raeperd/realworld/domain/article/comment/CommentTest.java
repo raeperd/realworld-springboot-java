@@ -1,5 +1,6 @@
-package io.github.raeperd.realworld.domain.article;
+package io.github.raeperd.realworld.domain.article.comment;
 
+import io.github.raeperd.realworld.domain.article.Article;
 import io.github.raeperd.realworld.domain.user.User;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;

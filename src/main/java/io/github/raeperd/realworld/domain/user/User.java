@@ -3,6 +3,7 @@ package io.github.raeperd.realworld.domain.user;
 import io.github.raeperd.realworld.domain.article.Article;
 import io.github.raeperd.realworld.domain.article.ArticleContents;
 import io.github.raeperd.realworld.domain.article.ArticleUpdateRequest;
+import io.github.raeperd.realworld.domain.article.comment.Comment;
 import org.springframework.security.crypto.password.PasswordEncoder;
 
 import javax.persistence.*;
@@ -62,6 +63,10 @@ public class User {
         }
         article.updateArticle(request);
         return article;
+    }
+
+    public Comment writeCommentToArticle(Article article, String body) {
+        return article.addComment(this, body);
     }
 
     public Article favoriteArticle(Article articleToFavorite) {

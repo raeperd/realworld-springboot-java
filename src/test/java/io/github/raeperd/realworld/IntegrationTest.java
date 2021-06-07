@@ -210,6 +210,16 @@ class IntegrationTest {
                 .andExpect(jsonPath("article.body", is("With two hands")));
     }
 
+    @Order(11)
+    @Test
+    void create_comments_for_article() throws Exception {
+        mockMvc.perform(post("/articles/{slug}/comments", "how-to-train-your-dragon")
+                .header(AUTHORIZATION, "Token " + token)
+                .contentType(APPLICATION_JSON)
+                .content("{\"comment\":{\"body\":\"Thank you so much!\"}}"))
+                .andExpect(status().isOk());
+    }
+
     @Order(12)
     @Test
     void post_favorite_article() throws Exception {
@@ -256,6 +266,5 @@ class IntegrationTest {
                 .header(AUTHORIZATION, "Token " + token))
                 .andExpect(status().isNoContent());
     }
-
 
 }

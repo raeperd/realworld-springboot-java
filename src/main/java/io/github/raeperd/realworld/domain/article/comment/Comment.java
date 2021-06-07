@@ -1,5 +1,6 @@
-package io.github.raeperd.realworld.domain.article;
+package io.github.raeperd.realworld.domain.article.comment;
 
+import io.github.raeperd.realworld.domain.article.Article;
 import io.github.raeperd.realworld.domain.user.User;
 import org.springframework.data.annotation.CreatedDate;
 import org.springframework.data.annotation.LastModifiedDate;
@@ -40,13 +41,33 @@ public class Comment {
     @Column(name = "body", nullable = false)
     private String body;
 
-    Comment(Article article, User author, String body) {
+    public Comment(Article article, User author, String body) {
         this.article = article;
         this.author = author;
         this.body = body;
     }
 
     protected Comment() {
+    }
+
+    public Long getId() {
+        return id;
+    }
+
+    public User getAuthor() {
+        return author;
+    }
+
+    public Instant getCreatedAt() {
+        return createdAt;
+    }
+
+    public Instant getUpdatedAt() {
+        return updatedAt;
+    }
+
+    public String getBody() {
+        return body;
     }
 
     @Override

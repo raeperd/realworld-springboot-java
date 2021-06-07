@@ -63,6 +63,6 @@ CREATE TABLE IF NOT EXISTS comments
     body        VARCHAR      NOT NULL,
     created_at  TIMESTAMP    NOT NULL DEFAULT CURRENT_TIMESTAMP,
     updated_at  TIMESTAMP    NOT NULL DEFAULT CURRENT_TIMESTAMP,
-    CONSTRAINT fk_comment_author FOREIGN KEY (author_id) REFERENCES users (id),
-    CONSTRAINT fk_comment_article FOREIGN KEY (article_id) REFERENCES articles (id)
+    CONSTRAINT fk_comment_author FOREIGN KEY (author_id) REFERENCES users (id) ON DELETE CASCADE,
+    CONSTRAINT fk_comment_article FOREIGN KEY (article_id) REFERENCES articles (id) ON DELETE CASCADE
 );

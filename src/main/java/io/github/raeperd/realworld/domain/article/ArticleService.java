@@ -15,7 +15,7 @@ import java.util.Optional;
 import static org.springframework.data.util.Optionals.mapIfAllPresent;
 
 @Service
-public class ArticleService {
+public class ArticleService implements ArticleFindService {
 
     private final UserFindService userFindService;
     private final TagService tagService;
@@ -70,6 +70,7 @@ public class ArticleService {
                 .orElse(Page.empty());
     }
 
+    @Override
     @Transactional(readOnly = true)
     public Optional<Article> getArticleBySlug(String slug) {
         return articleRepository.findFirstByContentsTitleSlug(slug);
