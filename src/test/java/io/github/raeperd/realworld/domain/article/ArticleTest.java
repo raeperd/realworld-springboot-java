@@ -1,6 +1,5 @@
 package io.github.raeperd.realworld.domain.article;
 
-import io.github.raeperd.realworld.domain.article.comment.Comment;
 import io.github.raeperd.realworld.domain.user.User;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -13,44 +12,49 @@ import static org.mockito.Mockito.when;
 @ExtendWith(MockitoExtension.class)
 class ArticleTest {
 
-    @Test
-    void when_update_all_possible_field_expect_return_article_updated() {
-        final var article = new Article("some title", null, null);
-        final var updateCommand = ArticleUpdateCommand.builder()
-                .title("title-updated").description("description-updated").body("body-updated")
-                .build();
+    @Mock
+    private ArticleContents contents;
+    @Mock
+    private ArticleTitle title;
+    @Mock
+    private User author;
 
-        assertThat(article.updateArticle(updateCommand))
-                .hasFieldOrPropertyWithValue("title", "title-updated")
-                .hasFieldOrPropertyWithValue("description", "description-updated")
-                .hasFieldOrPropertyWithValue("body", "body-updated");
+    @Test
+    void when_article_has_different_author_expect_not_equal_and_hashCode(@Mock User otherUser) {
+        when(contents.getTitle()).thenReturn(title);
+
+        var article = new Article(author, contents);
+        var articleFromOtherUser = new Article(otherUser, contents);
+
+        assertThat(articleFromOtherUser)
+                .isNotEqualTo(article)
+                .extracting(Article::hashCode)
+                .isNotEqualTo(article.hashCode());
     }
 
     @Test
-    void when_article_has_same_id_and_title_expect_equals() {
-        final var article = new Article("some title", null, null);
-        final var articleWithSameTitle = new Article(article.getTitle(), null, null);
+    void when_article_has_different_contents_expect_not_equal_and_hashCode(@Mock ArticleContents otherContents, @Mock ArticleTitle otherTitle) {
+        when(contents.getTitle()).thenReturn(title);
+        when(otherContents.getTitle()).thenReturn(otherTitle);
 
-        assertThat(article)
-                .isEqualTo(articleWithSameTitle)
-                .hasSameHashCodeAs(articleWithSameTitle);
+        var article = new Article(author, contents);
+        var articleWithOtherContents = new Article(author, otherContents);
+
+        assertThat(articleWithOtherContents)
+                .isNotEqualTo(article)
+                .extracting(Article::hashCode)
+                .isNotEqualTo(article.hashCode());
     }
 
     @Test
-    void when_create_article_with_empty_space_title_expect_dash_separated_slug() {
-        final var article = new Article("some title", null, null);
+    void when_article_has_same_author_and_title_expect_equal_and_hashCode() {
+        when(contents.getTitle()).thenReturn(title);
 
-        assertThat(article.getSlug()).isEqualTo("some-title");
+        var article = new Article(author, contents);
+        var articleWithSameAuthorSlug = new Article(author, contents);
+
+        assertThat(articleWithSameAuthorSlug)
+                .isEqualTo(article)
+                .hasSameHashCodeAs(article);
     }
-
-    @Test
-    void when_delete_comment_by_id_with_another_user_expect_return_false(@Mock Comment comment, @Mock User user) {
-        when(comment.getId()).thenReturn(0L);
-        when(comment.isAuthor(user)).thenReturn(false);
-        final var article = new Article("some title", null, null);
-        article.addComment(comment);
-
-        assertThat(article.deleteCommentByIdAndUser(0L, user)).isFalse();
-    }
-
 }

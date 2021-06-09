@@ -1,55 +1,63 @@
 package io.github.raeperd.realworld.domain.user;
 
-import io.github.raeperd.realworld.domain.jwt.JWTGenerator;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.util.NoSuchElementException;
 import java.util.Optional;
 
-import static io.github.raeperd.realworld.domain.user.AuthorizedUser.fromUser;
-
 @Service
-public class UserService {
+public class UserService implements UserFindService {
 
+    private final PasswordEncoder passwordEncoder;
     private final UserRepository userRepository;
-    private final JWTGenerator jwtGenerator;
-    private final UserContextHolder userContextHolder;
 
-    public UserService(UserRepository userRepository, JWTGenerator jwtGenerator, UserContextHolder userContextHolder) {
+    public UserService(PasswordEncoder passwordEncoder, UserRepository userRepository) {
+        this.passwordEncoder = passwordEncoder;
         this.userRepository = userRepository;
-        this.jwtGenerator = jwtGenerator;
-        this.userContextHolder = userContextHolder;
-    }
-
-    @Transactional(readOnly = true)
-    public Optional<AuthorizedUser> login(String email, String password) {
-        return userRepository.findFirstByEmailAndPassword(email, password)
-                .map(this::authorizeUser);
     }
 
     @Transactional
-    public AuthorizedUser signUp(User user) {
-        return authorizeUser(userRepository.save(user));
+    public User signUp(UserSignUpRequest request) {
+        final var encodedPassword = Password.of(request.getRawPassword(), passwordEncoder);
+        return userRepository.save(User.of(request.getEmail(),
+                request.getUserName(),
+                encodedPassword));
     }
 
     @Transactional(readOnly = true)
-    public AuthorizedUser refreshUserAuthorization() {
-        return userContextHolder.getCurrentUser()
-                .map(this::authorizeUser)
-                .orElseThrow(IllegalStateException::new);
+    public Optional<User> login(Email email, String rawPassword) {
+        return userRepository.findFirstByEmail(email)
+                .filter(user -> user.matchesPassword(rawPassword, passwordEncoder));
+    }
+
+    @Override
+    @Transactional(readOnly = true)
+    public Optional<User> findById(long id) {
+        return userRepository.findById(id);
+    }
+
+    @Override
+    public Optional<User> findByUsername(UserName userName) {
+        return userRepository.findFirstByProfileUserName(userName);
     }
 
     @Transactional
-    public AuthorizedUser updateUser(UserUpdateCommand updateCommand) {
-        return userContextHolder.getCurrentUser()
-                .map(user -> user.updateUser(updateCommand))
-                .map(userRepository::save)
-                .map(this::authorizeUser)
-                .orElseThrow(IllegalStateException::new);
-    }
-
-    private AuthorizedUser authorizeUser(User user) {
-        return fromUser(user, jwtGenerator.generateTokenFromUser(user));
+    public User updateUser(long id, UserUpdateRequest request) {
+        final var user = userRepository.findById(id).orElseThrow(NoSuchElementException::new);
+        request.getEmailToUpdate()
+                .ifPresent(user::changeEmail);
+        request.getUserNameToUpdate()
+                .ifPresent(user::changeName);
+        request.getPasswordToUpdate()
+                .map(rawPassword -> Password.of(rawPassword, passwordEncoder))
+                .ifPresent(user::changePassword);
+        request.getImageToUpdate()
+                .ifPresent(user::changeImage);
+        request.getBioToUpdate()
+                .ifPresent(user::changeBio);
+        return userRepository.save(user);
     }
 
 }

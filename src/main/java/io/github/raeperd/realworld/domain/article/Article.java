@@ -1,20 +1,24 @@
 package io.github.raeperd.realworld.domain.article;
 
 import io.github.raeperd.realworld.domain.article.comment.Comment;
-import io.github.raeperd.realworld.domain.article.tag.Tag;
 import io.github.raeperd.realworld.domain.user.User;
-import org.springframework.data.annotation.CreatedBy;
 import org.springframework.data.annotation.CreatedDate;
 import org.springframework.data.annotation.LastModifiedDate;
 import org.springframework.data.jpa.domain.support.AuditingEntityListener;
 
 import javax.persistence.*;
-import java.time.LocalDateTime;
-import java.util.*;
+import java.time.Instant;
+import java.util.HashSet;
+import java.util.NoSuchElementException;
+import java.util.Objects;
+import java.util.Set;
 
-import static java.util.Collections.emptySet;
+import static javax.persistence.CascadeType.PERSIST;
+import static javax.persistence.CascadeType.REMOVE;
+import static javax.persistence.FetchType.EAGER;
 import static javax.persistence.GenerationType.IDENTITY;
 
+@Table(name = "articles")
 @EntityListeners(AuditingEntityListener.class)
 @Entity
 public class Article {
@@ -23,117 +27,115 @@ public class Article {
     @Id
     private Long id;
 
-    @CreatedBy
-    @JoinColumn
-    @ManyToOne(targetEntity = User.class)
+    @JoinColumn(name = "author_id", referencedColumnName = "id", nullable = false)
+    @ManyToOne(fetch = EAGER)
     private User author;
 
-    @OneToMany(fetch = FetchType.LAZY, cascade = CascadeType.ALL)
-    private final Collection<Tag> tagList = new HashSet<>();
+    @Embedded
+    private ArticleContents contents;
 
-    @OneToMany(fetch = FetchType.LAZY, cascade = CascadeType.ALL)
-    private final Collection<Comment> comments = new ArrayList<>();
-
+    @Column(name = "created_at")
     @CreatedDate
-    private LocalDateTime createdAt;
+    private Instant createdAt;
 
+    @Column(name = "updated_at")
     @LastModifiedDate
-    private LocalDateTime updatedAt;
+    private Instant updatedAt;
 
-    private String title;
-    private String description;
-    private String body;
+    @JoinTable(name = "article_favorites",
+            joinColumns = @JoinColumn(name = "article_id", referencedColumnName = "id", nullable = false),
+            inverseJoinColumns = @JoinColumn(name = "user_id", referencedColumnName = "id", nullable = false))
+    @ManyToMany(fetch = EAGER, cascade = PERSIST)
+    private Set<User> userFavorited = new HashSet<>();
 
-    private String slug;
+    @OneToMany(mappedBy = "article", cascade = {PERSIST, REMOVE})
+    private Set<Comment> comments = new HashSet<>();
+
+    @Transient
+    private boolean favorited = false;
+
+    public Article(User author, ArticleContents contents) {
+        this.author = author;
+        this.contents = contents;
+    }
 
     protected Article() {
     }
 
-    public Article(String title, String description, String body) {
-        this(title, description, body, emptySet());
+    public Article afterUserFavoritesArticle(User user) {
+        userFavorited.add(user);
+        return updateFavoriteByUser(user);
     }
 
-    public Article(String title, String description, String body, Set<Tag> tagList) {
-        this.title = title;
-        this.slug = slugFromTitle(title);
-        this.description = description;
-        this.body = body;
-        this.tagList.addAll(tagList);
+    public Article afterUserUnFavoritesArticle(User user) {
+        userFavorited.remove(user);
+        return updateFavoriteByUser(user);
     }
 
-    private static String slugFromTitle(String title) {
-        return title.toLowerCase().replaceAll("\\$,'\"|\\s|\\.|\\?", "-");
+    public Comment addComment(User author, String body) {
+        final var commentToAdd = new Comment(this, author, body);
+        comments.add(commentToAdd);
+        return commentToAdd;
     }
 
-    Article updateArticle(ArticleUpdateCommand updateCommand) {
-        updateCommand.getTitleToUpdate().ifPresent(titleToUpdate -> {
-            title = titleToUpdate;
-            slug = slugFromTitle(titleToUpdate);
-        });
-        updateCommand.getDescriptionToUpdate().ifPresent(descriptionToUpdate -> description = descriptionToUpdate);
-        updateCommand.getBodyToUpdate().ifPresent(bodyToUpdate -> body = bodyToUpdate);
+    public void removeCommentByUser(User user, long commentId) {
+        final var commentsToDelete = comments.stream()
+                .filter(comment -> comment.getId().equals(commentId))
+                .findFirst()
+                .orElseThrow(NoSuchElementException::new);
+        if (!user.equals(author) || !user.equals(commentsToDelete.getAuthor())) {
+            throw new IllegalAccessError("Not authorized to delete comment");
+        }
+        comments.remove(commentsToDelete);
+    }
+
+    public void updateArticle(ArticleUpdateRequest updateRequest) {
+        contents.updateArticleContentsIfPresent(updateRequest);
+    }
+
+    public Article updateFavoriteByUser(User user) {
+        favorited = userFavorited.contains(user);
         return this;
-    }
-
-    public boolean deleteCommentByIdAndUser(long id, User user) {
-        return comments.removeIf(comment -> comment.getId() == id && comment.isAuthor(user));
-    }
-
-    public Comment addComment(Comment comment) {
-        comments.add(comment);
-        return comment;
-    }
-
-    public Collection<Comment> getComments() {
-        return comments;
-    }
-
-    public String getSlug() {
-        return slug;
-    }
-
-    public boolean isAuthor(User user) {
-        return author.equals(user);
     }
 
     public User getAuthor() {
         return author;
     }
 
-    public LocalDateTime getCreatedAt() {
+    public ArticleContents getContents() {
+        return contents;
+    }
+
+    public Instant getCreatedAt() {
         return createdAt;
     }
 
-    public LocalDateTime getUpdatedAt() {
+    public Instant getUpdatedAt() {
         return updatedAt;
     }
 
-    public String getTitle() {
-        return title;
+    public int getFavoritedCount() {
+        return userFavorited.size();
     }
 
-    public String getDescription() {
-        return description;
+    public boolean isFavorited() {
+        return favorited;
     }
 
-    public String getBody() {
-        return body;
-    }
-
-    public Collection<Tag> getTagList() {
-        return tagList;
+    public Set<Comment> getComments() {
+        return comments;
     }
 
     @Override
     public boolean equals(Object o) {
         if (this == o) return true;
         if (o == null || getClass() != o.getClass()) return false;
-        final var article = (Article) o;
-        return Objects.equals(id, article.id) && Objects.equals(title, article.title);
+        var article = (Article) o;
+        return author.equals(article.author) && contents.getTitle().equals(article.contents.getTitle());
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(id, title);
+        return Objects.hash(author, contents.getTitle());
     }
 }

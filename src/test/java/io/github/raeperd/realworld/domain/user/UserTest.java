@@ -1,79 +1,125 @@
 package io.github.raeperd.realworld.domain.user;
 
 import org.junit.jupiter.api.Test;
-import org.junit.jupiter.params.ParameterizedTest;
-import org.junit.jupiter.params.provider.Arguments;
-import org.junit.jupiter.params.provider.MethodSource;
-
-import java.util.stream.Stream;
+import org.junit.jupiter.api.extension.ExtendWith;
+import org.mockito.Mock;
+import org.mockito.junit.jupiter.MockitoExtension;
+import org.springframework.security.crypto.password.PasswordEncoder;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.mockito.Mockito.times;
+import static org.mockito.Mockito.verify;
 
+@ExtendWith(MockitoExtension.class)
 class UserTest {
 
-    @Test
-    void expect_user_has_protected_no_args_constructor() {
-        class ChildUser extends User {
-            public ChildUser() {
-                super();
-            }
-        }
-        final var childUser = new ChildUser();
+    @Mock
+    private PasswordEncoder passwordEncoder;
 
-        assertThat(childUser).isInstanceOf(User.class);
-    }
+    @Mock
+    private Email emailMock;
+    @Mock
+    private UserName userNameMock;
+    @Mock
+    private Password passwordMock;
 
     @Test
-    void when_update_all_possible_field_expect_return_user_updated() {
-        final var user = new User(null, null, null);
-        final var updateCommand = new UserUpdateCommand.Builder()
-                .email("updated-email")
-                .username("updated-username")
-                .bio("updated-bio")
-                .image("updated-image")
-                .password("updated-password")
-                .build();
+    void when_create_user_getImage_return_null() {
+        final var user = User.of(emailMock, userNameMock, passwordMock);
 
-        user.updateUser(updateCommand);
-
-        assertThat(user).hasNoNullFieldsOrPropertiesExcept("id", "followingUsers");
-    }
-
-    @MethodSource("provideUserUpdateCommandWithName")
-    @ParameterizedTest
-    void when_update_user_with_single_property_expect_return_user_updated(UserUpdateCommand command, String property) {
-        final var user = new User("some-email", "some-username", "some-password");
-
-        user.updateUser(command);
-
-        assertThat(user).hasFieldOrPropertyWithValue(property, "updated-" + property);
-    }
-
-    private static Stream<Arguments> provideUserUpdateCommandWithName() {
-        return Stream.of(
-                Arguments.of(new UserUpdateCommand.Builder().email("updated-email").build(), "email"),
-                Arguments.of(new UserUpdateCommand.Builder().username("updated-username").build(), "username"),
-                Arguments.of(new UserUpdateCommand.Builder().bio("updated-bio").build(), "bio"),
-                Arguments.of(new UserUpdateCommand.Builder().image("updated-image").build(), "image"),
-                Arguments.of(new UserUpdateCommand.Builder().password("updated-password").build(), "password")
-        );
+        assertThat(user.getImage()).isNull();
     }
 
     @Test
-    void when_follow_user_expect_following_profile() {
-        final var user = new User("some-email", "some-username", "some-password");
-        final var celebrity = new User("other-email", "celeb", "some-password");
+    void when_create_user_getBio_return_null() {
+        final var user = User.of(emailMock, userNameMock, passwordMock);
 
-        user.followUser(celebrity);
-
-        assertThat(user.viewProfile(celebrity).isFollowing()).isTrue();
+        assertThat(user.getBio()).isNull();
     }
 
     @Test
-    void same_user_generate_same_hash_code() {
-        final var user = new User("some-email", "some-username", "some-password");
+    void when_user_have_different_email_expect_not_equal_and_hashCode(
+            @Mock Email otherEmail, @Mock UserName otherName, @Mock Password otherPassword) {
+        final var user = User.of(emailMock, userNameMock, passwordMock);
+        final var userWithSameEmail = User.of(otherEmail, otherName, otherPassword);
 
-        assertThat(user).hasSameHashCodeAs(user);
+        assertThat(userWithSameEmail)
+                .isNotEqualTo(user)
+                .extracting(User::hashCode)
+                .isNotEqualTo(user.hashCode());
     }
 
+    @Test
+    void when_user_have_same_email_expect_equal_and_hashCode(@Mock UserName otherName, @Mock Password otherPassword) {
+        final var user = User.of(emailMock, userNameMock, passwordMock);
+        final var userWithSameEmail = User.of(emailMock, otherName, otherPassword);
+
+        assertThat(userWithSameEmail)
+                .isEqualTo(user)
+                .hasSameHashCodeAs(user);
+    }
+
+    @Test
+    void when_view_profile_not_following_user_expect_following_false(@Mock Email otherEmail) {
+        final var user = User.of(emailMock, userNameMock, passwordMock);
+        final var otherUser = User.of(otherEmail, userNameMock, passwordMock);
+
+        assertThat(user.viewProfile(otherUser))
+                .hasFieldOrPropertyWithValue("following", false);
+    }
+
+    @Test
+    void when_matches_password_expect_password_matches_password() {
+        final var user = User.of(emailMock, userNameMock, passwordMock);
+
+        user.matchesPassword("some-password", passwordEncoder);
+
+        verify(passwordMock, times(1)).matchesPassword("some-password", passwordEncoder);
+    }
+
+    @Test
+    void when_changeEmail_expect_getEmail_return_new_email(@Mock Email emailToChange) {
+        final var user = User.of(emailMock, userNameMock, passwordMock);
+
+        user.changeEmail(emailToChange);
+
+        assertThat(user.getEmail()).isEqualTo(emailToChange);
+    }
+
+    @Test
+    void when_changePassword_expect_matchesPassword_matches_new_password(@Mock Password passwordToChange) {
+        final var user = User.of(emailMock, userNameMock, passwordMock);
+
+        user.changePassword(passwordToChange);
+
+        user.matchesPassword("some-password", passwordEncoder);
+        verify(passwordToChange, times(1)).matchesPassword("some-password", passwordEncoder);
+    }
+
+    @Test
+    void when_changeName_expect_getName_return_new_name(@Mock UserName userNameToChange) {
+        final var user = User.of(emailMock, userNameMock, passwordMock);
+
+        user.changeName(userNameToChange);
+
+        assertThat(user.getName()).isEqualTo(userNameToChange);
+    }
+
+    @Test
+    void when_changeBio_expect_getBio_return_new_bio() {
+        final var user = User.of(emailMock, userNameMock, passwordMock);
+
+        user.changeBio("new bio");
+
+        assertThat(user.getBio()).isEqualTo("new bio");
+    }
+
+    @Test
+    void when_changeImage_expect_getImage_return_new_image(@Mock Image imageToChange) {
+        final var user = User.of(emailMock, userNameMock, passwordMock);
+
+        user.changeImage(imageToChange);
+
+        assertThat(user.getImage()).isEqualTo(imageToChange);
+    }
 }

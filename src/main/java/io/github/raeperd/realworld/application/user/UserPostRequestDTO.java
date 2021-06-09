@@ -2,25 +2,33 @@ package io.github.raeperd.realworld.application.user;
 
 import com.fasterxml.jackson.annotation.JsonTypeInfo;
 import com.fasterxml.jackson.annotation.JsonTypeName;
-import io.github.raeperd.realworld.domain.user.User;
-import lombok.AllArgsConstructor;
-import lombok.Getter;
+import io.github.raeperd.realworld.domain.user.Email;
+import io.github.raeperd.realworld.domain.user.UserName;
+import io.github.raeperd.realworld.domain.user.UserSignUpRequest;
+import lombok.Value;
+
+import javax.validation.constraints.NotBlank;
 
 import static com.fasterxml.jackson.annotation.JsonTypeInfo.As.WRAPPER_OBJECT;
 import static com.fasterxml.jackson.annotation.JsonTypeInfo.Id.NAME;
 
 @JsonTypeName("user")
 @JsonTypeInfo(include = WRAPPER_OBJECT, use = NAME)
-@Getter
-@AllArgsConstructor
-public class UserPostRequestDTO {
+@Value
+class UserPostRequestDTO {
 
-    private final String username;
-    private final String email;
-    private final String password;
+    @javax.validation.constraints.Email
+    String email;
+    @NotBlank
+    String username;
+    @NotBlank
+    String password;
 
-    public User toUser() {
-        return new User(email, username, password);
+    UserSignUpRequest toSignUpRequest() {
+        return new UserSignUpRequest(
+                new Email(email),
+                new UserName(username),
+                password);
     }
 
 }

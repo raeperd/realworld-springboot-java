@@ -1,57 +1,47 @@
 package io.github.raeperd.realworld.domain.article.comment;
 
-import io.github.raeperd.realworld.domain.article.Article;
-import io.github.raeperd.realworld.domain.article.ArticleRepository;
-import io.github.raeperd.realworld.domain.user.UserContextHolder;
+import io.github.raeperd.realworld.domain.article.ArticleFindService;
+import io.github.raeperd.realworld.domain.user.User;
+import io.github.raeperd.realworld.domain.user.UserFindService;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.util.List;
 import java.util.NoSuchElementException;
+import java.util.Set;
 
-import static java.util.stream.Collectors.toList;
+import static org.springframework.data.util.Optionals.mapIfAllPresent;
 
 @Service
 public class CommentService {
 
-    private final ArticleRepository articleRepository;
-    private final UserContextHolder userContextHolder;
+    private final UserFindService userFindService;
+    private final ArticleFindService articleFindService;
 
-    public CommentService(ArticleRepository articleRepository, UserContextHolder userContextHolder) {
-        this.articleRepository = articleRepository;
-        this.userContextHolder = userContextHolder;
+    CommentService(UserFindService userFindService, ArticleFindService articleFindService) {
+        this.userFindService = userFindService;
+        this.articleFindService = articleFindService;
     }
 
     @Transactional
-    public Comment commentArticleBySlug(String slug, Comment comment) {
-        return articleRepository.findFirstBySlug(slug)
-                .map(article -> article.addComment(comment))
+    public Comment createComment(long userId, String slug, String body) {
+        return mapIfAllPresent(userFindService.findById(userId), articleFindService.getArticleBySlug(slug),
+                (user, article) -> user.writeCommentToArticle(article, body))
                 .orElseThrow(NoSuchElementException::new);
     }
 
     @Transactional(readOnly = true)
-    public CommentView viewCommentFromCurrentUser(Comment comment) {
-        return userContextHolder.getCurrentUser()
-                .map(currentUser -> currentUser.viewProfile(comment.getAuthor()))
-                .map(profile -> CommentView.of(comment, profile))
-                .orElseThrow(IllegalStateException::new);
-    }
-
-    @Transactional(readOnly = true)
-    public List<CommentView> viewAllCommentsBySlugFromCurrentUser(String slug) {
-        return articleRepository.findFirstBySlug(slug)
-                .map(Article::getComments).orElseThrow(NoSuchElementException::new)
-                .stream()
-                .map(this::viewCommentFromCurrentUser)
-                .collect(toList());
+    public Set<Comment> getComments(long userId, String slug) {
+        return mapIfAllPresent(userFindService.findById(userId), articleFindService.getArticleBySlug(slug),
+                User::viewArticleComments)
+                .orElseThrow(NoSuchElementException::new);
     }
 
     @Transactional
-    public boolean deleteCommentInArticleById(String slug, long id) {
-        final var currentUser = userContextHolder.getCurrentUser()
-                .orElseThrow(IllegalStateException::new);
-        return articleRepository.findFirstBySlug(slug)
-                .map(article -> article.deleteCommentByIdAndUser(id, currentUser))
+    public void deleteCommentById(long userId, String slug, long commentId) {
+        final var articleContainsComments = articleFindService.getArticleBySlug(slug)
                 .orElseThrow(NoSuchElementException::new);
+        userFindService.findById(userId)
+                .ifPresentOrElse(user -> user.deleteArticleComment(articleContainsComments, commentId),
+                        () -> {throw new NoSuchElementException();});
     }
 }

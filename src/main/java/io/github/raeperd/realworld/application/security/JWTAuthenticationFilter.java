@@ -1,7 +1,5 @@
 package io.github.raeperd.realworld.application.security;
 
-import io.github.raeperd.realworld.domain.jwt.JWTParser;
-import io.github.raeperd.realworld.domain.jwt.JWTPayload;
 import org.springframework.security.authentication.AbstractAuthenticationToken;
 import org.springframework.web.filter.OncePerRequestFilter;
 
@@ -17,42 +15,33 @@ import static org.springframework.security.core.context.SecurityContextHolder.ge
 
 class JWTAuthenticationFilter extends OncePerRequestFilter {
 
-    private final JWTParser jwtParser;
-
-    public JWTAuthenticationFilter(JWTParser jwtParser) {
-        this.jwtParser = jwtParser;
-    }
-
     @Override
     protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response, FilterChain filterChain) throws ServletException, IOException {
         ofNullable(request.getHeader(AUTHORIZATION))
-                .map(headerValue -> headerValue.substring("Token ".length()))
-                .map(jwtParser::validateToken)
-                .map(JWTAuthenticationToken::new)
-                .ifPresent(authentication -> getContext().setAuthentication(authentication));
+                .map(authHeader -> authHeader.substring("Token ".length()))
+                .map(JWT::new)
+                .ifPresent(getContext()::setAuthentication);
         filterChain.doFilter(request, response);
     }
 
     @SuppressWarnings("java:S2160")
-    static class JWTAuthenticationToken extends AbstractAuthenticationToken {
+    static class JWT extends AbstractAuthenticationToken {
 
-        private final transient JWTPayload principal;
+        private final String token;
 
-        JWTAuthenticationToken(JWTPayload jwtPayload) {
+        private JWT(String token) {
             super(null);
-            this.principal = jwtPayload;
-            this.setAuthenticated(true);
+            this.token = token;
         }
 
         @Override
         public Object getPrincipal() {
-            return principal;
+            return token;
         }
 
         @Override
         public Object getCredentials() {
             return null;
         }
-
     }
 }

@@ -2,29 +2,28 @@ package io.github.raeperd.realworld.application.article;
 
 import com.fasterxml.jackson.annotation.JsonTypeInfo;
 import com.fasterxml.jackson.annotation.JsonTypeName;
-import io.github.raeperd.realworld.domain.article.ArticleUpdateCommand;
-import lombok.Getter;
-import lombok.RequiredArgsConstructor;
+import io.github.raeperd.realworld.domain.article.ArticleTitle;
+import io.github.raeperd.realworld.domain.article.ArticleUpdateRequest;
+import lombok.Value;
 
 import static com.fasterxml.jackson.annotation.JsonTypeInfo.As.WRAPPER_OBJECT;
 import static com.fasterxml.jackson.annotation.JsonTypeInfo.Id.NAME;
+import static io.github.raeperd.realworld.domain.article.ArticleUpdateRequest.builder;
+import static java.util.Optional.ofNullable;
 
 @JsonTypeName("article")
 @JsonTypeInfo(include = WRAPPER_OBJECT, use = NAME)
-@Getter
-@RequiredArgsConstructor
-public class ArticlePutRequestDTO {
+@Value
+class ArticlePutRequestDTO {
 
-    private final String title;
-    private final String description;
-    private final String body;
+    String title;
+    String description;
+    String body;
 
-    public ArticleUpdateCommand toUpdateCommand() {
-        return ArticleUpdateCommand.builder()
-                .title(title)
-                .description(description)
-                .body(body)
+    ArticleUpdateRequest toUpdateRequest() {
+        return builder().titleToUpdate(ofNullable(title).map(ArticleTitle::of).orElse(null))
+                .descriptionToUpdate(description)
+                .bodyToUpdate(body)
                 .build();
     }
-
 }

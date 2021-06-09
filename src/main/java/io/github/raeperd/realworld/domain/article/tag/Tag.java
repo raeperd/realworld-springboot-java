@@ -1,36 +1,43 @@
 package io.github.raeperd.realworld.domain.article.tag;
 
-import javax.persistence.Entity;
-import javax.persistence.Id;
+import javax.persistence.*;
 import java.util.Objects;
 
+import static javax.persistence.GenerationType.IDENTITY;
+
+@Table(name = "tags")
 @Entity
 public class Tag {
 
+    @GeneratedValue(strategy = IDENTITY)
     @Id
-    private String name;
+    private Long id;
+
+    @Column(name = "value", unique = true, nullable = false)
+    private String value;
+
+    public Tag(String value) {
+        this.value = value;
+    }
 
     protected Tag() {
     }
 
-    public Tag(String name) {
-        this.name = name;
-    }
-
-    public String getName() {
-        return name;
+    @Override
+    public String toString() {
+        return value;
     }
 
     @Override
     public boolean equals(Object o) {
         if (this == o) return true;
         if (o == null || getClass() != o.getClass()) return false;
-        Tag tag = (Tag) o;
-        return Objects.equals(name, tag.name);
+        var tag = (Tag) o;
+        return value.equals(tag.value);
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(name);
+        return Objects.hash(value);
     }
 }

@@ -1,38 +1,38 @@
 package io.github.raeperd.realworld.application.article.comment;
 
-
 import io.github.raeperd.realworld.domain.article.comment.CommentService;
+import io.github.raeperd.realworld.infrastructure.jwt.UserJWTPayload;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
 
-import static io.github.raeperd.realworld.application.article.comment.MultipleCommentResponseDTO.fromCommentViews;
-import static io.github.raeperd.realworld.application.article.comment.SingleCommentResponseDTO.fromCommentView;
-import static org.springframework.http.HttpStatus.NO_CONTENT;
+import javax.validation.Valid;
 
-@RequestMapping("/articles")
 @RestController
-public class CommentRestController {
+class CommentRestController {
 
     private final CommentService commentService;
 
-    public CommentRestController(CommentService commentService) {
+    CommentRestController(CommentService commentService) {
         this.commentService = commentService;
     }
 
-    @PostMapping("/{slug}/comments")
-    public SingleCommentResponseDTO postComment(@RequestBody CommentPostRequestDTO requestDTO, @PathVariable String slug) {
-        final var commentSaved = commentService.commentArticleBySlug(slug, requestDTO.toComment());
-        return fromCommentView(commentService.viewCommentFromCurrentUser(commentSaved));
+    @PostMapping("/articles/{slug}/comments")
+    public CommentModel postComments(@AuthenticationPrincipal UserJWTPayload jwtPayload,
+                                     @PathVariable String slug, @Valid @RequestBody CommentPostRequestDTO dto) {
+        final var commentAdded = commentService.createComment(jwtPayload.getUserId(), slug, dto.getBody());
+        return CommentModel.fromComment(commentAdded);
     }
 
-    @GetMapping("/{slug}/comments")
-    public MultipleCommentResponseDTO getComments(@PathVariable String slug) {
-        return fromCommentViews(
-                commentService.viewAllCommentsBySlugFromCurrentUser(slug));
+    @GetMapping("/articles/{slug}/comments")
+    public MultipleCommentModel getComments(@AuthenticationPrincipal UserJWTPayload jwtPayload,
+                                            @PathVariable String slug) {
+        final var comments = commentService.getComments(jwtPayload.getUserId(), slug);
+        return MultipleCommentModel.fromComments(comments);
     }
 
-    @ResponseStatus(NO_CONTENT)
-    @DeleteMapping("/{slug}/comments/{id}")
-    public void deleteCommentByID(@PathVariable String slug, @PathVariable long id) {
-        commentService.deleteCommentInArticleById(slug, id);
+    @DeleteMapping("/articles/{slug}/comments/{id}")
+    public void deleteComment(@AuthenticationPrincipal UserJWTPayload jwtPayload,
+                              @PathVariable String slug, @PathVariable long id) {
+        commentService.deleteCommentById(jwtPayload.getUserId(), slug, id);
     }
 }

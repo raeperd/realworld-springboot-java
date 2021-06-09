@@ -1,15 +1,15 @@
 package io.github.raeperd.realworld.domain.user;
 
-import org.springframework.data.jpa.repository.JpaRepository;
-import org.springframework.stereotype.Repository;
+import org.springframework.data.repository.Repository;
 
 import java.util.Optional;
 
-@Repository
-public interface UserRepository extends JpaRepository<User, Long> {
+interface UserRepository extends Repository<User, Long> {
 
-    Optional<User> findFirstByEmailAndPassword(String email, String password);
+    User save(User user);
 
-    Optional<User> findFirstByUsername(String username);
+    Optional<User> findById(long id);
+    Optional<User> findFirstByEmail(Email email);
+    Optional<User> findFirstByProfileUserName(UserName userName);
 
 }

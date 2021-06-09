@@ -1,82 +1,96 @@
 package io.github.raeperd.realworld.application.article;
 
-import io.github.raeperd.realworld.domain.article.ArticleDeleteService;
-import io.github.raeperd.realworld.domain.article.ArticleFavoriteService;
 import io.github.raeperd.realworld.domain.article.ArticleService;
+import io.github.raeperd.realworld.domain.user.UserName;
+import io.github.raeperd.realworld.infrastructure.jwt.UserJWTPayload;
 import org.springframework.data.domain.Pageable;
+import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
 
-import java.util.NoSuchElementException;
+import javax.validation.Valid;
 
-import static io.github.raeperd.realworld.application.article.MultipleArticleResponseDTO.fromArticleViews;
-import static io.github.raeperd.realworld.application.article.SingleArticleResponseDTO.fromArticleView;
-import static java.util.stream.Collectors.toList;
+import static org.springframework.http.HttpStatus.NO_CONTENT;
+import static org.springframework.http.ResponseEntity.of;
 
-@RequestMapping("/articles")
 @RestController
-public class ArticleRestController {
+class ArticleRestController {
 
     private final ArticleService articleService;
-    private final ArticleFavoriteService favoriteService;
-    private final ArticleDeleteService deleteService;
 
-    public ArticleRestController(ArticleService articleService, ArticleFavoriteService favoriteService, ArticleDeleteService deleteService) {
+    ArticleRestController(ArticleService articleService) {
         this.articleService = articleService;
-        this.favoriteService = favoriteService;
-        this.deleteService = deleteService;
     }
 
-    @PostMapping
-    public SingleArticleResponseDTO postArticle(@RequestBody ArticlePostRequestDTO articlePostRequestDTO) {
-        final var articleView = articleService.createAndViewArticle(articlePostRequestDTO.toArticle());
-        return fromArticleView(articleView);
+    @PostMapping("/articles")
+    public ArticleModel postArticle(@AuthenticationPrincipal UserJWTPayload jwtPayload,
+                                    @Valid @RequestBody ArticlePostRequestDTO dto) {
+        var articleCreated = articleService.createNewArticle(jwtPayload.getUserId(), dto.toArticleContents());
+        return ArticleModel.fromArticle(articleCreated);
     }
 
-    @GetMapping
-    public MultipleArticleResponseDTO getArticles(Pageable pageable) {
-        final var articleViews = articleService.viewAllArticle(pageable)
-                .stream().collect(toList());
-        return fromArticleViews(articleViews);
+    @GetMapping("/articles")
+    public MultipleArticleModel getArticles(Pageable pageable) {
+        final var articles = articleService.getArticles(pageable);
+        return MultipleArticleModel.fromArticles(articles);
     }
 
-    @GetMapping("/feed")
-    public MultipleArticleResponseDTO getArticleFeed(Pageable pageable) {
-        final var articleViews = articleService.viewFeedFromCurrentUser(pageable)
-                .stream().collect(toList());
-        return fromArticleViews(articleViews);
+    @GetMapping(value = "/articles", params = {"author"})
+    public MultipleArticleModel getArticlesByAuthor(@RequestParam String author, Pageable pageable) {
+        final var articles = articleService.getArticlesByAuthorName(author, pageable);
+        return MultipleArticleModel.fromArticles(articles);
     }
 
-    @GetMapping("/{slug}")
-    public SingleArticleResponseDTO getArticleBySlug(@PathVariable String slug) {
-        final var article = articleService.viewArticleBySlug(slug).orElseThrow(NoSuchElementException::new);
-        return fromArticleView(article);
+    @GetMapping(value = "/articles", params = {"tag"})
+    public MultipleArticleModel getArticlesByTag(@RequestParam String tag, Pageable pageable) {
+        final var articles = articleService.getArticlesByTag(tag, pageable);
+        return MultipleArticleModel.fromArticles(articles);
     }
 
-    @PutMapping("/{slug}")
-    public SingleArticleResponseDTO putArticleBySlug(@PathVariable String slug, @RequestBody ArticlePutRequestDTO articlePutRequestDTO) {
-        final var articleUpdated = articleService.updateArticleAndView(slug, articlePutRequestDTO.toUpdateCommand());
-        return fromArticleView(articleUpdated);
+    @GetMapping(value = "/articles", params = {"favorited"})
+    public MultipleArticleModel getArticleByFavoritedUsername(@RequestParam UserName favorited, Pageable pageable) {
+        final var articles = articleService.getArticleFavoritedByUsername(favorited, pageable);
+        return MultipleArticleModel.fromArticles(articles);
     }
 
-    @DeleteMapping("/{slug}")
-    public void deleteArticleBySlug(@PathVariable String slug) {
-        deleteService.deleteArticleBySlug(slug);
+    @GetMapping("/articles/feed")
+    public MultipleArticleModel getFeed(@AuthenticationPrincipal UserJWTPayload jwtPayload, Pageable pageable) {
+        final var articles = articleService.getFeedByUserId(jwtPayload.getUserId(), pageable);
+        return MultipleArticleModel.fromArticles(articles);
     }
 
-    @PostMapping("/{slug}/favorite")
-    public SingleArticleResponseDTO favoriteArticle(@PathVariable String slug) {
-        return articleService.findArticleBySlug(slug)
-                .map(favoriteService::favoriteArticleAndView)
-                .map(SingleArticleResponseDTO::fromArticleView)
-                .orElseThrow(NoSuchElementException::new);
+    @GetMapping("/articles/{slug}")
+    public ResponseEntity<ArticleModel> getArticleBySlug(@PathVariable String slug) {
+        return of(articleService.getArticleBySlug(slug)
+                .map(ArticleModel::fromArticle));
     }
 
-    @DeleteMapping("/{slug}/favorite")
-    public SingleArticleResponseDTO unfavoriteArticle(@PathVariable String slug) {
-        return articleService.findArticleBySlug(slug)
-                .map(favoriteService::unfavoriteArticleAndView)
-                .map(SingleArticleResponseDTO::fromArticleView)
-                .orElseThrow(NoSuchElementException::new);
+    @PutMapping("/articles/{slug}")
+    public ArticleModel putArticleBySlug(@AuthenticationPrincipal UserJWTPayload jwtPayload,
+                                         @PathVariable String slug,
+                                         @RequestBody ArticlePutRequestDTO dto) {
+        final var articleUpdated = articleService.updateArticle(jwtPayload.getUserId(), slug, dto.toUpdateRequest());
+        return ArticleModel.fromArticle(articleUpdated);
     }
 
+    @PostMapping("/articles/{slug}/favorite")
+    public ArticleModel favoriteArticleBySlug(@AuthenticationPrincipal UserJWTPayload jwtPayload,
+                                              @PathVariable String slug) {
+        var articleFavorited = articleService.favoriteArticle(jwtPayload.getUserId(), slug);
+        return ArticleModel.fromArticle(articleFavorited);
+    }
+
+    @DeleteMapping("/articles/{slug}/favorite")
+    public ArticleModel unfavoriteArticleBySlug(@AuthenticationPrincipal UserJWTPayload jwtPayload,
+                                                @PathVariable String slug) {
+        var articleUnfavored = articleService.unfavoriteArticle(jwtPayload.getUserId(), slug);
+        return ArticleModel.fromArticle(articleUnfavored);
+    }
+
+    @ResponseStatus(NO_CONTENT)
+    @DeleteMapping("/articles/{slug}")
+    public void deleteArticleBySlug(@AuthenticationPrincipal UserJWTPayload jwtPayload,
+                                    @PathVariable String slug) {
+        articleService.deleteArticleBySlug(jwtPayload.getUserId(), slug);
+    }
 }

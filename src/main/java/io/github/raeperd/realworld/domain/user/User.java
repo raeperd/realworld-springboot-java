@@ -1,17 +1,21 @@
 package io.github.raeperd.realworld.domain.user;
 
-import io.github.raeperd.realworld.domain.user.profile.Profile;
+import io.github.raeperd.realworld.domain.article.Article;
+import io.github.raeperd.realworld.domain.article.ArticleContents;
+import io.github.raeperd.realworld.domain.article.ArticleUpdateRequest;
+import io.github.raeperd.realworld.domain.article.comment.Comment;
+import org.springframework.security.crypto.password.PasswordEncoder;
 
-import javax.persistence.Entity;
-import javax.persistence.GeneratedValue;
-import javax.persistence.Id;
-import javax.persistence.OneToMany;
-import java.util.ArrayList;
-import java.util.Collection;
+import javax.persistence.*;
+import java.util.HashSet;
 import java.util.Objects;
+import java.util.Set;
 
+import static java.util.stream.Collectors.toSet;
+import static javax.persistence.CascadeType.REMOVE;
 import static javax.persistence.GenerationType.IDENTITY;
 
+@Table(name = "users")
 @Entity
 public class User {
 
@@ -19,77 +23,138 @@ public class User {
     @Id
     private Long id;
 
-    @OneToMany
-    private final Collection<User> followingUsers = new ArrayList<>();
+    @Embedded
+    private Email email;
 
-    private String email;
-    private String username;
-    private String bio;
-    private String image;
-    private String password;
+    @Embedded
+    private Profile profile;
 
-    public User(String email, String username, String password) {
-        this(email, username, null, null);
-        this.password = password;
+    @Embedded
+    private Password password;
+
+    @JoinTable(name = "user_followings",
+            joinColumns = @JoinColumn(name = "follower_id", referencedColumnName = "id"),
+            inverseJoinColumns = @JoinColumn(name = "followee_id", referencedColumnName = "id"))
+    @OneToMany(cascade = REMOVE)
+    private Set<User> followingUsers = new HashSet<>();
+
+    @ManyToMany(mappedBy = "userFavorited")
+    private Set<Article> articleFavorited = new HashSet<>();
+
+    static User of(Email email, UserName name, Password password) {
+        return new User(email, new Profile(name), password);
     }
 
-    User(String email, String username, String bio, String image) {
-        this.id = null;
+    private User(Email email, Profile profile, Password password) {
         this.email = email;
-        this.username = username;
-        this.bio = bio;
-        this.image = image;
+        this.profile = profile;
+        this.password = password;
     }
 
     protected User() {
     }
 
-    User updateUser(UserUpdateCommand updateCommand) {
-        updateCommand.getEmailToUpdate().ifPresent(emailToUpdate -> this.email = emailToUpdate);
-        updateCommand.getUsernameToUpdate().ifPresent(usernameToUpdate -> this.username = usernameToUpdate);
-        updateCommand.getBioToUpdate().ifPresent(bioToUpdate -> this.bio = bioToUpdate);
-        updateCommand.getImageToUpdate().ifPresent(imageToUpdate -> this.image = imageToUpdate);
-        updateCommand.getPasswordToUpdate().ifPresent(passwordToUpdate -> this.password = passwordToUpdate);
+    public Article writeArticle(ArticleContents contents) {
+        return new Article(this, contents);
+    }
+
+    public Article updateArticle(Article article, ArticleUpdateRequest request) {
+        if (article.getAuthor() != this) {
+            throw new IllegalAccessError("Not authorized to update this article");
+        }
+        article.updateArticle(request);
+        return article;
+    }
+
+    public Comment writeCommentToArticle(Article article, String body) {
+        return article.addComment(this, body);
+    }
+
+    public Article favoriteArticle(Article articleToFavorite) {
+        articleFavorited.add(articleToFavorite);
+        return articleToFavorite.afterUserFavoritesArticle(this);
+    }
+
+    public Article unfavoriteArticle(Article articleToUnfavorite) {
+        articleFavorited.remove(articleToUnfavorite);
+        return articleToUnfavorite.afterUserUnFavoritesArticle(this);
+    }
+
+    User followUser(User followee) {
+        followingUsers.add(followee);
         return this;
     }
 
-    public User followUser(User user) {
-        followingUsers.add(user);
+    User unfollowUser(User followee) {
+        followingUsers.remove(followee);
         return this;
     }
 
-    public User unfollowUser(User user) {
-        followingUsers.removeIf(followed -> followed.getId().equals(user.getId()));
-        return this;
+    public void deleteArticleComment(Article article, long commentId) {
+        article.removeCommentByUser(this, commentId);
     }
 
-    public Profile viewProfile(User otherUser) {
-        return new Profile(otherUser.getUsername(), otherUser.getBio(), otherUser.getImage(),
-                followingUsers.contains(otherUser));
+    public Set<Comment> viewArticleComments(Article article) {
+        return article.getComments().stream()
+                .map(this::viewComment)
+                .collect(toSet());
     }
 
-    public Collection<User> getFollowingUsers() {
-        return followingUsers;
+    Comment viewComment(Comment comment) {
+        viewProfile(comment.getAuthor());
+        return comment;
+    }
+
+    Profile viewProfile(User user) {
+        return user.profile.withFollowing(followingUsers.contains(user));
+    }
+
+    public Profile getProfile() {
+        return profile;
+    }
+
+    boolean matchesPassword(String rawPassword, PasswordEncoder passwordEncoder) {
+        return password.matchesPassword(rawPassword, passwordEncoder);
+    }
+
+    void changeEmail(Email email) {
+        this.email = email;
+    }
+
+    void changePassword(Password password) {
+        this.password = password;
+    }
+
+    void changeName(UserName userName) {
+        profile.changeUserName(userName);
+    }
+
+    void changeBio(String bio) {
+        profile.changeBio(bio);
+    }
+
+    void changeImage(Image image) {
+        profile.changeImage(image);
     }
 
     public Long getId() {
         return id;
     }
 
-    public String getEmail() {
+    public Email getEmail() {
         return email;
     }
 
-    public String getUsername() {
-        return username;
+    public UserName getName() {
+        return profile.getUserName();
     }
 
-    public String getBio() {
-        return bio;
+    String getBio() {
+        return profile.getBio();
     }
 
-    public String getImage() {
-        return image;
+    Image getImage() {
+        return profile.getImage();
     }
 
     @Override
@@ -97,11 +162,11 @@ public class User {
         if (this == o) return true;
         if (o == null || getClass() != o.getClass()) return false;
         final var user = (User) o;
-        return Objects.equals(id, user.id) && Objects.equals(email, user.email);
+        return email.equals(user.email);
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(id, email);
+        return Objects.hash(email);
     }
 }
