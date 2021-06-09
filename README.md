@@ -1,3 +1,4 @@
+
 ![RealWorld example apps cover](./doc/image/realworld-cover.png)
 [![Build](https://github.com/raeperd/realworld-springboot-java/actions/workflows/build.yml/badge.svg)](https://github.com/raeperd/realworld-springboot-java/actions/workflows/build.yml)
 [![Lines of Code](https://sonarcloud.io/api/project_badges/measure?project=raeperd_realworld-springboot-java&metric=ncloc)](https://sonarcloud.io/dashboard?id=raeperd_realworld-springboot-java)
@@ -48,7 +49,7 @@ Import [`./doc/Conduit.postman_collection.json`](./doc/Conduit.postman_collectio
 
 
 
-And also, pure `gradle test` covers almost every lines of code.
+And also, pure `gradle test` covers almost every line of code.
 
 More details can be found in [`./doc/README.md`](./doc/README.md) and  [original source](https://github.com/gothinkster/realworld/tree/master/spec)
 
@@ -57,19 +58,18 @@ More details can be found in [`./doc/README.md`](./doc/README.md) and  [original
 ## Design Principal
 
 - Always `final` whenever possible
-- Always pacakage private class whenever possible
-- **Always test every package, class, method, insturction in codes**
+- Always package private class whenever possible
+- **Always test every package, class, method, instruction in codes**
   - Except for some boilerplate `equals` and `hashcode` method
   - This is validated by [jacoco-gradle-plugin](https://docs.gradle.org/current/userguide/jacoco_plugin.html).
   - Coverage verification in [`./test.gradle`](./test.gradle)
-- Try to avoid including additional dependencies as much as possbile
+- Try to avoid including additional dependencies as much as possible
   - Implements JWT generation / validation logic without 3rd party library [#3](https://github.com/raeperd/realworld-springboot-java/issues/3)
-- Try to maintiain codes in domain package to keep POJO
-  - Except for special spring annotations like `@Service`, `@Repository`
-  - Not to use lombok in domain pacakge classes
-
-
-
+- Try to maintain codes in domain package remain POJO
+  - Except for special spring annotations like `@Service`, `@Repository`, `@Transactional`
+  - Prohibit use of lombok in domain package
+- Try to follow all modern best practices for spring-boot project
+  
 ## Diagrams 
 
 - You can open full diagram file in [`realworld.drawio`](./realworld.drawio) using [draw.io](https://app.diagrams.net/)
@@ -78,40 +78,25 @@ More details can be found in [`./doc/README.md`](./doc/README.md) and  [original
 
 ![realworld-User](./doc/image/realworld-User.png)
 
-- Separate interface for `JWTGenerator` and `JWTParser`
-- Try to do everything in `UserService`
+- Separate password encoding logic out of User.
+- User must be created with password encoder.
+
+### Article
+
+![realworld-Article](./doc/image/realworld-Article.png)
+
+- Article contains other elements with `@Embedded` classes
+- Try to reduce number of repositories.
+- Prefer `@JoinTable` to `@JoinColumn`
 
 ### JWT 
 
 ![realworld-Jwt](./doc/image/realworld-Jwt.png)
 
 - Try not to use 3rd party library
-- Context from JWT token can be retrieved using `UserContextHolder` implemtation
-- `HS256JWTService` do core logic
-  - Symmetric JWT token signing using HS256 (includes Base64URL, SHA256) 
-  - Validate given token 
-
-### Article
-
-![realworld-Article](./doc/image/realworld-Article.png)
-
-- Separate `@Entity` with `ArticleView` class 
-- Favorite of articles is another `@Entity`
-- `ArticleView` contains run-time information about `Article`
-
-### ArticleView
-
-![realworld-ArticleView](./doc/image/realworld-ArticleViewer.png)
-
-
-
-### Profile
-
-![realworld-Profile](./doc/image/realworld-Profile.png)
-
-- Profile as sperate service since it is used widely 
-
-
+- Serialization and Deserialization are seperated with interfaces
+- Domain package contains interface, infrastructure code provide implementation  
+- Application package do stuff with spring-security logic
 
 ## Performance
 
@@ -121,12 +106,9 @@ More details can be found in [`./doc/README.md`](./doc/README.md) and  [original
 
 # What can be done more
 
-- More strict validation in application layer
-- Profile view logic can be imporved.
-- JWT Token can be improved
-  - JWTToken should not contains userid. 
-  - Current version of JWT authentication is somewhat imperfact.
-  - More details in [Stop using JWT for sessions](http://cryto.net/~joepie91/blog/2016/06/13/stop-using-jwt-for-sessions/) 
+- User class doing so many things now. It can be improved someway.
+- Service classes can be divided into smaller services
+- Test cases order can be improved
 
 # Contact
 
@@ -137,8 +119,7 @@ You can contact me with [email](raeperd117@gmail.com) or issue in this project
 
 # Referenced
 
-- [JSON Web Token Introduction - jwt.io](https://jwt.io/introduction)
-
+- [JSON Web Token Introduction - jwt.io](https://jwt.io/introduction)  
 - [Symmetric vs Asymmetric JWTs. What is JWT? | by Swayam Raina | Noteworthy - The Journal Blog](https://blog.usejournal.com/symmetric-vs-asymmetric-jwts-bd5d1a9567f6)
 - [presentations/auth.md at master · alex996/presentations · GitHub](https://github.com/alex996/presentations/blob/master/auth.md)
 
