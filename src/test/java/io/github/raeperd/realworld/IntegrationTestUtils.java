@@ -17,6 +17,10 @@ public class IntegrationTestUtils {
     static final String PASSWORD = "password";
     static final String USERNAME = "username";
 
+    static final String SECOND_EMAIL = "second-user@email.com";
+    static final String SECOND_PASSWORD = "password";
+    static final String SECOND_USERNAME = "second-username";
+
     static final String CELEB_EMAIL = "celeb_" + EMAIL;
     static final String CELEB_USERNAME = "celeb_" + USERNAME;
 
@@ -92,6 +96,21 @@ public class IntegrationTestUtils {
                 jsonPath(path + ".body").isString(),
                 jsonPath(path + ".createdAt", matchesPattern(ISO_8601_PATTERN)),
                 jsonPath(path + ".updatedAt", matchesPattern(ISO_8601_PATTERN)),
+                validProfileModelInPath(path + ".author"));
+    }
+
+    static ResultMatcher validSingleReportModel() {
+        return matchAll(
+                jsonPath("denounce").isMap(),
+                validReportModelInPath("denounce"));
+    }
+
+    private static ResultMatcher validReportModelInPath(String path) {
+        return matchAll(
+                jsonPath(path + ".id").isNumber(),
+                jsonPath(path + ".body").isString(),
+                jsonPath(path + ".articleTitle").isString(),
+                validCommentModelInPath(path + ".comment"),
                 validProfileModelInPath(path + ".author"));
     }
 }

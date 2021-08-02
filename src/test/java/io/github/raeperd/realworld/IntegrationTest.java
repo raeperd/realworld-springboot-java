@@ -35,7 +35,9 @@ class IntegrationTest {
     private ObjectMapper objectMapper;
 
     private String token;
+    private String secondToken;
     private int commentId;
+    private int reportId;
 
     @Order(1)
     @Test
@@ -43,6 +45,16 @@ class IntegrationTest {
         mockMvc.perform(post("/users")
                 .contentType(APPLICATION_JSON)
                 .content(format("{\"user\":{\"email\":\"%s\", \"password\":\"%s\", \"username\":\"%s\"}}", EMAIL, PASSWORD, USERNAME)))
+                .andExpect(status().isOk())
+                .andExpect(validUserModel());
+    }
+
+    @Order(1)
+    @Test
+    void auth_register_second_user() throws Exception {
+        mockMvc.perform(post("/users")
+                        .contentType(APPLICATION_JSON)
+                        .content(format("{\"user\":{\"email\":\"%s\", \"password\":\"%s\", \"username\":\"%s\"}}", SECOND_EMAIL, SECOND_PASSWORD, SECOND_USERNAME)))
                 .andExpect(status().isOk())
                 .andExpect(validUserModel());
     }
@@ -68,6 +80,19 @@ class IntegrationTest {
                 .andReturn().getResponse().getContentAsString();
 
         token = objectMapper.readTree(contentAsString).get("user").get("token").textValue();
+    }
+
+    @Order(3)
+    @Test
+    void auth_login_and_remember_second_token() throws Exception{
+        final var contentAsString = mockMvc.perform(post("/users/login")
+                        .contentType(APPLICATION_JSON)
+                        .content(format("{\"user\":{\"email\":\"%s\", \"password\":\"%s\"}}", SECOND_EMAIL, SECOND_PASSWORD)))
+                .andExpect(status().isOk())
+                .andExpect(validUserModel())
+                .andReturn().getResponse().getContentAsString();
+
+        secondToken = objectMapper.readTree(contentAsString).get("user").get("token").textValue();
     }
 
     @Order(4)
@@ -228,6 +253,21 @@ class IntegrationTest {
 
     @Order(12)
     @Test
+    void create_reports_for_comment() throws Exception {
+        final var contentAsString = mockMvc.perform(post("/article/{slug}/comment/{id}/denounce", "how-to-train-your-dragon", commentId)
+                        .header(AUTHORIZATION, "Token " + secondToken)
+                        .contentType(APPLICATION_JSON)
+                        .content("{\"denounce\":{\"body\":\"Offensive\"}}"))
+                .andExpect(status().isOk())
+                .andExpect(validSingleReportModel())
+                .andExpect(jsonPath("denounce.body", is("Offensive")))
+                .andReturn().getResponse().getContentAsString();
+
+        reportId = objectMapper.readTree(contentAsString).get("denounce").get("id").intValue();
+    }
+
+    @Order(13)
+    @Test
     void all_comments_for_article() throws Exception {
         mockMvc.perform(get("/articles/{slug}/comments", "how-to-train-your-dragon")
                 .header(AUTHORIZATION, "Token " + token))
@@ -235,7 +275,7 @@ class IntegrationTest {
                 .andExpect(validMultipleCommentModel());
     }
 
-    @Order(13)
+    @Order(14)
     @Test
     void delete_comment_for_article() throws Exception {
         mockMvc.perform(delete("/articles/{slug}/comments/{id}", "how-to-train-your-dragon", commentId)
@@ -243,7 +283,7 @@ class IntegrationTest {
                 .andExpect(status().isOk());
     }
 
-    @Order(12)
+    @Order(13)
     @Test
     void post_favorite_article() throws Exception {
         mockMvc.perform(post("/articles/{slug}/favorite", "how-to-train-your-dragon")
@@ -252,7 +292,7 @@ class IntegrationTest {
                 .andExpect(validSingleArticleModel());
     }
 
-    @Order(13)
+    @Order(14)
     @Test
     void get_articles_favorited_by_username() throws Exception {
         mockMvc.perform(get("/articles?favorited={username}", USERNAME)
@@ -262,7 +302,7 @@ class IntegrationTest {
                 .andExpect(jsonPath("articles[0].favorited", is(true)));
     }
 
-    @Order(13)
+    @Order(14)
     @Test
     void get_articles_favorited_by_username_not_exists() throws Exception {
         mockMvc.perform(get("/articles?favorited={username}", "jane")
@@ -272,7 +312,7 @@ class IntegrationTest {
                 .andExpect(jsonPath("articlesCount", is(0)));
     }
 
-    @Order(13)
+    @Order(14)
     @Test
     void get_feed() throws Exception {
         mockMvc.perform(get("/articles/feed")
@@ -282,7 +322,7 @@ class IntegrationTest {
                 .andExpect(jsonPath("articles[0].favorited", is(true)));
     }
 
-    @Order(14)
+    @Order(15)
     @Test
     void unfavorite_article() throws Exception {
         mockMvc.perform(delete("/articles/{slug}/favorite", "how-to-train-your-dragon")
@@ -292,7 +332,7 @@ class IntegrationTest {
                 .andExpect(jsonPath("article.favorited", is(false)));
     }
 
-    @Order(15)
+    @Order(16)
     @Test
     void delete_article() throws Exception {
         mockMvc.perform(delete("/articles/{slug}", "how-to-train-your-dragon")
