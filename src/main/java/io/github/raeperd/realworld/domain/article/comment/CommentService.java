@@ -7,6 +7,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.NoSuchElementException;
+import java.util.Optional;
 import java.util.Set;
 
 import static org.springframework.data.util.Optionals.mapIfAllPresent;
@@ -34,6 +35,13 @@ public class CommentService {
         return mapIfAllPresent(userFindService.findById(userId), articleFindService.getArticleBySlug(slug),
                 User::viewArticleComments)
                 .orElseThrow(NoSuchElementException::new);
+    }
+
+    public Optional<Comment> getCommentById(Long userId, String slug, Long commentId) {
+        return getComments(userId,slug)
+                .stream()
+                .filter(comment -> comment.getId().equals(commentId))
+                .findFirst();
     }
 
     @Transactional

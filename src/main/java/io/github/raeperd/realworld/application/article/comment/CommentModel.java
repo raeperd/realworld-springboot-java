@@ -8,7 +8,7 @@ import java.time.ZoneId;
 import java.time.ZonedDateTime;
 
 @Value
-class CommentModel {
+public class CommentModel {
 
     CommentModelNested comment;
 
@@ -17,14 +17,14 @@ class CommentModel {
     }
 
     @Value
-    static class CommentModelNested {
+    public static class CommentModelNested {
         long id;
         String body;
         ZonedDateTime createdAt;
         ZonedDateTime updatedAt;
         ProfileModelNested author;
 
-        static CommentModelNested fromComment(Comment comment) {
+        public static CommentModelNested fromComment(Comment comment) {
             return new CommentModelNested(comment.getId(),
                     comment.getBody(),
                     comment.getCreatedAt().atZone(ZoneId.of("Asia/Seoul")),

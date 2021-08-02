@@ -58,6 +58,10 @@ public class Comment {
         return author;
     }
 
+    public Article getArticle() {
+        return article;
+    }
+
     public Instant getCreatedAt() {
         return createdAt;
     }
