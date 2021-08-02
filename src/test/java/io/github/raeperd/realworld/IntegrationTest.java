@@ -8,6 +8,7 @@ import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.test.web.servlet.MockMvc;
 
 import static io.github.raeperd.realworld.IntegrationTestUtils.*;
+import static io.github.raeperd.realworld.IntegrationTestUtils.validMultipleReportModel;
 import static java.lang.String.format;
 import static org.hamcrest.Matchers.is;
 import static org.junit.jupiter.api.TestInstance.Lifecycle.PER_CLASS;
@@ -264,6 +265,15 @@ class IntegrationTest {
                 .andReturn().getResponse().getContentAsString();
 
         reportId = objectMapper.readTree(contentAsString).get("denounce").get("id").intValue();
+    }
+
+    @Order(13)
+    @Test
+    void get_all_reports_for_comment() throws Exception {
+        mockMvc.perform(get("/denounces")
+                        .header(AUTHORIZATION, "Token " + token))
+                .andExpect(status().isOk())
+                .andExpect(validMultipleReportModel());
     }
 
     @Order(13)

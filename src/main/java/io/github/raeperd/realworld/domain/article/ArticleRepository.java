@@ -5,11 +5,13 @@ import io.github.raeperd.realworld.domain.user.User;
 import io.github.raeperd.realworld.domain.user.UserName;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
+import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.Repository;
 
+import java.util.List;
 import java.util.Optional;
 
-interface ArticleRepository extends Repository<Article, Long> {
+public interface ArticleRepository extends Repository<Article, Long> {
 
     Article save(Article article);
 
@@ -18,6 +20,9 @@ interface ArticleRepository extends Repository<Article, Long> {
     Page<Article> findAllByAuthorProfileUserName(UserName authorName, Pageable pageable);
     Page<Article> findAllByContentsTagsContains(Tag tag, Pageable pageable);
     Optional<Article> findFirstByContentsTitleSlug(String slug);
+
+    @Query(value = "select a.title from articles a where author_id = :author", nativeQuery = true)
+    List<String> findAllByAuthor(long author);
 
     void deleteArticleByAuthorAndContentsTitleSlug(User author, String slug);
 

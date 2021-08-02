@@ -3,10 +3,7 @@ package io.github.raeperd.realworld.application.article.comment.report;
 import io.github.raeperd.realworld.domain.article.comment.reports.ReportService;
 import io.github.raeperd.realworld.infrastructure.jwt.UserJWTPayload;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 import javax.validation.Valid;
 
@@ -26,5 +23,10 @@ public class ReportRestController {
                                              @Valid @RequestBody ReportPostRequestDTO dto) {
         final var reportAdded = reportService.createReport(jwtPayload.getUserId(),slug,id,dto);
         return ReportModel.fromReport(reportAdded);
+    }
+
+    @GetMapping("/denounces")
+    public MultipleReportModel getAllReportsForCommentsOnUsersArticles(@AuthenticationPrincipal UserJWTPayload jwtPayload) {
+        return reportService.getAllReportsToThisUser(jwtPayload.getUserId());
     }
 }

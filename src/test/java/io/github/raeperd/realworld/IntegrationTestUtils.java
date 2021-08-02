@@ -113,4 +113,17 @@ public class IntegrationTestUtils {
                 validCommentModelInPath(path + ".comment"),
                 validProfileModelInPath(path + ".author"));
     }
+
+    static ResultMatcher validMultipleReportModel() {
+        return matchAll(
+                jsonPath("reports").isArray(),
+                validReducedReportModelInPath("reports[0]"));
+    }
+
+    private static ResultMatcher validReducedReportModelInPath(String path) {
+        return matchAll(
+                jsonPath(path + ".comment").isString(),
+                jsonPath(path + ".article").isString(),
+                jsonPath(path + "reports").isArray());
+    }
 }
