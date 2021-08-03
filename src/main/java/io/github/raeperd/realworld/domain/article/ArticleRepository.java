@@ -23,6 +23,8 @@ public interface ArticleRepository extends Repository<Article, Long> {
 
     @Query(value = "select a.title from articles a where author_id = :author", nativeQuery = true)
     List<String> findAllByAuthor(long author);
+    @Query(value = "select * from articles a where a.title = :title", nativeQuery = true)
+    Optional<Article> findByTitle(String title);
 
     void deleteArticleByAuthorAndContentsTitleSlug(User author, String slug);
 

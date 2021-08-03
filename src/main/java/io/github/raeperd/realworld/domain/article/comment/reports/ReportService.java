@@ -2,6 +2,7 @@ package io.github.raeperd.realworld.domain.article.comment.reports;
 
 import io.github.raeperd.realworld.application.article.comment.report.MultipleReportModel;
 import io.github.raeperd.realworld.application.article.comment.report.ReportPostRequestDTO;
+import io.github.raeperd.realworld.domain.article.Article;
 import io.github.raeperd.realworld.domain.article.ArticleRepository;
 import io.github.raeperd.realworld.domain.article.comment.Comment;
 import io.github.raeperd.realworld.domain.article.comment.CommentService;
@@ -48,6 +49,17 @@ public class ReportService {
                         articleRepository.findAllByAuthor(userId)
                 )
         );
+    }
+
+    @Transactional
+    public void removeReport(long userId, Long id) {
+        Report report = reportRepository.findById(id).orElseThrow(() -> new ReportException(ReportConstants.REPORT_NOT_FOUND));
+        Article article = articleRepository.findByTitle(report.getArticleTitle()).orElseThrow(() -> new ReportException(ReportConstants.ARTICLE_NOT_FOUND));
+        if(article.getAuthor().equals(userFindService.findById(userId).orElseThrow(() -> new ReportException(ReportConstants.USER_NOT_FOUND)))) {
+            reportRepository.deleteById(id);
+        } else {
+            throw new ReportException(ReportConstants.USER_NOT_ALLOWED);
+        }
     }
 
     private void allowReport(User reporter, Comment reported) {

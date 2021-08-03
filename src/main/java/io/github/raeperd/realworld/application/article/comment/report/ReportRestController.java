@@ -2,6 +2,7 @@ package io.github.raeperd.realworld.application.article.comment.report;
 
 import io.github.raeperd.realworld.domain.article.comment.reports.ReportService;
 import io.github.raeperd.realworld.infrastructure.jwt.UserJWTPayload;
+import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
 
@@ -28,5 +29,12 @@ public class ReportRestController {
     @GetMapping("/denounces")
     public MultipleReportModel getAllReportsForCommentsOnUsersArticles(@AuthenticationPrincipal UserJWTPayload jwtPayload) {
         return reportService.getAllReportsToThisUser(jwtPayload.getUserId());
+    }
+
+    @DeleteMapping("/denounces/{id}")
+    public ResponseEntity<?> deleteSpecificReport(@AuthenticationPrincipal UserJWTPayload jwtPayload,
+                                                  @PathVariable Long id) {
+        reportService.removeReport(jwtPayload.getUserId(),id);
+        return ResponseEntity.noContent().build();
     }
 }

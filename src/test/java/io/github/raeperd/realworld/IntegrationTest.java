@@ -278,6 +278,14 @@ class IntegrationTest {
 
     @Order(13)
     @Test
+    void delete_report_for_comment() throws Exception {
+        mockMvc.perform(delete("/denounces/{id}", reportId)
+                        .header(AUTHORIZATION, "Token " + token))
+                .andExpect(status().isNoContent());
+    }
+
+    @Order(13)
+    @Test
     void all_comments_for_article() throws Exception {
         mockMvc.perform(get("/articles/{slug}/comments", "how-to-train-your-dragon")
                 .header(AUTHORIZATION, "Token " + token))

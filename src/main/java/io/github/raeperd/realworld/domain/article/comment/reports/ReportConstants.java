@@ -4,5 +4,7 @@ public final class ReportConstants {
     public static final String USER_NOT_FOUND = "user not found";
     public static final String COMMENT_NOT_FOUND = "comment not found";
     public static final String USER_NOT_ALLOWED = "user not allowed";
+    public static final String REPORT_NOT_FOUND = "report not found";
+    public static final String ARTICLE_NOT_FOUND = "article not found";
     private ReportConstants(){}
 }

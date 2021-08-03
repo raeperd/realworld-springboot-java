@@ -94,6 +94,19 @@ public class ReportServiceTest {
         ).isEqualTo(1);
     }
 
+    @Test
+    void must_instance_ReportException_and_user_not_allowed_message(@Mock User firstUser, @Mock User secondUser, @Mock Report report, @Mock Article article) {
+        when(reportRepository.findById(1L)).thenReturn(Optional.ofNullable(report));
+        when(report.getArticleTitle()).thenReturn("title");
+        when(articleRepository.findByTitle("title")).thenReturn(Optional.ofNullable(article));
+        when(article.getAuthor()).thenReturn(secondUser);
+        when(userFindService.findById(1L)).thenReturn(Optional.ofNullable(firstUser));
+
+        assertThatThrownBy(() ->
+                reportService.removeReport(1L,1L)
+        ).isInstanceOf(ReportException.class).hasMessage(ReportConstants.USER_NOT_ALLOWED);
+    }
+
     private static Comment createComment(Article article, User user, String body) {
         return new Comment(article,user,body);
     }
