@@ -58,7 +58,7 @@ jib {
         }
     }
     to {
-        image = "raeperd/realworld-spring-boot-java"
+        image = "ghcr.io/raeperd/${rootProject.name}"
     }
     container {
         ports = ["8080"]
