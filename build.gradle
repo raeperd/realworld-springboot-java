@@ -1,16 +1,16 @@
 plugins {
-    id 'org.springframework.boot' version '2.4.4'
+    id 'org.springframework.boot' version '2.5.2'
     id 'io.spring.dependency-management' version '1.0.11.RELEASE'
     id 'java'
     id 'jacoco'
     id "io.freefair.lombok" version "5.3.3.3"
     id "org.ec4j.editorconfig" version "0.0.3"
     id "org.sonarqube" version "3.1.1"
-    id 'com.google.cloud.tools.jib' version '3.0.0'
+    id 'com.google.cloud.tools.jib' version '3.1.4'
 }
 
 group = 'io.github.raeperd'
-version = '2.0.0'
+version = '2.1.0'
 sourceCompatibility = '11'
 
 repositories {
@@ -19,14 +19,14 @@ repositories {
 
 dependencies {
     implementation 'org.springframework.boot:spring-boot-starter-web'
-    implementation 'org.springframework.boot:spring-boot-starter-security:2.4.5'
+    implementation 'org.springframework.boot:spring-boot-starter-security'
     implementation 'org.springframework.boot:spring-boot-starter-validation'
     implementation 'org.springframework.boot:spring-boot-starter-data-jpa'
 
     runtimeOnly 'com.h2database:h2'
     testImplementation 'org.springframework.boot:spring-boot-starter-test'
     testImplementation 'org.springframework.security:spring-security-test'
-    testImplementation 'org.mockito:mockito-inline:3.9.0'
+    testImplementation 'org.mockito:mockito-inline:3.12.1'
 }
 
 apply from: 'test.gradle'
@@ -58,7 +58,7 @@ jib {
         }
     }
     to {
-        image = "raeperd/realworld-spring-boot-java"
+        image = "ghcr.io/raeperd/${rootProject.name}"
     }
     container {
         ports = ["8080"]
