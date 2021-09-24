@@ -25,7 +25,7 @@
 
  ## Using docker
  ``` shell
- $ docker run --rm -p 8080:8080 raeperd/realworld-spring-boot-java
+ $ docker run --rm -p 8080:8080 ghcr.io/raeperd/realworld-spring-boot-java:master
  ```
 
 - Dockerhub registry is [here](https://hub.docker.com/repository/docker/raeperd/realworld-spring-boot-java)  
