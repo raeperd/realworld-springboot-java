@@ -1,5 +1,6 @@
 package io.github.raeperd.realworld.domain.article.comment;
 
+import io.github.raeperd.realworld.domain.article.Article;
 import io.github.raeperd.realworld.domain.article.ArticleFindService;
 import io.github.raeperd.realworld.domain.user.User;
 import io.github.raeperd.realworld.domain.user.UserFindService;
@@ -33,6 +34,13 @@ public class CommentService {
     public Set<Comment> getComments(long userId, String slug) {
         return mapIfAllPresent(userFindService.findById(userId), articleFindService.getArticleBySlug(slug),
                 User::viewArticleComments)
+                .orElseThrow(NoSuchElementException::new);
+    }
+
+    @Transactional(readOnly = true)
+    public Set<Comment> getComments(String slug) {
+        return articleFindService.getArticleBySlug(slug)
+                .map(Article::getComments)
                 .orElseThrow(NoSuchElementException::new);
     }
 

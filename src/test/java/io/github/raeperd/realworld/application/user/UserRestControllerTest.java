@@ -23,6 +23,7 @@ import static java.util.Optional.of;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyLong;
 import static org.mockito.Mockito.when;
+import static org.springframework.http.HttpHeaders.AUTHORIZATION;
 import static org.springframework.http.MediaType.APPLICATION_JSON;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
@@ -73,6 +74,18 @@ class UserRestControllerTest {
         mockMvc.perform(post("/users/login")
                 .contentType(APPLICATION_JSON)
                 .content(objectMapper.writeValueAsString(sampleLoginDTO())))
+                .andExpect(status().isOk())
+                .andExpect(IntegrationTestUtils.validUserModel());
+    }
+
+    @Test
+    void when_login_with_invalid_authorization_header_expect_ignore_token() throws Exception {
+        when(userService.login(new Email("user@email.com"), "password")).thenReturn(of(sampleUser()));
+
+        mockMvc.perform(post("/users/login")
+                        .header(AUTHORIZATION, "Token token-invalid")
+                        .contentType(APPLICATION_JSON)
+                        .content(objectMapper.writeValueAsString(sampleLoginDTO())))
                 .andExpect(status().isOk())
                 .andExpect(IntegrationTestUtils.validUserModel());
     }

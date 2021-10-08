@@ -1,11 +1,14 @@
 package io.github.raeperd.realworld.application.article.comment;
 
 import io.github.raeperd.realworld.domain.article.comment.CommentService;
+import io.github.raeperd.realworld.domain.jwt.JWTPayload;
 import io.github.raeperd.realworld.infrastructure.jwt.UserJWTPayload;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
 
 import javax.validation.Valid;
+
+import static java.util.Optional.ofNullable;
 
 @RestController
 class CommentRestController {
@@ -26,7 +29,10 @@ class CommentRestController {
     @GetMapping("/articles/{slug}/comments")
     public MultipleCommentModel getComments(@AuthenticationPrincipal UserJWTPayload jwtPayload,
                                             @PathVariable String slug) {
-        final var comments = commentService.getComments(jwtPayload.getUserId(), slug);
+        final var comments = ofNullable(jwtPayload)
+                .map(JWTPayload::getUserId)
+                .map(userId -> commentService.getComments(userId, slug))
+                .orElseGet(() -> commentService.getComments(slug));
         return MultipleCommentModel.fromComments(comments);
     }
 

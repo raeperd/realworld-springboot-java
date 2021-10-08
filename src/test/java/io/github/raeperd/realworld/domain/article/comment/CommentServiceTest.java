@@ -11,9 +11,11 @@ import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 
 import java.util.NoSuchElementException;
+import java.util.Set;
 
 import static java.util.Optional.empty;
 import static java.util.Optional.of;
+import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.mockito.BDDMockito.given;
 import static org.mockito.BDDMockito.then;
@@ -42,6 +44,23 @@ class CommentServiceTest {
         assertThatThrownBy(() ->
                 commentService.deleteCommentById(1L, "slug", 2L)
         ).isInstanceOf(NoSuchElementException.class);
+    }
+
+    @Test
+    void when_articleFindService_return_empty_expect_NoSuchElementException_without_userId() {
+        when(articleFindService.getArticleBySlug("slug")).thenReturn(empty());
+
+        assertThatThrownBy(() -> commentService.getComments("slug")).isInstanceOf(NoSuchElementException.class);
+    }
+
+    @Test
+    void given_articleFindService_return_article_then_return_comments_of_article(@Mock Article article, @Mock Comment comment) {
+        given(articleFindService.getArticleBySlug("slug")).willReturn(of(article));
+        given(article.getComments()).willReturn(Set.of(comment));
+
+        assertThat(commentService.getComments("slug")).contains(comment);
+
+        then(article).should(times(1)).getComments();
     }
 
     @Test
