@@ -1,9 +1,6 @@
 
 ![RealWorld example apps cover](./doc/image/realworld-cover.png)
 [![Build](https://github.com/raeperd/realworld-springboot-java/actions/workflows/build.yml/badge.svg)](https://github.com/raeperd/realworld-springboot-java/actions/workflows/build.yml)
-[![Lines of Code](https://sonarcloud.io/api/project_badges/measure?project=raeperd_realworld-springboot-java&metric=ncloc)](https://sonarcloud.io/dashboard?id=raeperd_realworld-springboot-java)
-[![Coverage](https://sonarcloud.io/api/project_badges/measure?project=raeperd_realworld-springboot-java&metric=coverage)](https://sonarcloud.io/dashboard?id=raeperd_realworld-springboot-java)
-[![Reliability Rating](https://sonarcloud.io/api/project_badges/measure?project=raeperd_realworld-springboot-java&metric=reliability_rating)](https://sonarcloud.io/dashboard?id=raeperd_realworld-springboot-java)
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
 
 [ReadWorld.io](https://github.com/gothinkster/realworld) backend project using spring boot java using `spring-security`, `spring-data-jpa`
