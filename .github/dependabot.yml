@@ -13,7 +13,6 @@ updates:
       gradle-plugins:
         patterns:
           - "org.ec4j.editorconfig"
-          - "org.sonarqube"
           - "io.freefair.lombok"
           - "com.google.cloud.tools.jib"
       test-dependencies:
