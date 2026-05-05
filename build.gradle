@@ -25,7 +25,7 @@ dependencies {
     runtimeOnly 'com.h2database:h2'
     testImplementation 'org.springframework.boot:spring-boot-starter-test'
     testImplementation 'org.springframework.security:spring-security-test'
-    testImplementation 'org.mockito:mockito-inline:3.12.1'
+    testImplementation 'org.mockito:mockito-inline:5.2.0'
 }
 
 apply from: 'test.gradle'
