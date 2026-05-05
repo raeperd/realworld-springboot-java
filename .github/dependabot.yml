@@ -1,0 +1,30 @@
+version: 2
+updates:
+  - package-ecosystem: "gradle"
+    directory: "/"
+    schedule:
+      interval: "weekly"
+    open-pull-requests-limit: 5
+    groups:
+      spring:
+        patterns:
+          - "org.springframework.boot*"
+          - "io.spring.dependency-management"
+      gradle-plugins:
+        patterns:
+          - "org.ec4j.editorconfig"
+          - "io.freefair.lombok"
+          - "com.google.cloud.tools.jib"
+      test-dependencies:
+        patterns:
+          - "org.mockito*"
+
+  - package-ecosystem: "github-actions"
+    directory: "/"
+    schedule:
+      interval: "weekly"
+    open-pull-requests-limit: 5
+    groups:
+      github-actions:
+        patterns:
+          - "*"
