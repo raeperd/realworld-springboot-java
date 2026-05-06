@@ -6,7 +6,6 @@ import java.util.regex.Pattern;
 
 import static java.util.regex.Pattern.compile;
 import static org.hamcrest.Matchers.matchesPattern;
-import static org.springframework.test.web.servlet.ResultMatcher.matchAll;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 
 public class IntegrationTestUtils {
@@ -21,6 +20,14 @@ public class IntegrationTestUtils {
     static final String CELEB_USERNAME = "celeb_" + USERNAME;
 
     private IntegrationTestUtils() {
+    }
+
+    private static ResultMatcher matchAll(ResultMatcher... matchers) {
+        return result -> {
+            for (ResultMatcher matcher : matchers) {
+                matcher.match(result);
+            }
+        };
     }
 
     public static ResultMatcher validUserModel() {

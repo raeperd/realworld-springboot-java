@@ -7,7 +7,7 @@ import io.github.raeperd.realworld.domain.user.UserName;
 import io.github.raeperd.realworld.domain.user.UserSignUpRequest;
 import lombok.Value;
 
-import javax.validation.constraints.NotBlank;
+import jakarta.validation.constraints.NotBlank;
 
 import static com.fasterxml.jackson.annotation.JsonTypeInfo.As.WRAPPER_OBJECT;
 import static com.fasterxml.jackson.annotation.JsonTypeInfo.Id.NAME;
@@ -17,7 +17,7 @@ import static com.fasterxml.jackson.annotation.JsonTypeInfo.Id.NAME;
 @Value
 class UserPostRequestDTO {
 
-    @javax.validation.constraints.Email
+    @jakarta.validation.constraints.Email
     String email;
     @NotBlank
     String username;

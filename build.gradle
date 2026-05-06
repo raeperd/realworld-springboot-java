@@ -1,6 +1,6 @@
 plugins {
-    id 'org.springframework.boot' version '2.5.2'
-    id 'io.spring.dependency-management' version '1.0.11.RELEASE'
+    id 'org.springframework.boot' version '4.0.6'
+    id 'io.spring.dependency-management' version '1.1.7'
     id 'java'
     id 'jacoco'
     id "io.freefair.lombok" version "9.5.0"
@@ -10,7 +10,10 @@ plugins {
 
 group = 'io.github.raeperd'
 version = '2.1.1'
-sourceCompatibility = '17'
+
+java {
+    sourceCompatibility = JavaVersion.VERSION_17
+}
 
 repositories {
     mavenCentral()
@@ -24,6 +27,9 @@ dependencies {
 
     runtimeOnly 'com.h2database:h2'
     testImplementation 'org.springframework.boot:spring-boot-starter-test'
+    testImplementation 'org.springframework.boot:spring-boot-webmvc-test'
+    testImplementation 'org.springframework.boot:spring-boot-data-jpa-test'
+    testImplementation 'org.springframework.boot:spring-boot-security-test'
     testImplementation 'org.springframework.security:spring-security-test'
     testImplementation 'org.mockito:mockito-inline:5.2.0'
 }
@@ -36,7 +42,7 @@ test {
 
 jib {
     from {
-        image = "openjdk:11.0.10-jre-buster"
+        image = "eclipse-temurin:17-jre"
         platforms {
             platform {
                 architecture = 'amd64'

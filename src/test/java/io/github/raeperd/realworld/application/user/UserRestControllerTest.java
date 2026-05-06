@@ -1,6 +1,6 @@
 package io.github.raeperd.realworld.application.user;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
+import tools.jackson.databind.ObjectMapper;
 import io.github.raeperd.realworld.IntegrationTestUtils;
 import io.github.raeperd.realworld.application.security.WithMockJWTUser;
 import io.github.raeperd.realworld.domain.jwt.JWTDeserializer;
@@ -12,8 +12,8 @@ import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.Arguments;
 import org.junit.jupiter.params.provider.MethodSource;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
-import org.springframework.boot.test.mock.mockito.MockBean;
+import org.springframework.boot.webmvc.test.autoconfigure.WebMvcTest;
+import org.springframework.test.context.bean.override.mockito.MockitoBean;
 import org.springframework.test.web.servlet.MockMvc;
 
 import java.util.stream.Stream;
@@ -35,11 +35,11 @@ class UserRestControllerTest {
     private MockMvc mockMvc;
     @Autowired
     private ObjectMapper objectMapper;
-    @MockBean
+    @MockitoBean
     private UserService userService;
-    @MockBean
+    @MockitoBean
     private JWTSerializer jwtSerializer;
-    @MockBean
+    @MockitoBean
     private JWTDeserializer jwtDeserializer;
 
     @BeforeEach

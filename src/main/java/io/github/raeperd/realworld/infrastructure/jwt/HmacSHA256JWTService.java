@@ -1,6 +1,6 @@
 package io.github.raeperd.realworld.infrastructure.jwt;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
+import tools.jackson.databind.ObjectMapper;
 import io.github.raeperd.realworld.domain.jwt.JWTDeserializer;
 import io.github.raeperd.realworld.domain.jwt.JWTPayload;
 import io.github.raeperd.realworld.domain.jwt.JWTSerializer;

@@ -2,12 +2,12 @@ package io.github.raeperd.realworld.domain.article;
 
 import io.github.raeperd.realworld.domain.article.tag.Tag;
 
-import javax.persistence.*;
+import jakarta.persistence.*;
 import java.util.HashSet;
 import java.util.Set;
 
-import static javax.persistence.CascadeType.PERSIST;
-import static javax.persistence.FetchType.EAGER;
+import static jakarta.persistence.CascadeType.PERSIST;
+import static jakarta.persistence.FetchType.EAGER;
 
 @Embeddable
 public class ArticleContents {

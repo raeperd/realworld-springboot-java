@@ -1,5 +1,7 @@
 package io.github.raeperd.realworld.infrastructure.jwt;
 
+import com.fasterxml.jackson.annotation.JsonCreator;
+import com.fasterxml.jackson.annotation.JsonProperty;
 import io.github.raeperd.realworld.domain.jwt.JWTPayload;
 import io.github.raeperd.realworld.domain.user.User;
 
@@ -17,7 +19,10 @@ public class UserJWTPayload implements JWTPayload {
         return new UserJWTPayload(user.getId(), valueOf(user.getEmail()), epochSecondExpired);
     }
 
-    UserJWTPayload(long sub, String name, long iat) {
+    @JsonCreator
+    UserJWTPayload(@JsonProperty("sub") long sub,
+                   @JsonProperty("name") String name,
+                   @JsonProperty("iat") long iat) {
         this.sub = sub;
         this.name = name;
         this.iat = iat;

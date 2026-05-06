@@ -1,7 +1,6 @@
 package io.github.raeperd.realworld.infrastructure.jwt;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
-import com.fasterxml.jackson.module.paramnames.ParameterNamesModule;
+import tools.jackson.databind.ObjectMapper;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -11,7 +10,6 @@ import org.springframework.boot.test.autoconfigure.json.JsonTest;
 
 import java.nio.charset.StandardCharsets;
 
-import static com.fasterxml.jackson.annotation.JsonCreator.Mode.PROPERTIES;
 import static io.github.raeperd.realworld.domain.user.UserTestUtils.userWithIdAndEmail;
 import static io.github.raeperd.realworld.infrastructure.jwt.Base64URL.base64URLFromBytes;
 import static io.github.raeperd.realworld.infrastructure.jwt.Base64URL.base64URLFromString;
@@ -34,7 +32,6 @@ class HmacSHA256JWTServiceTest {
 
     @BeforeEach
     void initializeService() {
-        objectMapper.registerModule(new ParameterNamesModule(PROPERTIES));
         this.jwtService = new HmacSHA256JWTService(SECRET, 3, objectMapper);
     }
 
