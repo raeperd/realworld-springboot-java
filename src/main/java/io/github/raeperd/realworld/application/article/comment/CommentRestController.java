@@ -6,7 +6,7 @@ import io.github.raeperd.realworld.infrastructure.jwt.UserJWTPayload;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
 
-import javax.validation.Valid;
+import jakarta.validation.Valid;
 
 import static java.util.Optional.ofNullable;
 

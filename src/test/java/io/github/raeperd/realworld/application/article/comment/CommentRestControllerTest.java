@@ -5,8 +5,8 @@ import io.github.raeperd.realworld.domain.article.comment.CommentService;
 import io.github.raeperd.realworld.domain.jwt.JWTDeserializer;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
-import org.springframework.boot.test.mock.mockito.MockBean;
+import org.springframework.boot.webmvc.test.autoconfigure.WebMvcTest;
+import org.springframework.test.context.bean.override.mockito.MockitoBean;
 import org.springframework.test.web.servlet.MockMvc;
 
 import static java.util.Collections.emptySet;
@@ -21,9 +21,9 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 @WebMvcTest(CommentRestController.class)
 class CommentRestControllerTest {
 
-    @MockBean
+    @MockitoBean
     private CommentService commentService;
-    @MockBean
+    @MockitoBean
     private JWTDeserializer jwtDeserializer;
 
     @Autowired

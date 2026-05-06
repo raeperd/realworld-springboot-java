@@ -6,14 +6,14 @@ import io.github.raeperd.realworld.domain.article.ArticleUpdateRequest;
 import io.github.raeperd.realworld.domain.article.comment.Comment;
 import org.springframework.security.crypto.password.PasswordEncoder;
 
-import javax.persistence.*;
+import jakarta.persistence.*;
 import java.util.HashSet;
 import java.util.Objects;
 import java.util.Set;
 
 import static java.util.stream.Collectors.toSet;
-import static javax.persistence.CascadeType.REMOVE;
-import static javax.persistence.GenerationType.IDENTITY;
+import static jakarta.persistence.CascadeType.REMOVE;
+import static jakarta.persistence.GenerationType.IDENTITY;
 
 @Table(name = "users")
 @Entity

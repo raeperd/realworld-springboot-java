@@ -9,7 +9,7 @@ import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.web.bind.annotation.*;
 
-import javax.validation.Valid;
+import jakarta.validation.Valid;
 
 import static io.github.raeperd.realworld.application.user.UserModel.fromUserAndToken;
 import static org.springframework.http.ResponseEntity.of;

@@ -1,7 +1,7 @@
 package io.github.raeperd.realworld.domain.user;
 
-import javax.persistence.Column;
-import javax.persistence.Embeddable;
+import jakarta.persistence.Column;
+import jakarta.persistence.Embeddable;
 import java.util.Objects;
 
 @Embeddable

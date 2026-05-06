@@ -7,8 +7,8 @@ import io.github.raeperd.realworld.domain.article.ArticleTitle;
 import io.github.raeperd.realworld.domain.article.tag.Tag;
 import lombok.Value;
 
-import javax.validation.constraints.NotBlank;
-import javax.validation.constraints.NotNull;
+import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.NotNull;
 import java.util.Set;
 
 import static com.fasterxml.jackson.annotation.JsonTypeInfo.As.WRAPPER_OBJECT;
