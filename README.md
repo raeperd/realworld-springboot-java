@@ -103,8 +103,9 @@ Result of [`./doc/run-api-tests.sh`](./doc/run-api-tests.sh), run 100 times for 
 |---|---:|---:|---:|---:|---:|---:|---:|---:|---:|---:|
 | Before Spring Boot 4 upgrade (`d9c19f1`) | 100 | 3100 | 0 | 21.64ms | 6.0ms | 113ms | 123ms | 137ms | 188ms | 16.848s |
 | After Spring Boot 4 upgrade (`18432fa`) | 100 | 3100 | 0 | 21.10ms | 6.0ms | 115ms | 119ms | 131ms | 233ms | 16.866s |
+| Java 25 with virtual threads | 100 | 3100 | 0 | 20.31ms | 6.0ms | 104ms | 116ms | 128ms | 210ms | 16.765s |
 
-Current version is not meaningfully slower overall. Average and tail latency are slightly better, with one higher max outlier.
+Java 25 with virtual threads is not meaningfully slower than the Java 17 baseline. Average response time and tail latency were slightly better in this local run.
 
 # What can be done more
 

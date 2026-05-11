@@ -12,7 +12,7 @@ group = 'io.github.raeperd'
 version = '2.1.1'
 
 java {
-    sourceCompatibility = JavaVersion.VERSION_17
+    sourceCompatibility = JavaVersion.VERSION_25
 }
 
 repositories {
@@ -42,7 +42,7 @@ test {
 
 jib {
     from {
-        image = "eclipse-temurin:17-jre"
+        image = "eclipse-temurin:25-jre"
         platforms {
             platform {
                 architecture = 'amd64'
