@@ -5,7 +5,6 @@ import com.fasterxml.jackson.annotation.JsonTypeName;
 import io.github.raeperd.realworld.domain.article.ArticleContents;
 import io.github.raeperd.realworld.domain.article.ArticleTitle;
 import io.github.raeperd.realworld.domain.article.tag.Tag;
-import lombok.Value;
 
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
@@ -16,17 +15,11 @@ import static com.fasterxml.jackson.annotation.JsonTypeInfo.Id.NAME;
 
 @JsonTypeName("article")
 @JsonTypeInfo(include = WRAPPER_OBJECT, use = NAME)
-@Value
-class ArticlePostRequestDTO {
-
-    @NotBlank
-    String title;
-    @NotBlank
-    String description;
-    @NotBlank
-    String body;
-    @NotNull
-    Set<Tag> tagList;
+record ArticlePostRequestDTO(
+        @NotBlank String title,
+        @NotBlank String description,
+        @NotBlank String body,
+        @NotNull Set<Tag> tagList) {
 
     ArticleContents toArticleContents() {
         return new ArticleContents(description, ArticleTitle.of(title), body, tagList);

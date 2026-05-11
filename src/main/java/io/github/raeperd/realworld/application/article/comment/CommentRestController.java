@@ -22,7 +22,7 @@ class CommentRestController {
     @PostMapping("/articles/{slug}/comments")
     public CommentModel postComments(@AuthenticationPrincipal UserJWTPayload jwtPayload,
                                      @PathVariable String slug, @Valid @RequestBody CommentPostRequestDTO dto) {
-        final var commentAdded = commentService.createComment(jwtPayload.getUserId(), slug, dto.getBody());
+        final var commentAdded = commentService.createComment(jwtPayload.getUserId(), slug, dto.body());
         return CommentModel.fromComment(commentAdded);
     }
 
