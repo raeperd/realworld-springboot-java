@@ -29,8 +29,6 @@ dependencies {
     testImplementation 'org.springframework.boot:spring-boot-webmvc-test'
     testImplementation 'org.springframework.boot:spring-boot-data-jpa-test'
     testImplementation 'org.springframework.boot:spring-boot-security-test'
-    testImplementation 'org.springframework.security:spring-security-test'
-    testImplementation 'org.mockito:mockito-inline:5.2.0'
 }
 
 apply from: 'test.gradle'
