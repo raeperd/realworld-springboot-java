@@ -5,7 +5,6 @@ import com.fasterxml.jackson.annotation.JsonTypeName;
 import io.github.raeperd.realworld.domain.user.Email;
 import io.github.raeperd.realworld.domain.user.UserName;
 import io.github.raeperd.realworld.domain.user.UserSignUpRequest;
-import lombok.Value;
 
 import jakarta.validation.constraints.NotBlank;
 
@@ -14,15 +13,10 @@ import static com.fasterxml.jackson.annotation.JsonTypeInfo.Id.NAME;
 
 @JsonTypeName("user")
 @JsonTypeInfo(include = WRAPPER_OBJECT, use = NAME)
-@Value
-class UserPostRequestDTO {
-
-    @jakarta.validation.constraints.Email
-    String email;
-    @NotBlank
-    String username;
-    @NotBlank
-    String password;
+record UserPostRequestDTO(
+        @jakarta.validation.constraints.Email String email,
+        @NotBlank String username,
+        @NotBlank String password) {
 
     UserSignUpRequest toSignUpRequest() {
         return new UserSignUpRequest(
@@ -30,5 +24,4 @@ class UserPostRequestDTO {
                 new UserName(username),
                 password);
     }
-
 }

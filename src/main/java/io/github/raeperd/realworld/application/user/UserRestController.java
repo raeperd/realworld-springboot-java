@@ -33,7 +33,7 @@ class UserRestController {
 
     @PostMapping("/users/login")
     public ResponseEntity<UserModel> loginUser(@Valid @RequestBody UserLoginRequestDTO dto) {
-        return of(userService.login(new Email(dto.getEmail()), dto.getPassword())
+        return of(userService.login(new Email(dto.email()), dto.password())
                 .map(user -> fromUserAndToken(user, jwtSerializer.jwtFromUser(user))));
     }
 

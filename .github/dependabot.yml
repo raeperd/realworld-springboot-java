@@ -4,6 +4,8 @@ updates:
     directory: "/"
     schedule:
       interval: "weekly"
+    cooldown:
+      default-days: 7
     open-pull-requests-limit: 5
     groups:
       spring:
@@ -13,16 +15,13 @@ updates:
       gradle-plugins:
         patterns:
           - "org.ec4j.editorconfig"
-          - "io.freefair.lombok"
           - "com.google.cloud.tools.jib"
-      test-dependencies:
-        patterns:
-          - "org.mockito*"
-
   - package-ecosystem: "github-actions"
     directory: "/"
     schedule:
       interval: "weekly"
+    cooldown:
+      default-days: 7
     open-pull-requests-limit: 5
     groups:
       github-actions:

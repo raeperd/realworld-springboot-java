@@ -6,7 +6,6 @@ import io.github.raeperd.realworld.domain.user.Email;
 import io.github.raeperd.realworld.domain.user.Image;
 import io.github.raeperd.realworld.domain.user.UserName;
 import io.github.raeperd.realworld.domain.user.UserUpdateRequest;
-import lombok.Value;
 
 import static com.fasterxml.jackson.annotation.JsonTypeInfo.As.WRAPPER_OBJECT;
 import static com.fasterxml.jackson.annotation.JsonTypeInfo.Id.NAME;
@@ -14,14 +13,7 @@ import static java.util.Optional.ofNullable;
 
 @JsonTypeName("user")
 @JsonTypeInfo(include = WRAPPER_OBJECT, use = NAME)
-@Value
-class UserPutRequestDTO {
-
-    String email;
-    String username;
-    String password;
-    String bio;
-    String image;
+record UserPutRequestDTO(String email, String username, String password, String bio, String image) {
 
     UserUpdateRequest toUpdateRequest() {
         return UserUpdateRequest.builder()
