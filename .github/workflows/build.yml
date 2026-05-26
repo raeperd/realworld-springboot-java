@@ -27,7 +27,7 @@ jobs:
         with:
           path: build/libs/*.jar
 
-      - uses: docker/login-action@v4
+      - uses: docker/login-action@v4.1.0
         if: github.event_name == 'push'
         with:
           registry: ghcr.io/raeperd
