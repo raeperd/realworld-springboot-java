@@ -33,6 +33,11 @@ jobs:
           registry: ghcr.io/raeperd
           username: ${{ github.actor }}
           password: ${{ secrets.GITHUB_TOKEN }}
+      - name: Get branch name
+        if: github.event_name == 'push' && github.actor != 'dependabot[bot]'
+        run: |
+          BRANCH_NAME=$(printf '%s' "$GITHUB_REF_NAME" | tr '/#' '-')
+          echo "BRANCH_NAME=$BRANCH_NAME" >> "$GITHUB_ENV"
       - name: Build container image
         if: github.event_name == 'push' && github.actor != 'dependabot[bot]'
         run: ./gradlew jib -Djib.to.tags="$BRANCH_NAME"
