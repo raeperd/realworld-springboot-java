@@ -4,7 +4,7 @@ plugins {
     id 'java'
     id 'jacoco'
     id "org.ec4j.editorconfig" version "0.1.0"
-    id 'com.google.cloud.tools.jib' version '3.5.3'
+    id 'com.google.cloud.tools.jib' version '3.5.4'
 }
 
 group = 'io.github.raeperd'
